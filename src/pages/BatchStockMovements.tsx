@@ -5,8 +5,7 @@ import type { Supplier } from '../types/supplier';
 import { ingredientService } from '../services/ingredientService';
 import { supplierService } from '../services/supplierService';
 import { stockService } from '../services/stockService';
-import type { StockMovementType } from '../types/stock';
-import { MdAdd, MdDelete, MdCheckCircle, MdClose, MdDescription } from 'react-icons/md';
+import { MdAdd, MdRemove, MdDelete, MdCheckCircle, MdClose, MdDescription } from 'react-icons/md';
 
 interface BatchMovementItem {
   id: string;
@@ -15,6 +14,7 @@ interface BatchMovementItem {
   quantity: number;
   unitCost: number;
   unit?: string;
+  type: 'IN' | 'OUT';
 }
 
 export function BatchStockMovements() {
@@ -26,6 +26,7 @@ export function BatchStockMovements() {
   const [supplierId, setSupplierId] = useState<string>('');
   const [ingredientSearch, setIngredientSearch] = useState<Record<string, string>>({});
   const [showSuggestions, setShowSuggestions] = useState<Record<string, boolean>>({});
+  const [stockSummaries, setStockSummaries] = useState<Record<string, { quantityOnHand: number; lastEntryUnitCost?: number }>>({});
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -41,12 +42,18 @@ export function BatchStockMovements() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [ingredientsData, suppliersData] = await Promise.all([
+      const [ingredientsData, suppliersData, stockMap] = await Promise.all([
         ingredientService.getAll(),
         supplierService.getAll(),
+        stockService.getSummaryAll(),
       ]);
       setIngredients(ingredientsData);
       setSuppliers(suppliersData);
+      const summaries: Record<string, { quantityOnHand: number; lastEntryUnitCost?: number }> = {};
+      Object.values(stockMap).forEach((s: any) => {
+        summaries[s.ingredientId] = { quantityOnHand: s.quantityOnHand, lastEntryUnitCost: s.lastEntryUnitCost };
+      });
+      setStockSummaries(summaries);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -54,12 +61,13 @@ export function BatchStockMovements() {
     }
   };
 
-  const addMovementItem = () => {
+  const addMovementItem = (type: 'IN' | 'OUT') => {
     const newItem: BatchMovementItem = {
       id: Date.now().toString(),
       ingredientId: '',
       quantity: 0,
       unitCost: 0,
+      type: type,
     };
     setMovementItems([...movementItems, newItem]);
   };
@@ -129,13 +137,24 @@ export function BatchStockMovements() {
       return;
     }
 
-    const invalidItems = movementItems.filter(item => 
-      !item.ingredientId || item.quantity <= 0 || item.unitCost <= 0
-    );
-
-    if (invalidItems.length > 0) {
-      alert('Preencha todos os campos obrigatórios de todos os itens');
-      return;
+    // Validar itens
+    for (const item of movementItems) {
+      if (!item.ingredientId || item.quantity <= 0) {
+        alert('Preencha todos os campos obrigatórios de todos os itens');
+        return;
+      }
+      if (item.type === 'IN' && item.unitCost <= 0) {
+        alert('Informe o custo unitário para itens de entrada');
+        return;
+      }
+      if (item.type === 'OUT') {
+        const currentStock = stockSummaries[item.ingredientId]?.quantityOnHand ?? 0;
+        if (item.quantity > currentStock) {
+          const ingredientName = ingredients.find(i => i.id === item.ingredientId)?.name || 'Item';
+          alert(`Estoque insuficiente para ${ingredientName}! Disponível: ${currentStock}, Solicitado: ${item.quantity}`);
+          return;
+        }
+      }
     }
 
     try {
@@ -144,9 +163,9 @@ export function BatchStockMovements() {
         movementItems.map(item =>
           stockService.create({
             ingredientId: item.ingredientId,
-            type: 'IN' as StockMovementType,
+            type: item.type,
             quantity: item.quantity,
-            unitCost: item.unitCost,
+            unitCost: item.type === 'IN' ? item.unitCost : undefined,
             date: movementDate,
           })
         )
@@ -202,10 +221,10 @@ export function BatchStockMovements() {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
+          <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Movimentações em Lote</h1>
           <p className="mt-2 text-gray-600">
-            Adicione múltiplos itens de uma vez para importar nota fiscal e fazer conciliação
+            Adicione múltiplos itens de uma vez para importar nota fiscal, fazer conciliação ou registrar saídas de estoque
           </p>
         </div>
 
@@ -244,21 +263,30 @@ export function BatchStockMovements() {
 
           {/* Itens de movimentação */}
           <div className="mb-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Itens da Nota Fiscal</h2>
-              <button
-                onClick={addMovementItem}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-              >
-                <MdAdd className="w-5 h-5" />
-                Adicionar Item
-              </button>
+                                <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Movimentações</h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => addMovementItem('IN')}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                >
+                  <MdAdd className="w-5 h-5" />
+                  Adicionar Entrada
+                </button>
+                <button
+                  onClick={() => addMovementItem('OUT')}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+                >
+                  <MdRemove className="w-5 h-5" />
+                  Adicionar Saída
+                </button>
+              </div>
             </div>
 
             {movementItems.length === 0 ? (
               <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
                 <MdDescription className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500">Nenhum item adicionado. Clique em "Adicionar Item" para começar.</p>
+                <p className="text-gray-500">Nenhum item adicionado. Clique em "Adicionar Entrada" ou "Adicionar Saída" para começar.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -285,7 +313,8 @@ export function BatchStockMovements() {
                   <tbody className="divide-y divide-gray-200">
                     {movementItems.map((item) => {
                       const filtered = getFilteredIngredients(item.id);
-                      const itemTotal = item.quantity * item.unitCost;
+                      const itemTotal = item.type === 'IN' ? (item.quantity * item.unitCost) : 0;
+                      const currentStock = item.ingredientId ? (stockSummaries[item.ingredientId]?.quantityOnHand ?? 0) : 0;
 
                       return (
                         <tr key={item.id} className="hover:bg-gray-50">
@@ -301,6 +330,9 @@ export function BatchStockMovements() {
                             {item.ingredientId && (
                               <div className="text-xs text-gray-500 mt-1">
                                 {item.ingredientName} ({item.unit})
+                                {item.type === 'OUT' && (
+                                  <span className="ml-2">| Estoque: {currentStock}</span>
+                                )}
                               </div>
                             )}
                             {showSuggestions[item.id] && filtered.length > 0 && (
@@ -321,30 +353,51 @@ export function BatchStockMovements() {
                             )}
                           </td>
                           <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className={`px-3 py-2 rounded text-sm font-medium ${
+                                item.type === 'IN' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {item.type === 'IN' ? 'Entrada' : 'Saída'}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
                             <input
                               type="number"
                               step="0.001"
                               min="0"
+                              max={item.type === 'OUT' && item.ingredientId ? currentStock : undefined}
                               value={item.quantity || ''}
                               onChange={(e) => updateMovementItem(item.id, { quantity: parseFloat(e.target.value) || 0 })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                               placeholder="0"
                             />
+                            {item.type === 'OUT' && item.ingredientId && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                Máx: {currentStock}
+                              </p>
+                            )}
                           </td>
                           <td className="px-4 py-3">
-                            <input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              value={item.unitCost || ''}
-                              onChange={(e) => updateMovementItem(item.id, { unitCost: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                              placeholder="0,00"
-                            />
+                            {item.type === 'IN' ? (
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={item.unitCost || ''}
+                                onChange={(e) => updateMovementItem(item.id, { unitCost: parseFloat(e.target.value) || 0 })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                placeholder="0,00"
+                              />
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
                           </td>
                           <td className="px-4 py-3 text-right">
                             <div className="font-medium text-gray-900">
-                              {formatCurrency(itemTotal)}
+                              {item.type === 'IN' ? formatCurrency(itemTotal) : '-'}
                             </div>
                           </td>
                           <td className="px-4 py-3 text-center">

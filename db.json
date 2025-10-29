@@ -149,11 +149,11 @@
       "code": "1",
       "name": "BLEND BOVINO",
       "pricePaid": 49.46,
-      "volume": 7.5,
+      "volume": 6.5,
       "unit": "KG",
       "correctionFactor": 1,
       "supplierId": "1",
-      "finalValue": 6.594666666666667,
+      "finalValue": 7.609230769230769,
       "supplierName": "MUNHOZ",
       "id": "1"
     },
@@ -948,6 +948,13 @@
       "unitCost": 62.5,
       "isInitial": true,
       "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 1,
+      "date": "2025-10-29T22:05:39.300Z",
+      "id": 37
     }
   ]
 }

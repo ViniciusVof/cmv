@@ -468,11 +468,11 @@ export function Ingredients() {
     setFormData({ ...formData, correctionFactor: factor });
   };
 
-  const openMovementForm = (ingredientId: string) => {
+  const openMovementForm = (ingredientId: string, type: StockMovementType = 'IN') => {
     // Determine if initial movement (no movements recorded for this ingredient)
     const isInitial = !stockSummaries[ingredientId] || (stockSummaries[ingredientId]?.quantityOnHand === 0 && !ingredientMovements[ingredientId]?.length);
-    setIsInitialMovement(isInitial);
-    setMovementType('IN');
+    setIsInitialMovement(isInitial && type === 'IN'); // Só marca como inicial se for entrada
+    setMovementType(type);
     setMovementQuantity(0);
     setMovementUnitCost(0);
     setMovementDate('');
@@ -496,6 +496,14 @@ export function Ingredients() {
     if (movementType === 'IN' && movementUnitCost <= 0) {
       alert('Informe o custo unitário da entrada');
       return;
+    }
+    if (movementType === 'OUT') {
+      // Validar se há estoque suficiente
+      const currentStock = stockSummaries[ingredientId]?.quantityOnHand ?? 0;
+      if (movementQuantity > currentStock) {
+        alert(`Estoque insuficiente! Disponível: ${currentStock}, Solicitado: ${movementQuantity}`);
+        return;
+      }
     }
 
     try {
@@ -1061,66 +1069,81 @@ export function Ingredients() {
                             {/* Header do Submenu */}
                             <div className="flex justify-between items-center">
                               <h3 className="text-lg font-semibold text-gray-800">Movimentações de Estoque</h3>
-                              <button
-                                onClick={() => openMovementForm(ingredient.id)}
-                                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                              >
-                                <MdAdd className="w-5 h-5" />
-                                Nova Movimentação
-                              </button>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => openMovementForm(ingredient.id, 'IN')}
+                                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                                >
+                                  <MdAdd className="w-5 h-5" />
+                                  Adicionar Entrada
+                                </button>
+                                <button
+                                  onClick={() => openMovementForm(ingredient.id, 'OUT')}
+                                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+                                >
+                                  <MdRemove className="w-5 h-5" />
+                                  Adicionar Saída
+                                </button>
+                              </div>
                             </div>
 
                             {/* Formulário de Nova Movimentação */}
                             {showFormForMovement && (
                               <div className="bg-white border border-gray-200 rounded-lg p-4">
-                                <h4 className="text-md font-semibold text-gray-800 mb-4">Nova Movimentação</h4>
+                                <div className="flex items-center justify-between mb-4">
+                                  <h4 className="text-md font-semibold text-gray-800">
+                                    {movementType === 'IN' ? 'Nova Entrada' : 'Nova Saída'}
+                                  </h4>
+                                  <span className={`px-3 py-1 rounded text-sm font-medium ${
+                                    movementType === 'IN' 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {movementType === 'IN' ? 'Entrada' : 'Saída'}
+                                  </span>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Tipo *</label>
-                                    <select
-                                      value={movementType}
-                                      onChange={(e) => setMovementType(e.target.value as StockMovementType)}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                    >
-                                      <option value="IN">Entrada</option>
-                                      <option value="OUT">Saída</option>
-                                    </select>
-                                  </div>
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Quantidade *</label>
                                     <input
                                       type="number"
                                       step="0.001"
                                       min="0"
+                                      max={movementType === 'OUT' ? stockSummaries[ingredient.id]?.quantityOnHand : undefined}
                                       value={movementQuantity || ''}
                                       onChange={(e) => setMovementQuantity(parseFloat(e.target.value) || 0)}
                                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     />
+                                    {movementType === 'OUT' && stockSummaries[ingredient.id] && (
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        Estoque disponível: {stockSummaries[ingredient.id].quantityOnHand} {ingredient.unit}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                      {movementType === 'IN' ? 'Data de Entrada' : 'Data de Saída'} (opcional)
+                                    </label>
+                                    <input
+                                      type="date"
+                                      value={movementDate}
+                                      onChange={(e) => setMovementDate(e.target.value)}
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Se não informado, será usada a data atual.</p>
                                   </div>
                                   {movementType === 'IN' && (
-                                    <>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Custo Unitário (R$) *</label>
-                                        <input
-                                          type="number"
-                                          step="0.01"
-                                          min="0"
-                                          value={movementUnitCost || ''}
-                                          onChange={(e) => setMovementUnitCost(parseFloat(e.target.value) || 0)}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Data de Entrada (opcional)</label>
-                                        <input
-                                          type="date"
-                                          value={movementDate}
-                                          onChange={(e) => setMovementDate(e.target.value)}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                        />
-                                        <p className="text-xs text-gray-500 mt-1">Se não informado, será usada a data atual.</p>
-                                      </div>
-                                    </>
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-2">Custo Unitário (R$) *</label>
+                                      <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        value={movementUnitCost || ''}
+                                        onChange={(e) => setMovementUnitCost(parseFloat(e.target.value) || 0)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                      />
+                                    </div>
                                   )}
                                 </div>
                                 <div className="flex justify-end gap-2 mt-4">
