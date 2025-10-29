@@ -413,6 +413,26 @@ export function Ingredients() {
           </button>
         </div>
 
+        {/* Insights */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="text-sm text-gray-500">Total de Insumos</div>
+            <div className="text-2xl font-bold text-gray-900">{ingredients.length}</div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="text-sm text-gray-500">Valor Final Médio</div>
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(ingredients.length ? (ingredients.reduce((s, i) => s + (i.finalValue || 0), 0) / ingredients.length) : 0)}</div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="text-sm text-gray-500">Mais Caro (R$ Final)</div>
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(Math.max(0, ...ingredients.map(i => i.finalValue || 0)))}</div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="text-sm text-gray-500">Fornecedores Únicos</div>
+            <div className="text-2xl font-bold text-gray-900">{new Set(ingredients.map(i => i.supplierId)).size}</div>
+          </div>
+        </div>
+
         {/* Form */}
         {showForm && (
           <div className="bg-white rounded-lg shadow p-6">

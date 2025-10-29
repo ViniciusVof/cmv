@@ -511,5 +511,83 @@
       "supplierId": "4",
       "supplierName": "FABRICAÇÃO"
     }
+  ],
+  "recipes": [
+    {
+      "code": "1",
+      "name": "Origin",
+      "description": "",
+      "isProduct": true,
+      "lossPercentage": 5,
+      "items": [
+        {
+          "id": "1761764122343-0",
+          "ingredientId": "2",
+          "ingredientCode": "2",
+          "ingredientName": "PÃO BRIOCHE MAX",
+          "netQuantity": 1,
+          "unit": "UN",
+          "correctionFactor": 1,
+          "unitCost": 2.6041666666666665,
+          "totalCost": 2.6041666666666665,
+          "percentage": 29.584691271415082
+        },
+        {
+          "id": "1761764122350-1",
+          "ingredientId": "1",
+          "ingredientCode": "1",
+          "ingredientName": "BLEND BOVINO",
+          "netQuantity": 0.15,
+          "unit": "KG",
+          "correctionFactor": 1,
+          "unitCost": 31.930277598450616,
+          "totalCost": 4.7895416397675925,
+          "percentage": 54.41169052573876
+        },
+        {
+          "id": "1761764122351-2",
+          "ingredientId": "3",
+          "ingredientCode": "3",
+          "ingredientName": "QUEIJO CHEDDAR VIGOR/POLENGUI",
+          "netQuantity": 2,
+          "unit": "UN",
+          "correctionFactor": 1,
+          "unitCost": 0.5191250000000001,
+          "totalCost": 1.0382500000000001,
+          "percentage": 11.795061393617937
+        },
+        {
+          "id": "1761764122352-3",
+          "ingredientId": "12",
+          "ingredientCode": "12",
+          "ingredientName": "MAIONESE BASE",
+          "netQuantity": 0.02,
+          "unit": "KG",
+          "correctionFactor": 1,
+          "unitCost": 18.52272727272727,
+          "totalCost": 0.3704545454545454,
+          "percentage": 4.20855680922821
+        }
+      ],
+      "markup": 3,
+      "recipeCost": 8.802412851888805,
+      "suggestedPrice": 26.407238555666417,
+      "suggestedIfoodPrice": 31.140611504323605,
+      "currentPrice": 28,
+      "currentIfoodPrice": 33,
+      "isCombo": false,
+      "grossProfit": 17.604825703777614,
+      "cmv": 33.33333333333333,
+      "createdAt": "2025-10-29T18:55:22.411Z",
+      "updatedAt": "2025-10-29T18:55:22.411Z",
+      "id": 1
+    }
+  ],
+  "businessSettings": [
+    {
+      "id": "1",
+      "markup": 3,
+      "ifoodTaxPercentage": 15.2
+    }
   ]
 }

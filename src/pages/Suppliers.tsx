@@ -171,6 +171,22 @@ export function Suppliers() {
   return (
     <Layout>
       <div className="space-y-6">
+        {/* Insights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="text-sm text-gray-500">Total de Fornecedores</div>
+            <div className="text-2xl font-bold text-gray-900">{suppliers.length}</div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="text-sm text-gray-500">Com Email</div>
+            <div className="text-2xl font-bold text-gray-900">{suppliers.filter(s => s.email).length}</div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="text-sm text-gray-500">Com Telefone</div>
+            <div className="text-2xl font-bold text-gray-900">{suppliers.filter(s => s.phone).length}</div>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>

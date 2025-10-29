@@ -5,6 +5,8 @@ import { FixedCost } from './pages/FixedCost';
 import { VariableCost } from './pages/VariableCost';
 import { Suppliers } from './pages/Suppliers';
 import { Ingredients } from './pages/Ingredients';
+import { Recipes } from './pages/Recipes';
+import { BusinessSettings } from './pages/BusinessSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './stores/authStore';
 
@@ -55,6 +57,22 @@ function App() {
           element={
             <ProtectedRoute>
               <Ingredients />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fichas-tecnicas"
+          element={
+            <ProtectedRoute>
+              <Recipes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/configuracoes"
+          element={
+            <ProtectedRoute>
+              <BusinessSettings />
             </ProtectedRoute>
           }
         />

@@ -12,10 +12,12 @@ const menuItems: MenuItem[] = [
   { name: 'PDV', icon: '🛒', path: '/pdv' },
   { name: 'Estoque', icon: '📦', path: '/estoque' },
   { name: 'Fornecedores', icon: '🏢', path: '/fornecedores' },
+  { name: 'Fichas Técnicas', icon: '📝', path: '/fichas-tecnicas' },
   { name: 'CMV', icon: '💵', path: '/cmv' },
   { name: 'CMV Global', icon: '📈', path: '/cmv-global' },
   { name: 'Custo Fixo', icon: '💰', path: '/custo-fixo' },
   { name: 'Custo Variável', icon: '📉', path: '/custo-variavel' },
+  { name: 'Configurações', icon: '⚙️', path: '/configuracoes' },
   { name: 'Relatórios', icon: '📋', path: '/relatorios' },
 ];
 

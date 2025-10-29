@@ -9,6 +9,7 @@ export interface Ingredient {
   finalValue: number; // Valor Final R$
   supplierId: string;
   supplierName: string;
+  isProduct?: boolean; // Se pode ser usado em outras fichas técnicas
 }
 
 export interface IngredientFormData {
