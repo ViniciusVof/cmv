@@ -3,6 +3,8 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { FixedCost } from './pages/FixedCost';
 import { VariableCost } from './pages/VariableCost';
+import { Suppliers } from './pages/Suppliers';
+import { Ingredients } from './pages/Ingredients';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './stores/authStore';
 
@@ -37,6 +39,22 @@ function App() {
           element={
             <ProtectedRoute>
               <VariableCost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fornecedores"
+          element={
+            <ProtectedRoute>
+              <Suppliers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/estoque"
+          element={
+            <ProtectedRoute>
+              <Ingredients />
             </ProtectedRoute>
           }
         />

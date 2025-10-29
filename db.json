@@ -1,21 +1,77 @@
 {
   "fixedCosts": [
-    { "id": "1", "name": "Aluguel", "value": 2500.00 },
-    { "id": "2", "name": "Água", "value": 150.00 },
-    { "id": "3", "name": "Luz", "value": 880.00 },
-    { "id": "4", "name": "Contador", "value": 200.00 },
-    { "id": "5", "name": "Entregador", "value": 2400.00 },
-    { "id": "6", "name": "Marketing", "value": 1100.00 },
-    { "id": "7", "name": "Gás", "value": 910.00 },
-    { "id": "8", "name": "Sistema", "value": 270.00 },
-    { "id": "9", "name": "Internet/Telefone", "value": 180.00 },
-    { "id": "10", "name": "Limpeza", "value": 120.00 },
-    { "id": "11", "name": "Reserva Operacional", "value": 300.00 }
+    {
+      "id": "1",
+      "name": "Aluguel",
+      "value": 2500
+    },
+    {
+      "id": "2",
+      "name": "Água",
+      "value": 150
+    },
+    {
+      "id": "3",
+      "name": "Luz",
+      "value": 880
+    },
+    {
+      "id": "4",
+      "name": "Contador",
+      "value": 200
+    },
+    {
+      "id": "5",
+      "name": "Entregador",
+      "value": 2400
+    },
+    {
+      "id": "6",
+      "name": "Marketing",
+      "value": 1100
+    },
+    {
+      "id": "7",
+      "name": "Gás",
+      "value": 910
+    },
+    {
+      "id": "8",
+      "name": "Sistema",
+      "value": 270
+    },
+    {
+      "id": "9",
+      "name": "Internet/Telefone",
+      "value": 180
+    },
+    {
+      "id": "10",
+      "name": "Limpeza",
+      "value": 120
+    },
+    {
+      "id": "11",
+      "name": "Reserva Operacional",
+      "value": 300
+    }
   ],
   "variableCosts": [
-    { "id": "1", "name": "Taxa de Cartão", "percentage": 3.0 },
-    { "id": "2", "name": "Simples Nacional", "percentage": 7.5 },
-    { "id": "3", "name": "Embalagem", "percentage": 4.5 }
+    {
+      "id": "1",
+      "name": "Taxa de Cartão",
+      "percentage": 3
+    },
+    {
+      "id": "2",
+      "name": "Simples Nacional",
+      "percentage": 7.5
+    },
+    {
+      "id": "3",
+      "name": "Embalagem",
+      "percentage": 4.5
+    }
   ],
   "users": [
     {
@@ -25,6 +81,435 @@
       "password": "123456",
       "role": "admin"
     }
+  ],
+  "suppliers": [
+    {
+      "id": "1",
+      "name": "MUNHOZ"
+    },
+    {
+      "id": "2",
+      "name": "ATTIMINO"
+    },
+    {
+      "id": "3",
+      "name": "SOS"
+    },
+    {
+      "id": "4",
+      "name": "FABRICAÇÃO"
+    },
+    {
+      "id": "5",
+      "name": "KOCH"
+    },
+    {
+      "id": "6",
+      "name": "FORT"
+    },
+    {
+      "id": "7",
+      "name": "PAMPLONA"
+    },
+    {
+      "id": "8",
+      "name": "DELLYS"
+    },
+    {
+      "id": "9",
+      "name": "24PRINT"
+    },
+    {
+      "id": "10",
+      "name": "MERCADO LIVRE"
+    },
+    {
+      "id": "11",
+      "name": "FITLAND"
+    },
+    {
+      "name": "teste",
+      "id": "4NQHDU3"
+    },
+    {
+      "name": "teste",
+      "id": "PVfxQbv"
+    }
+  ],
+  "ingredients": [
+    {
+      "id": "1",
+      "code": "1",
+      "name": "BLEND BOVINO",
+      "pricePaid": 49.46,
+      "volume": 1.549,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "1",
+      "supplierName": "MUNHOZ"
+    },
+    {
+      "id": "2",
+      "code": "2",
+      "name": "PÃO BRIOCHE MAX",
+      "pricePaid": 125,
+      "volume": 48,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "2",
+      "supplierName": "ATTIMINO"
+    },
+    {
+      "id": "3",
+      "code": "3",
+      "name": "QUEIJO CHEDDAR VIGOR/POLENGUI",
+      "pricePaid": 83.06,
+      "volume": 160,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "3",
+      "supplierName": "SOS"
+    },
+    {
+      "id": "4",
+      "code": "4",
+      "name": "CEBOLA CARAMELIZADA",
+      "pricePaid": 8.77,
+      "volume": 0.9,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "4",
+      "supplierName": "FABRICAÇÃO"
+    },
+    {
+      "id": "5",
+      "code": "5",
+      "name": "ALFACE",
+      "pricePaid": 4.49,
+      "volume": 0.356,
+      "unit": "KG",
+      "correctionFactor": 1.11,
+      "supplierId": "5",
+      "supplierName": "KOCH"
+    },
+    {
+      "id": "6",
+      "code": "6",
+      "name": "CEBOLA",
+      "pricePaid": 0.36,
+      "volume": 0.079,
+      "unit": "KG",
+      "correctionFactor": 1.67,
+      "supplierId": "5",
+      "supplierName": "KOCH"
+    },
+    {
+      "id": "7",
+      "code": "7",
+      "name": "DORITOS",
+      "pricePaid": 16.98,
+      "volume": 0.3,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "6",
+      "supplierName": "FORT"
+    },
+    {
+      "id": "8",
+      "code": "8",
+      "name": "BACON",
+      "pricePaid": 284.1,
+      "volume": 7.5,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "7",
+      "supplierName": "PAMPLONA"
+    },
+    {
+      "id": "9",
+      "code": "9",
+      "name": "CEBOLA CRISPY",
+      "pricePaid": 8.35,
+      "volume": 1,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "4",
+      "supplierName": "FABRICAÇÃO"
+    },
+    {
+      "id": "10",
+      "code": "10",
+      "name": "ANÉIS DE CEBOLA",
+      "pricePaid": 19.9,
+      "volume": 1.1,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "8",
+      "supplierName": "DELLYS"
+    },
+    {
+      "id": "11",
+      "code": "11",
+      "name": "BATATA CONGELADA",
+      "pricePaid": 287.82,
+      "volume": 18,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "8",
+      "supplierName": "DELLYS"
+    },
+    {
+      "id": "12",
+      "code": "12",
+      "name": "MAIONESE BASE",
+      "pricePaid": 9.78,
+      "volume": 0.528,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "4",
+      "supplierName": "FABRICAÇÃO"
+    },
+    {
+      "id": "13",
+      "code": "13",
+      "name": "PICLES ARTESANAL",
+      "pricePaid": 4.8,
+      "volume": 0.5,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "4",
+      "supplierName": "FABRICAÇÃO"
+    },
+    {
+      "id": "14",
+      "code": "14",
+      "name": "CEBOLA CRISPY",
+      "pricePaid": 8.35,
+      "volume": 1,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "4",
+      "supplierName": "FABRICAÇÃO"
+    },
+    {
+      "id": "15",
+      "code": "15",
+      "name": "KETCHUP",
+      "pricePaid": 17.9,
+      "volume": 1.033,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "6",
+      "supplierName": "FORT"
+    },
+    {
+      "id": "16",
+      "code": "16",
+      "name": "MOSTARDA",
+      "pricePaid": 18.4,
+      "volume": 1,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "6",
+      "supplierName": "FORT"
+    },
+    {
+      "id": "17",
+      "code": "17",
+      "name": "HAMBURGUER DE FRANGO",
+      "pricePaid": 33.16,
+      "volume": 10,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "4",
+      "supplierName": "FABRICAÇÃO"
+    },
+    {
+      "id": "18",
+      "code": "18",
+      "name": "BARBECUE",
+      "pricePaid": 10.98,
+      "volume": 1.01,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "6",
+      "supplierName": "FORT"
+    },
+    {
+      "id": "19",
+      "code": "19",
+      "name": "CHEDDAR MELT POLENGHI",
+      "pricePaid": 47.48,
+      "volume": 1.5,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "3",
+      "supplierName": "SOS"
+    },
+    {
+      "id": "20",
+      "code": "20",
+      "name": "JALAPENO EM CONSERVA",
+      "pricePaid": 27.9,
+      "volume": 0.35,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "10",
+      "supplierName": "MERCADO LIVRE"
+    },
+    {
+      "id": "21",
+      "code": "21",
+      "name": "BLEND COSTELA",
+      "pricePaid": 80.59,
+      "volume": 1.504,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "1",
+      "supplierName": "MUNHOZ"
+    },
+    {
+      "id": "22",
+      "code": "22",
+      "name": "COCA LATA",
+      "pricePaid": 22.14,
+      "volume": 6,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "6",
+      "supplierName": "FORT"
+    },
+    {
+      "id": "23",
+      "code": "23",
+      "name": "COMBO BATATA + COCA",
+      "pricePaid": 15,
+      "volume": 1,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "1",
+      "supplierName": "MUNHOZ"
+    },
+    {
+      "id": "24",
+      "code": "24",
+      "name": "EMBALAGEM BOX ZIPER",
+      "pricePaid": 1500,
+      "volume": 2000,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "9",
+      "supplierName": "24PRINT"
+    },
+    {
+      "id": "25",
+      "code": "25",
+      "name": "EMBALAGEM FRITAS",
+      "pricePaid": 1100,
+      "volume": 2000,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "9",
+      "supplierName": "24PRINT"
+    },
+    {
+      "id": "26",
+      "code": "26",
+      "name": "SACO KRAFT M",
+      "pricePaid": 2070,
+      "volume": 3000,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "9",
+      "supplierName": "24PRINT"
+    },
+    {
+      "id": "27",
+      "code": "27",
+      "name": "PAPEL ACOPLADO 30X40",
+      "pricePaid": 3000,
+      "volume": 10000,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "9",
+      "supplierName": "24PRINT"
+    },
+    {
+      "id": "28",
+      "code": "28",
+      "name": "CLICHE SACO KRAFT",
+      "pricePaid": 630,
+      "volume": 1,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "9",
+      "supplierName": "24PRINT"
+    },
+    {
+      "id": "29",
+      "code": "29",
+      "name": "CLICHE ACOPLADO",
+      "pricePaid": 350,
+      "volume": 1,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "9",
+      "supplierName": "24PRINT"
+    },
+    {
+      "id": "30",
+      "code": "30",
+      "name": "COSTELA ALFAMA",
+      "pricePaid": 67.99,
+      "volume": 1,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "8",
+      "supplierName": "DELLYS"
+    },
+    {
+      "id": "31",
+      "code": "31",
+      "name": "CATUPIRY",
+      "pricePaid": 69.9,
+      "volume": 1.5,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "8",
+      "supplierName": "DELLYS"
+    },
+    {
+      "id": "32",
+      "code": "32",
+      "name": "CREME DE LEITE",
+      "pricePaid": 13.49,
+      "volume": 1.03,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "8",
+      "supplierName": "DELLYS"
+    },
+    {
+      "id": "33",
+      "code": "33",
+      "name": "TEMPERO EM GERAL",
+      "pricePaid": 5,
+      "volume": 0.1,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "11",
+      "supplierName": "FITLAND"
+    },
+    {
+      "id": "34",
+      "code": "34",
+      "name": "SOUR CREAM",
+      "pricePaid": 13.46,
+      "volume": 0.36,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "4",
+      "supplierName": "FABRICAÇÃO"
+    }
   ]
 }
-
