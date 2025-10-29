@@ -1,25 +1,5 @@
 import type { FixedCost, FixedCostFormData } from '../types/fixedCost';
-
-// Initial data based on CSV
-const initialFixedCosts: FixedCost[] = [
-  { id: '1', name: 'Aluguel', value: 2500.00 },
-  { id: '2', name: 'Água', value: 150.00 },
-  { id: '3', name: 'Luz', value: 880.00 },
-  { id: '4', name: 'Contador', value: 200.00 },
-  { id: '5', name: 'Entregador', value: 2400.00 },
-  { id: '6', name: 'Marketing', value: 1100.00 },
-  { id: '7', name: 'Gás', value: 910.00 },
-  { id: '8', name: 'Sistema', value: 270.00 },
-  { id: '9', name: 'Internet/Telefone', value: 180.00 },
-  { id: '10', name: 'Limpeza', value: 120.00 },
-  { id: '11', name: 'Reserva Operacional', value: 300.00 },
-];
-
-// Simulated local storage (in production would be an API)
-let fixedCosts: FixedCost[] = [...initialFixedCosts];
-
-// Simulated API delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { api } from '../config/api';
 
 // Calculate percentages based on total
 const calculatePercentages = (costs: FixedCost[]): FixedCost[] => {
@@ -32,53 +12,38 @@ const calculatePercentages = (costs: FixedCost[]): FixedCost[] => {
 
 export const fixedCostService = {
   getAll: async (): Promise<FixedCost[]> => {
-    await delay(300);
-    return calculatePercentages([...fixedCosts]);
+    const response = await api.get<FixedCost[]>('/fixedCosts');
+    return calculatePercentages(response.data);
   },
 
   getById: async (id: string): Promise<FixedCost | null> => {
-    await delay(200);
-    const cost = fixedCosts.find((c) => c.id === id);
-    return cost ? { ...cost } : null;
+    try {
+      const response = await api.get<FixedCost>(`/fixedCosts/${id}`);
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        return null;
+      }
+      throw error;
+    }
   },
 
   create: async (data: FixedCostFormData): Promise<FixedCost> => {
-    await delay(500);
-    const newCost: FixedCost = {
-      id: Date.now().toString(),
-      name: data.name,
-      value: data.value,
-    };
-    fixedCosts.push(newCost);
-    return newCost;
+    const response = await api.post<FixedCost>('/fixedCosts', data);
+    return response.data;
   },
 
   update: async (id: string, data: FixedCostFormData): Promise<FixedCost> => {
-    await delay(500);
-    const index = fixedCosts.findIndex((c) => c.id === id);
-    if (index === -1) {
-      throw new Error('Fixed cost not found');
-    }
-    fixedCosts[index] = {
-      ...fixedCosts[index],
-      name: data.name,
-      value: data.value,
-    };
-    return { ...fixedCosts[index] };
+    const response = await api.put<FixedCost>(`/fixedCosts/${id}`, data);
+    return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await delay(500);
-    const index = fixedCosts.findIndex((c) => c.id === id);
-    if (index === -1) {
-      throw new Error('Fixed cost not found');
-    }
-    fixedCosts.splice(index, 1);
+    await api.delete(`/fixedCosts/${id}`);
   },
 
   getTotal: async (): Promise<number> => {
-    await delay(200);
-    return fixedCosts.reduce((sum, cost) => sum + cost.value, 0);
+    const response = await api.get<FixedCost[]>('/fixedCosts');
+    return response.data.reduce((sum, cost) => sum + cost.value, 0);
   },
 };
-

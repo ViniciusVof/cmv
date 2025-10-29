@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { FixedCost } from './pages/FixedCost';
+import { VariableCost } from './pages/VariableCost';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './stores/authStore';
 
@@ -28,6 +29,14 @@ function App() {
           element={
             <ProtectedRoute>
               <FixedCost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/custo-variavel"
+          element={
+            <ProtectedRoute>
+              <VariableCost />
             </ProtectedRoute>
           }
         />

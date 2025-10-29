@@ -15,6 +15,7 @@ const menuItems: MenuItem[] = [
   { name: 'CMV', icon: '💵', path: '/cmv' },
   { name: 'CMV Global', icon: '📈', path: '/cmv-global' },
   { name: 'Custo Fixo', icon: '💰', path: '/custo-fixo' },
+  { name: 'Custo Variável', icon: '📉', path: '/custo-variavel' },
   { name: 'Relatórios', icon: '📋', path: '/relatorios' },
 ];
 
