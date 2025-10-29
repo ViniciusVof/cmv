@@ -161,11 +161,11 @@
       "code": "2",
       "name": "PÃO BRIOCHE MAX",
       "pricePaid": 125,
-      "volume": 48,
+      "volume": 198,
       "unit": "UN",
       "correctionFactor": 1,
       "supplierId": "2",
-      "finalValue": 2.6041666666666665,
+      "finalValue": 0.6313131313131313,
       "supplierName": "ATTIMINO",
       "id": "2"
     },
@@ -562,9 +562,9 @@
           "netQuantity": 1,
           "unit": "UN",
           "correctionFactor": 1,
-          "unitCost": 2.6041666666666665,
-          "totalCost": 2.6041666666666665,
-          "percentage": 29.584691271415082
+          "unitCost": 0.6313131313131313,
+          "totalCost": 0.6313131313131313,
+          "percentage": 24.901265677860348
         },
         {
           "id": "1761764122350-1",
@@ -574,9 +574,9 @@
           "netQuantity": 0.15,
           "unit": "KG",
           "correctionFactor": 1,
-          "unitCost": 31.930277598450616,
-          "totalCost": 4.7895416397675925,
-          "percentage": 54.41169052573876
+          "unitCost": 3.301650375026084,
+          "totalCost": 0.4952475562539126,
+          "percentage": 19.53434890375019
         },
         {
           "id": "1761764122351-2",
@@ -588,7 +588,7 @@
           "correctionFactor": 1,
           "unitCost": 0.5191250000000001,
           "totalCost": 1.0382500000000001,
-          "percentage": 11.795061393617937
+          "percentage": 40.952322718621005
         },
         {
           "id": "1761764122352-3",
@@ -600,20 +600,20 @@
           "correctionFactor": 1,
           "unitCost": 18.52272727272727,
           "totalCost": 0.3704545454545454,
-          "percentage": 4.20855680922821
+          "percentage": 14.612062699768453
         }
       ],
       "markup": 3,
-      "recipeCost": 8.802412851888805,
-      "suggestedPrice": 26.407238555666417,
-      "suggestedIfoodPrice": 31.140611504323605,
+      "recipeCost": 2.5352652330215895,
+      "suggestedPrice": 7.605795699064768,
+      "suggestedIfoodPrice": 8.969098701727322,
       "currentPrice": 28,
       "currentIfoodPrice": 33,
       "isCombo": false,
-      "grossProfit": 17.604825703777614,
+      "grossProfit": 5.070530466043179,
       "cmv": 33.33333333333333,
       "createdAt": "2025-10-29T18:55:22.411Z",
-      "updatedAt": "2025-10-29T18:55:22.411Z",
+      "updatedAt": "2025-10-29T22:18:57.030Z",
       "id": 1
     }
   ],
@@ -621,7 +621,9 @@
     {
       "id": "1",
       "markup": 3,
-      "ifoodTaxPercentage": 15.2
+      "ifoodTaxPercentage": 15.2,
+      "costCalculationMethod": "current",
+      "updatedAt": "2025-10-29T22:18:48.830Z"
     }
   ],
   "stockMovements": [
@@ -955,6 +957,14 @@
       "quantity": 1,
       "date": "2025-10-29T22:05:39.300Z",
       "id": 37
+    },
+    {
+      "ingredientId": "2",
+      "type": "IN",
+      "quantity": 150,
+      "unitCost": 1,
+      "date": "2025-10-29T22:11:04.807Z",
+      "id": 38
     }
   ]
 }

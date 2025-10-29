@@ -20,7 +20,8 @@ import {
   MdPriceCheck,
   MdLocalOffer,
   MdPercent,
-  MdInfo
+  MdInfo,
+  MdSync
 } from 'react-icons/md';
 
 type SortField = 'code' | 'name' | 'recipeCost' | 'suggestedPrice' | 'cmv';
@@ -32,7 +33,9 @@ export function Recipes() {
   const [availableProducts, setAvailableProducts] = useState<Recipe[]>([]);
   const [variableCostsTotal, setVariableCostsTotal] = useState<number>(0);
   const [ifoodTax, setIfoodTax] = useState<number>(0);
+  const [costCalculationMethod, setCostCalculationMethod] = useState<'current' | 'monthly_average'>('current');
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<RecipeFormData>({
@@ -101,6 +104,7 @@ export function Recipes() {
       const totalVariableCosts = variableCosts.reduce((sum, cost) => sum + cost.percentage, 0);
       setVariableCostsTotal(totalVariableCosts);
       setIfoodTax(businessSettings.ifoodTaxPercentage);
+      setCostCalculationMethod(businessSettings.costCalculationMethod || 'current');
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -548,16 +552,48 @@ export function Recipes() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Fichas Técnicas</h1>
+            <div className="flex items-center gap-4 mb-2">
+            <h1 className="text-3xl font-bold text-gray-800">Fichas Técnicas</h1>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+              costCalculationMethod === 'current' 
+                ? 'bg-blue-100 text-blue-800' 
+                : 'bg-purple-100 text-purple-800'
+            }`}>
+              <MdInfo className="inline w-4 h-4 mr-1" />
+              {costCalculationMethod === 'current' ? 'Custo Atual' : 'Média Mensal'}
+            </span>
+          </div>
             <p className="text-gray-600">Cadastro de receitas e precificação</p>
           </div>
-              <button
-                onClick={() => setShowForm(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                <MdAdd className="w-5 h-5" />
-                Nova Ficha Técnica
-              </button>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                setSyncing(true);
+                try {
+                  await recipeService.recalculateAllCosts();
+                  await loadData();
+                  alert('Custos sincronizados com sucesso!');
+                } catch (error) {
+                  console.error('Error syncing costs:', error);
+                  alert('Erro ao sincronizar custos');
+                } finally {
+                  setSyncing(false);
+                }
+              }}
+              disabled={syncing || loading}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <MdSync className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} />
+              {syncing ? 'Sincronizando...' : 'Sincronizar Custos'}
+            </button>
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <MdAdd className="w-5 h-5" />
+              Nova Ficha Técnica
+            </button>
+          </div>
         </div>
 
         {/* Form */}

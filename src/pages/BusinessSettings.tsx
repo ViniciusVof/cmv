@@ -7,6 +7,7 @@ export function BusinessSettings() {
   const [settings, setSettings] = useState<BusinessSettingsFormData>({
     markup: 3.0,
     ifoodTaxPercentage: 15.2,
+    costCalculationMethod: 'current',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -22,6 +23,7 @@ export function BusinessSettings() {
       setSettings({
         markup: data.markup,
         ifoodTaxPercentage: data.ifoodTaxPercentage,
+        costCalculationMethod: data.costCalculationMethod || 'current',
       });
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -126,6 +128,54 @@ export function BusinessSettings() {
                 <p className="mt-1 text-xs text-gray-500">
                   Taxa percentual cobrada pelo IFood sobre vendas
                 </p>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Método de Cálculo de Custo *
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="current"
+                      checked={settings.costCalculationMethod === 'current'}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          costCalculationMethod: e.target.value as 'current',
+                        })
+                      }
+                      className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                    />
+                    <div>
+                      <span className="text-gray-700 font-medium">Custo Atual</span>
+                      <p className="text-xs text-gray-500">
+                        Usa o custo do último registro de entrada no estoque
+                      </p>
+                    </div>
+                  </label>
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="monthly_average"
+                      checked={settings.costCalculationMethod === 'monthly_average'}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          costCalculationMethod: e.target.value as 'monthly_average',
+                        })
+                      }
+                      className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                    />
+                    <div>
+                      <span className="text-gray-700 font-medium">Média Mensal</span>
+                      <p className="text-xs text-gray-500">
+                        Calcula a média ponderada dos custos das entradas dos últimos 30 dias
+                      </p>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
 

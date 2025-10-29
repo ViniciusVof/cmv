@@ -83,6 +83,48 @@ export const stockService = {
     }
     return result;
   },
+
+  // Calculate monthly average cost for an ingredient (last 30 days)
+  getMonthlyAverageCost: async (ingredientId: string): Promise<number | undefined> => {
+    const movements = await stockService.getByIngredient(ingredientId);
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    // Filter IN movements from the last 30 days with unitCost
+    const recentMovements = movements
+      .filter((m) => {
+        const movementDate = new Date(m.date);
+        return (
+          m.type === 'IN' &&
+          m.unitCost !== undefined &&
+          m.unitCost !== null &&
+          movementDate >= thirtyDaysAgo &&
+          movementDate <= now
+        );
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    if (recentMovements.length === 0) {
+      return undefined; // No movements in the last 30 days
+    }
+
+    // Calculate weighted average: sum(quantity * unitCost) / sum(quantity)
+    let totalCost = 0;
+    let totalQuantity = 0;
+
+    for (const movement of recentMovements) {
+      if (movement.unitCost !== undefined && movement.unitCost !== null) {
+        totalCost += movement.quantity * movement.unitCost;
+        totalQuantity += movement.quantity;
+      }
+    }
+
+    if (totalQuantity === 0) {
+      return undefined;
+    }
+
+    return totalCost / totalQuantity;
+  },
 };
 
 

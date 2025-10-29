@@ -13,6 +13,7 @@ export const businessSettingsService = {
         id: '1',
         markup: 3.0,
         ifoodTaxPercentage: 15.2,
+        costCalculationMethod: 'current',
       };
     } catch (error) {
       // Return default settings on error
@@ -20,6 +21,7 @@ export const businessSettingsService = {
         id: '1',
         markup: 3.0,
         ifoodTaxPercentage: 15.2,
+        costCalculationMethod: 'current',
       };
     }
   },
