@@ -29,6 +29,8 @@ const menuItems: MenuItem[] = [
     subItems: [
       { name: 'Cadastro', path: '/estoque' },
       { name: 'Movimentações em Lote', path: '/estoque/movimentacoes-lote' },
+      { name: 'Conciliação', path: '/estoque/conciliacao' },
+      { name: 'Relatórios', path: '/estoque/relatorios-conciliacao' },
     ]
   },
   { name: 'Fornecedores', icon: MdBusiness, path: '/fornecedores' },

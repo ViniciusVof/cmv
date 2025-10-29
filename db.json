@@ -149,11 +149,11 @@
       "code": "1",
       "name": "BLEND BOVINO",
       "pricePaid": 49.46,
-      "volume": 6.5,
+      "volume": 6,
       "unit": "KG",
       "correctionFactor": 1,
       "supplierId": "1",
-      "finalValue": 7.609230769230769,
+      "finalValue": 8.243333333333334,
       "supplierName": "MUNHOZ",
       "id": "1"
     },
@@ -161,57 +161,61 @@
       "code": "2",
       "name": "PÃO BRIOCHE MAX",
       "pricePaid": 125,
-      "volume": 198,
+      "volume": 149.999,
       "unit": "UN",
       "correctionFactor": 1,
       "supplierId": "2",
-      "finalValue": 0.6313131313131313,
+      "finalValue": 0.8333388889259262,
       "supplierName": "ATTIMINO",
       "id": "2"
     },
     {
-      "id": "3",
       "code": "3",
       "name": "QUEIJO CHEDDAR VIGOR/POLENGUI",
       "pricePaid": 83.06,
-      "volume": 160,
+      "volume": 48,
       "unit": "UN",
       "correctionFactor": 1,
       "supplierId": "3",
-      "supplierName": "SOS"
+      "finalValue": 1.7304166666666667,
+      "supplierName": "SOS",
+      "id": "3"
     },
     {
-      "id": "4",
       "code": "4",
       "name": "CEBOLA CARAMELIZADA",
       "pricePaid": 8.77,
-      "volume": 0.9,
+      "volume": 1,
       "unit": "KG",
       "correctionFactor": 1,
       "supplierId": "4",
-      "supplierName": "FABRICAÇÃO"
+      "finalValue": 8.77,
+      "supplierName": "FABRICAÇÃO",
+      "id": "4"
     },
     {
-      "id": "5",
       "code": "5",
       "name": "ALFACE",
       "pricePaid": 4.49,
-      "volume": 0.356,
+      "volume": 0.5,
       "unit": "KG",
       "correctionFactor": 1.11,
       "supplierId": "5",
-      "supplierName": "KOCH"
+      "finalValue": 9.967800000000002,
+      "supplierName": "KOCH",
+      "id": "5"
     },
     {
-      "id": "6",
       "code": "6",
       "name": "CEBOLA",
       "pricePaid": 0.36,
-      "volume": 0.079,
+      "volume": 1,
       "unit": "KG",
       "correctionFactor": 1.67,
       "supplierId": "5",
-      "supplierName": "KOCH"
+      "finalValue": 0.6012,
+      "supplierName": "KOCH",
+      "id": "6"
     },
     {
       "id": "7",
@@ -626,6 +630,381 @@
       "updatedAt": "2025-10-29T22:18:48.830Z"
     }
   ],
+  "reconciliationReports": [
+    {
+      "date": "2025-10-29",
+      "items": [
+        {
+          "ingredientId": "1",
+          "ingredientCode": "1",
+          "ingredientName": "BLEND BOVINO",
+          "unit": "KG",
+          "systemStock": 6.5,
+          "physicalStock": 6,
+          "difference": -0.5,
+          "adjustmentType": "OUT"
+        },
+        {
+          "ingredientId": "2",
+          "ingredientCode": "2",
+          "ingredientName": "PÃO BRIOCHE MAX",
+          "unit": "UN",
+          "systemStock": 198,
+          "physicalStock": 149.999,
+          "difference": -48.001000000000005,
+          "adjustmentType": "OUT"
+        },
+        {
+          "ingredientId": "3",
+          "ingredientCode": "3",
+          "ingredientName": "QUEIJO CHEDDAR VIGOR/POLENGUI",
+          "unit": "UN",
+          "systemStock": 160,
+          "physicalStock": 48,
+          "difference": -112,
+          "adjustmentType": "OUT"
+        },
+        {
+          "ingredientId": "4",
+          "ingredientCode": "4",
+          "ingredientName": "CEBOLA CARAMELIZADA",
+          "unit": "KG",
+          "systemStock": 0.9,
+          "physicalStock": 1,
+          "difference": 0.09999999999999998,
+          "adjustmentType": "IN"
+        },
+        {
+          "ingredientId": "5",
+          "ingredientCode": "5",
+          "ingredientName": "ALFACE",
+          "unit": "KG",
+          "systemStock": 0.356,
+          "physicalStock": 0.5,
+          "difference": 0.14400000000000002,
+          "adjustmentType": "IN"
+        },
+        {
+          "ingredientId": "6",
+          "ingredientCode": "6",
+          "ingredientName": "CEBOLA",
+          "unit": "KG",
+          "systemStock": 0.079,
+          "physicalStock": 1,
+          "difference": 0.921,
+          "adjustmentType": "IN"
+        },
+        {
+          "ingredientId": "7",
+          "ingredientCode": "7",
+          "ingredientName": "DORITOS",
+          "unit": "KG",
+          "systemStock": 0.3,
+          "physicalStock": 0.3,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "8",
+          "ingredientCode": "8",
+          "ingredientName": "BACON",
+          "unit": "KG",
+          "systemStock": 7.5,
+          "physicalStock": 7.5,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "9",
+          "ingredientCode": "9",
+          "ingredientName": "CEBOLA CRISPY",
+          "unit": "KG",
+          "systemStock": 1,
+          "physicalStock": 1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "10",
+          "ingredientCode": "10",
+          "ingredientName": "ANÉIS DE CEBOLA",
+          "unit": "KG",
+          "systemStock": 1.1,
+          "physicalStock": 1.1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "11",
+          "ingredientCode": "11",
+          "ingredientName": "BATATA CONGELADA",
+          "unit": "KG",
+          "systemStock": 18,
+          "physicalStock": 18,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "12",
+          "ingredientCode": "12",
+          "ingredientName": "MAIONESE BASE",
+          "unit": "KG",
+          "systemStock": 0.528,
+          "physicalStock": 0.528,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "13",
+          "ingredientCode": "13",
+          "ingredientName": "PICLES ARTESANAL",
+          "unit": "KG",
+          "systemStock": 0.5,
+          "physicalStock": 0.5,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "14",
+          "ingredientCode": "14",
+          "ingredientName": "CEBOLA CRISPY",
+          "unit": "KG",
+          "systemStock": 1,
+          "physicalStock": 1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "15",
+          "ingredientCode": "15",
+          "ingredientName": "KETCHUP",
+          "unit": "KG",
+          "systemStock": 1.033,
+          "physicalStock": 1.033,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "16",
+          "ingredientCode": "16",
+          "ingredientName": "MOSTARDA",
+          "unit": "KG",
+          "systemStock": 1,
+          "physicalStock": 1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "17",
+          "ingredientCode": "17",
+          "ingredientName": "HAMBURGUER DE FRANGO",
+          "unit": "UN",
+          "systemStock": 10,
+          "physicalStock": 10,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "18",
+          "ingredientCode": "18",
+          "ingredientName": "BARBECUE",
+          "unit": "UN",
+          "systemStock": 1.01,
+          "physicalStock": 1.01,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "19",
+          "ingredientCode": "19",
+          "ingredientName": "CHEDDAR MELT POLENGHI",
+          "unit": "UN",
+          "systemStock": 1.5,
+          "physicalStock": 1.5,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "20",
+          "ingredientCode": "20",
+          "ingredientName": "JALAPENO EM CONSERVA",
+          "unit": "UN",
+          "systemStock": 0.35,
+          "physicalStock": 0.35,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "21",
+          "ingredientCode": "21",
+          "ingredientName": "BLEND COSTELA",
+          "unit": "UN",
+          "systemStock": 1.504,
+          "physicalStock": 1.504,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "22",
+          "ingredientCode": "22",
+          "ingredientName": "COCA LATA",
+          "unit": "UN",
+          "systemStock": 6,
+          "physicalStock": 6,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "23",
+          "ingredientCode": "23",
+          "ingredientName": "COMBO BATATA + COCA",
+          "unit": "UN",
+          "systemStock": 1,
+          "physicalStock": 1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "24",
+          "ingredientCode": "24",
+          "ingredientName": "EMBALAGEM BOX ZIPER",
+          "unit": "UN",
+          "systemStock": 2000,
+          "physicalStock": 2000,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "25",
+          "ingredientCode": "25",
+          "ingredientName": "EMBALAGEM FRITAS",
+          "unit": "UN",
+          "systemStock": 2000,
+          "physicalStock": 2000,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "26",
+          "ingredientCode": "26",
+          "ingredientName": "SACO KRAFT M",
+          "unit": "UN",
+          "systemStock": 3000,
+          "physicalStock": 3000,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "27",
+          "ingredientCode": "27",
+          "ingredientName": "PAPEL ACOPLADO 30X40",
+          "unit": "UN",
+          "systemStock": 10000,
+          "physicalStock": 10000,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "28",
+          "ingredientCode": "28",
+          "ingredientName": "CLICHE SACO KRAFT",
+          "unit": "UN",
+          "systemStock": 1,
+          "physicalStock": 1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "29",
+          "ingredientCode": "29",
+          "ingredientName": "CLICHE ACOPLADO",
+          "unit": "UN",
+          "systemStock": 1,
+          "physicalStock": 1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "30",
+          "ingredientCode": "30",
+          "ingredientName": "COSTELA ALFAMA",
+          "unit": "KG",
+          "systemStock": 1,
+          "physicalStock": 1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "31",
+          "ingredientCode": "31",
+          "ingredientName": "CATUPIRY",
+          "unit": "KG",
+          "systemStock": 1.5,
+          "physicalStock": 1.5,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "32",
+          "ingredientCode": "32",
+          "ingredientName": "CREME DE LEITE",
+          "unit": "UN",
+          "systemStock": 1.03,
+          "physicalStock": 1.03,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "33",
+          "ingredientCode": "33",
+          "ingredientName": "TEMPERO EM GERAL",
+          "unit": "UN",
+          "systemStock": 0.1,
+          "physicalStock": 0.1,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "34",
+          "ingredientCode": "34",
+          "ingredientName": "SOUR CREAM",
+          "unit": "UN",
+          "systemStock": 0.36,
+          "physicalStock": 0.36,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "2jKuhX0",
+          "ingredientCode": "35",
+          "ingredientName": "Produto Teste Movimentação",
+          "unit": "UN",
+          "systemStock": 10,
+          "physicalStock": 10,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        },
+        {
+          "ingredientId": "UiMGlZv",
+          "ingredientCode": "36",
+          "ingredientName": "Produto Primeira Movimentação",
+          "unit": "KG",
+          "systemStock": 2,
+          "physicalStock": 2,
+          "difference": 0,
+          "adjustmentType": "NONE"
+        }
+      ],
+      "summary": {
+        "totalItems": 36,
+        "itemsWithDifference": 6,
+        "totalEntries": 1.165,
+        "totalExits": 160.501
+      },
+      "reconciledAt": "2025-10-29T22:33:00.310Z",
+      "id": 1
+    }
+  ],
   "stockMovements": [
     {
       "id": 1,
@@ -965,6 +1344,57 @@
       "unitCost": 1,
       "date": "2025-10-29T22:11:04.807Z",
       "id": 38
+    },
+    {
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.5,
+      "date": "2025-10-29T00:00:00.000Z",
+      "note": "Ajuste de conciliação física - Estoque sistema: 6.5, Estoque físico: 6",
+      "id": 39
+    },
+    {
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 48.001000000000005,
+      "date": "2025-10-29T00:00:00.000Z",
+      "note": "Ajuste de conciliação física - Estoque sistema: 198, Estoque físico: 149.999",
+      "id": 40
+    },
+    {
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 112,
+      "date": "2025-10-29T00:00:00.000Z",
+      "note": "Ajuste de conciliação física - Estoque sistema: 160, Estoque físico: 48",
+      "id": 41
+    },
+    {
+      "ingredientId": "4",
+      "type": "IN",
+      "quantity": 0.09999999999999998,
+      "unitCost": 0,
+      "date": "2025-10-29T00:00:00.000Z",
+      "note": "Ajuste de conciliação física - Estoque sistema: 0.9, Estoque físico: 1",
+      "id": 42
+    },
+    {
+      "ingredientId": "5",
+      "type": "IN",
+      "quantity": 0.14400000000000002,
+      "unitCost": 0,
+      "date": "2025-10-29T00:00:00.000Z",
+      "note": "Ajuste de conciliação física - Estoque sistema: 0.356, Estoque físico: 0.5",
+      "id": 43
+    },
+    {
+      "ingredientId": "6",
+      "type": "IN",
+      "quantity": 0.921,
+      "unitCost": 0,
+      "date": "2025-10-29T00:00:00.000Z",
+      "note": "Ajuste de conciliação física - Estoque sistema: 0.079, Estoque físico: 1",
+      "id": 44
     }
   ]
 }

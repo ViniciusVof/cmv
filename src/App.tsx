@@ -6,6 +6,8 @@ import { VariableCost } from './pages/VariableCost';
 import { Suppliers } from './pages/Suppliers';
 import { Ingredients } from './pages/Ingredients';
 import { BatchStockMovements } from './pages/BatchStockMovements';
+import { StockReconciliation } from './pages/StockReconciliation';
+import { ReconciliationReports } from './pages/ReconciliationReports';
 import { Recipes } from './pages/Recipes';
 import { BusinessSettings } from './pages/BusinessSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -66,6 +68,22 @@ function App() {
           element={
             <ProtectedRoute>
               <BatchStockMovements />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/estoque/conciliacao"
+          element={
+            <ProtectedRoute>
+              <StockReconciliation />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/estoque/relatorios-conciliacao"
+          element={
+            <ProtectedRoute>
+              <ReconciliationReports />
             </ProtectedRoute>
           }
         />
