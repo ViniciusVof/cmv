@@ -2,6 +2,18 @@ import { useState, useEffect, useMemo } from 'react';
 import { Layout } from '../components/Layout';
 import type { VariableCost, VariableCostFormData } from '../types/variableCost';
 import { variableCostService } from '../services/variableCostService';
+import {
+  MdAdd,
+  MdEdit,
+  MdDelete,
+  MdSearch,
+  MdTrendingUp,
+  MdTrendingDown,
+  MdAssessment,
+  MdCheckCircle,
+  MdClose,
+  MdPercent
+} from 'react-icons/md';
 
 type SortField = 'name' | 'percentage';
 type SortDirection = 'asc' | 'desc';
@@ -233,19 +245,7 @@ export function VariableCost() {
             onClick={() => setShowForm(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
+            <MdAdd className="w-5 h-5" />
             Adicionar Custo
           </button>
         </div>
@@ -296,15 +296,17 @@ export function VariableCost() {
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                 >
+                  <MdCheckCircle className="w-5 h-5" />
                   Salvar
                 </button>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
                 >
+                  <MdClose className="w-5 h-5" />
                   Cancelar
                 </button>
               </div>
@@ -317,7 +319,9 @@ export function VariableCost() {
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow p-6 border-l-4 border-blue-500">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-blue-700">Maior Percentual</h3>
-              <span className="text-2xl">📈</span>
+              <div className="bg-blue-200 p-2 rounded-lg">
+                <MdTrendingUp className="w-6 h-6 text-blue-700" />
+              </div>
             </div>
             {insights.highest ? (
               <>
@@ -336,7 +340,9 @@ export function VariableCost() {
           <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow p-6 border-l-4 border-green-500">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-green-700">Menor Percentual</h3>
-              <span className="text-2xl">📉</span>
+              <div className="bg-green-200 p-2 rounded-lg">
+                <MdTrendingDown className="w-6 h-6 text-green-700" />
+              </div>
             </div>
             {insights.lowest ? (
               <>
@@ -355,7 +361,9 @@ export function VariableCost() {
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg shadow p-6 border-l-4 border-purple-500">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-purple-700">Média</h3>
-              <span className="text-2xl">📊</span>
+              <div className="bg-purple-200 p-2 rounded-lg">
+                <MdAssessment className="w-6 h-6 text-purple-700" />
+              </div>
             </div>
             <p className="text-lg font-bold text-purple-900">
               {formatPercent(insights.average)}
@@ -368,7 +376,9 @@ export function VariableCost() {
           <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg shadow p-6 border-l-4 border-orange-500">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-orange-700">Total Variável</h3>
-              <span className="text-2xl">💰</span>
+              <div className="bg-orange-200 p-2 rounded-lg">
+                <MdPercent className="w-6 h-6 text-orange-700" />
+              </div>
             </div>
             <p className="text-lg font-bold text-orange-900">
               {formatPercent(totalPercentage)}
@@ -388,19 +398,7 @@ export function VariableCost() {
                 placeholder="Buscar por nome do custo..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
-              <svg
-                className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <MdSearch className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
             </div>
             {searchTerm && (
               <button
@@ -474,38 +472,14 @@ export function VariableCost() {
                             className="text-blue-600 hover:text-blue-800"
                             title="Editar"
                           >
-                            <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                              />
-                            </svg>
+                            <MdEdit className="w-5 h-5" />
                           </button>
                           <button
                             onClick={() => handleDelete(cost.id)}
                             className="text-red-600 hover:text-red-800"
                             title="Excluir"
                           >
-                            <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
+                            <MdDelete className="w-5 h-5" />
                           </button>
                         </div>
                       </td>

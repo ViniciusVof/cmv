@@ -6,6 +6,22 @@ import { recipeService } from '../services/recipeService';
 import { ingredientService } from '../services/ingredientService';
 import { businessSettingsService } from '../services/businessSettingsService';
 import { variableCostService } from '../services/variableCostService';
+import { 
+  MdReceiptLong,
+  MdAttachMoney,
+  MdTrendingUp,
+  MdAdd,
+  MdEdit,
+  MdDelete,
+  MdClose,
+  MdSearch,
+  MdRemove,
+  MdCheckCircle,
+  MdPriceCheck,
+  MdLocalOffer,
+  MdPercent,
+  MdInfo
+} from 'react-icons/md';
 
 type SortField = 'code' | 'name' | 'recipeCost' | 'suggestedPrice' | 'cmv';
 type SortDirection = 'asc' | 'desc';
@@ -47,6 +63,7 @@ export function Recipes() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('code');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [selectedRecipeView, setSelectedRecipeView] = useState<Recipe | null>(null);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -534,15 +551,13 @@ export function Recipes() {
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Fichas Técnicas</h1>
             <p className="text-gray-600">Cadastro de receitas e precificação</p>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Nova Ficha Técnica
-          </button>
+              <button
+                onClick={() => setShowForm(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <MdAdd className="w-5 h-5" />
+                Nova Ficha Técnica
+              </button>
         </div>
 
         {/* Form */}
@@ -747,16 +762,17 @@ export function Recipes() {
                     )}
                   </div>
 
-                  <div className="md:col-span-2">
-                    <button
-                      type="button"
-                      onClick={handleAddItem}
-                      disabled={!selectedItem || (!quantityInput && newItemQuantity <= 0)}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Adicionar Item
-                    </button>
-                  </div>
+                      <div className="md:col-span-2">
+                        <button
+                          type="button"
+                          onClick={handleAddItem}
+                          disabled={!selectedItem || (!quantityInput && newItemQuantity <= 0)}
+                          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                          <MdAdd className="w-5 h-5" />
+                          Adicionar Item
+                        </button>
+                      </div>
                 </div>
 
                 {/* Items List */}
@@ -783,15 +799,17 @@ export function Recipes() {
                               <td className="px-4 py-2 text-right">{item.netQuantity}</td>
                               <td className="px-4 py-2 text-center">{item.unit}</td>
                               <td className="px-4 py-2 text-center">{item.correctionFactor.toFixed(2)}</td>
-                              <td className="px-4 py-2 text-right">
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveItem(index)}
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  Remover
-                                </button>
-                              </td>
+                                  <td className="px-4 py-2 text-right">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveItem(index)}
+                                      className="text-red-600 hover:text-red-800 flex items-center gap-1 mx-auto"
+                                      title="Remover"
+                                    >
+                                      <MdRemove className="w-4 h-4" />
+                                      Remover
+                                    </button>
+                                  </td>
                             </tr>
                           ))}
                         </tbody>
@@ -939,42 +957,64 @@ export function Recipes() {
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Salvar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  Cancelar
-                </button>
-              </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    >
+                      <MdCheckCircle className="w-5 h-5" />
+                      Salvar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancel}
+                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
+                    >
+                      <MdClose className="w-5 h-5" />
+                      Cancelar
+                    </button>
+                  </div>
             </form>
           </div>
         )}
 
         {/* Insights */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-500">Total de Fichas</div>
-            <div className="text-2xl font-bold text-gray-900">{recipes.length}</div>
+          <div className="bg-white rounded-lg shadow p-4 flex items-start gap-3">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <MdReceiptLong className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">Total de Fichas</div>
+              <div className="text-2xl font-bold text-gray-900">{recipes.length}</div>
+            </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-500">Custo Total</div>
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(recipes.reduce((s, r) => s + (r.recipeCost || 0), 0))}</div>
+          <div className="bg-white rounded-lg shadow p-4 flex items-start gap-3">
+            <div className="bg-green-100 p-3 rounded-lg">
+              <MdAttachMoney className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">Custo Total</div>
+              <div className="text-2xl font-bold text-gray-900">{formatCurrency(recipes.reduce((s, r) => s + (r.recipeCost || 0), 0))}</div>
+            </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-500">CMV Médio</div>
-            <div className="text-2xl font-bold text-gray-900">{formatPercentage(recipes.length ? (recipes.reduce((s, r) => s + (r.cmv || 0), 0) / recipes.length) : 0)}</div>
+          <div className="bg-white rounded-lg shadow p-4 flex items-start gap-3">
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <MdPercent className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">CMV Médio</div>
+              <div className="text-2xl font-bold text-gray-900">{formatPercentage(recipes.length ? (recipes.reduce((s, r) => s + (r.cmv || 0), 0) / recipes.length) : 0)}</div>
+            </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-sm text-gray-500">Maior Custo</div>
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(Math.max(0, ...recipes.map(r => r.recipeCost || 0)))}</div>
+          <div className="bg-white rounded-lg shadow p-4 flex items-start gap-3">
+            <div className="bg-amber-100 p-3 rounded-lg">
+              <MdTrendingUp className="w-6 h-6 text-amber-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">Maior Custo</div>
+              <div className="text-2xl font-bold text-gray-900">{formatCurrency(Math.max(0, ...recipes.map(r => r.recipeCost || 0)))}</div>
+            </div>
           </div>
         </div>
 
@@ -989,14 +1029,7 @@ export function Recipes() {
                 placeholder="Buscar por código ou nome..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
-              <svg
-                className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+                  <MdSearch className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
             </div>
             {searchTerm && (
               <button
@@ -1091,7 +1124,11 @@ export function Recipes() {
                   </tr>
                 ) : (
                   filteredAndSortedRecipes.map((recipe) => (
-                    <tr key={recipe.id} className="hover:bg-gray-50">
+                    <tr 
+                      key={recipe.id} 
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => setSelectedRecipeView(recipe)}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{recipe.code}</div>
                       </td>
@@ -1156,22 +1193,24 @@ export function Recipes() {
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="flex justify-center gap-2">
                           <button
-                            onClick={() => handleEdit(recipe)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(recipe);
+                            }}
                             className="text-blue-600 hover:text-blue-800"
                             title="Editar"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
+                            <MdEdit className="w-5 h-5" />
                           </button>
                           <button
-                            onClick={() => handleDelete(recipe.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(recipe.id);
+                            }}
                             className="text-red-600 hover:text-red-800"
                             title="Excluir"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            <MdDelete className="w-5 h-5" />
                           </button>
                         </div>
                       </td>
@@ -1182,6 +1221,207 @@ export function Recipes() {
             </table>
           </div>
         </div>
+
+        {/* Recipe Detail Modal */}
+        {selectedRecipeView && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedRecipeView(null)}>
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedRecipeView.name}</h2>
+                    <p className="text-sm text-gray-600">Código: {selectedRecipeView.code}</p>
+                    {selectedRecipeView.description && (
+                      <p className="text-sm text-gray-600 mt-1">{selectedRecipeView.description}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setSelectedRecipeView(null)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <MdClose className="w-6 h-6" />
+                  </button>
+                </div>
+
+                {/* Insights */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+                    <div className="bg-blue-100 p-2 rounded-lg">
+                      <MdAttachMoney className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">Custo da Receita</div>
+                      <div className="text-xl font-bold text-blue-700">{formatCurrency(selectedRecipeView.recipeCost)}</div>
+                    </div>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+                    <div className="bg-green-100 p-2 rounded-lg">
+                      <MdPriceCheck className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">Preço Normal</div>
+                      <div className="text-xl font-bold text-green-700">{formatCurrency(selectedRecipeView.currentPrice)}</div>
+                    </div>
+                  </div>
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 flex items-start gap-3">
+                    <div className="bg-purple-100 p-2 rounded-lg">
+                      <MdPercent className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">CMV</div>
+                      <div className="text-xl font-bold text-purple-700">{formatPercentage(selectedRecipeView.cmv)}</div>
+                    </div>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                    <div className="bg-amber-100 p-2 rounded-lg">
+                      <MdTrendingUp className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-600 mb-1">Lucro Bruto</div>
+                      <div className="text-xl font-bold text-amber-700">{formatCurrency(selectedRecipeView.grossProfit)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Items with Percentage */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Itens da Receita</h3>
+                  <div className="border rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-2 text-left">Código</th>
+                          <th className="px-4 py-2 text-left">Ingrediente</th>
+                          <th className="px-4 py-2 text-right">Qtd.</th>
+                          <th className="px-4 py-2 text-center">Un.</th>
+                          <th className="px-4 py-2 text-right">Custo Unit.</th>
+                          <th className="px-4 py-2 text-right">Custo Total</th>
+                          <th className="px-4 py-2 text-right">% do Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedRecipeView.items.map((item, index) => (
+                          <tr key={index} className="border-t hover:bg-gray-50">
+                            <td className="px-4 py-2">{item.ingredientCode}</td>
+                            <td className="px-4 py-2">{item.ingredientName}</td>
+                            <td className="px-4 py-2 text-right">{item.netQuantity}</td>
+                            <td className="px-4 py-2 text-center">{item.unit}</td>
+                            <td className="px-4 py-2 text-right">{formatCurrency(item.unitCost)}</td>
+                            <td className="px-4 py-2 text-right font-medium">{formatCurrency(item.totalCost)}</td>
+                            <td className="px-4 py-2 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className="bg-blue-600 h-2 rounded-full"
+                                    style={{ width: `${Math.min(item.percentage || 0, 100)}%` }}
+                                  />
+                                </div>
+                                <span className="text-sm font-medium">{formatPercentage(item.percentage || 0)}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-gray-50 font-semibold">
+                        <tr>
+                          <td colSpan={5} className="px-4 py-2 text-right">Total:</td>
+                          <td className="px-4 py-2 text-right">{formatCurrency(selectedRecipeView.recipeCost)}</td>
+                          <td className="px-4 py-2 text-right">100%</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Additional Insights */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <MdLocalOffer className="w-5 h-5 text-blue-600" />
+                      Precificação
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Preço Sugerido Normal:</span>
+                        <span className="font-medium">{formatCurrency(selectedRecipeView.suggestedPrice)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Preço Praticado Normal:</span>
+                        <span className="font-medium">{formatCurrency(selectedRecipeView.currentPrice)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Preço Sugerido IFood:</span>
+                        <span className="font-medium">{formatCurrency(selectedRecipeView.suggestedIfoodPrice)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Preço Praticado IFood:</span>
+                        <span className="font-medium">{formatCurrency(selectedRecipeView.currentIfoodPrice || selectedRecipeView.suggestedIfoodPrice)}</span>
+                      </div>
+                      {selectedRecipeView.isCombo && (
+                        <div className="mt-2 pt-2 border-t flex items-center gap-2">
+                          <MdCheckCircle className="w-5 h-5 text-blue-600" />
+                          <span className="text-blue-600 font-medium">Este produto é um combo</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <MdInfo className="w-5 h-5 text-blue-600" />
+                      Informações Adicionais
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Markup:</span>
+                        <span className="font-medium">{selectedRecipeView.markup.toFixed(2)}x</span>
+                      </div>
+                      {selectedRecipeView.lossPercentage && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">% de Perda:</span>
+                          <span className="font-medium">{formatPercentage(selectedRecipeView.lossPercentage)}</span>
+                        </div>
+                      )}
+                      {selectedRecipeView.lossPercentage && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Custo c/ Segurança:</span>
+                          <span className="font-medium">
+                            {formatCurrency(selectedRecipeView.recipeCost * (1 + (selectedRecipeView.lossPercentage || 0) / 100))}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Total de Itens:</span>
+                        <span className="font-medium">{selectedRecipeView.items.length}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex justify-end gap-2 mt-6 pt-6 border-t">
+                  <button
+                    onClick={() => {
+                      setSelectedRecipeView(null);
+                      handleEdit(selectedRecipeView);
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  >
+                    <MdEdit className="w-5 h-5" />
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => setSelectedRecipeView(null)}
+                    className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
+                  >
+                    <MdClose className="w-5 h-5" />
+                    Fechar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

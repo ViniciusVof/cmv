@@ -1,24 +1,30 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUiStore } from '../stores/uiStore';
+import { 
+  MdDashboard, 
+  MdInventory, 
+  MdBusiness, 
+  MdReceipt, 
+  MdAttachMoney, 
+  MdTrendingDown, 
+  MdSettings 
+} from 'react-icons/md';
+import type { IconType } from 'react-icons';
 
 interface MenuItem {
   name: string;
-  icon: string;
+  icon: IconType;
   path: string;
 }
 
 const menuItems: MenuItem[] = [
-  { name: 'Dashboard', icon: '📊', path: '/dashboard' },
-  { name: 'PDV', icon: '🛒', path: '/pdv' },
-  { name: 'Estoque', icon: '📦', path: '/estoque' },
-  { name: 'Fornecedores', icon: '🏢', path: '/fornecedores' },
-  { name: 'Fichas Técnicas', icon: '📝', path: '/fichas-tecnicas' },
-  { name: 'CMV', icon: '💵', path: '/cmv' },
-  { name: 'CMV Global', icon: '📈', path: '/cmv-global' },
-  { name: 'Custo Fixo', icon: '💰', path: '/custo-fixo' },
-  { name: 'Custo Variável', icon: '📉', path: '/custo-variavel' },
-  { name: 'Configurações', icon: '⚙️', path: '/configuracoes' },
-  { name: 'Relatórios', icon: '📋', path: '/relatorios' },
+  { name: 'Dashboard', icon: MdDashboard, path: '/dashboard' },
+  { name: 'Estoque', icon: MdInventory, path: '/estoque' },
+  { name: 'Fornecedores', icon: MdBusiness, path: '/fornecedores' },
+  { name: 'Fichas Técnicas', icon: MdReceipt, path: '/fichas-tecnicas' },
+  { name: 'Custo Fixo', icon: MdAttachMoney, path: '/custo-fixo' },
+  { name: 'Custo Variável', icon: MdTrendingDown, path: '/custo-variavel' },
+  { name: 'Configurações', icon: MdSettings, path: '/configuracoes' },
 ];
 
 export function Sidebar() {
@@ -95,7 +101,7 @@ export function Sidebar() {
                     }`}
                     title={!sidebarExpanded ? item.name : undefined}
                   >
-                    <span className="text-xl flex-shrink-0">{item.icon}</span>
+                    <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-600'}`} />
                     {sidebarExpanded && (
                       <span className="text-sm truncate">{item.name}</span>
                     )}
