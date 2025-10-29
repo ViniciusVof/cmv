@@ -5,6 +5,9 @@ import type { Ingredient, IngredientFormData } from '../types/ingredient';
 import type { Supplier } from '../types/supplier';
 import { ingredientService } from '../services/ingredientService';
 import { supplierService } from '../services/supplierService';
+import { stockService } from '../services/stockService';
+import type { StockMovementType, StockMovement } from '../types/stock';
+import { MdAdd, MdRemove, MdDelete, MdExpandMore, MdExpandLess } from 'react-icons/md';
 
 type SortField = 'code' | 'name' | 'pricePaid' | 'volume' | 'unit' | 'correctionFactor' | 'finalValue' | 'supplierName';
 type SortDirection = 'asc' | 'desc';
@@ -14,6 +17,7 @@ export function Ingredients() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [stockSummaries, setStockSummaries] = useState<Record<string, { quantityOnHand: number; lastEntryUnitCost?: number }>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<IngredientFormData>({
     code: '',
@@ -30,6 +34,14 @@ export function Ingredients() {
   const [sortField, setSortField] = useState<SortField>('code');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [showCalculator, setShowCalculator] = useState(false);
+  const [expandedIngredientId, setExpandedIngredientId] = useState<string | null>(null);
+  const [ingredientMovements, setIngredientMovements] = useState<Record<string, StockMovement[]>>({});
+  const [showMovementForm, setShowMovementForm] = useState<string | null>(null);
+  const [movementType, setMovementType] = useState<StockMovementType>('IN');
+  const [movementQuantity, setMovementQuantity] = useState<number>(0);
+  const [movementUnitCost, setMovementUnitCost] = useState<number>(0);
+  const [movementDate, setMovementDate] = useState<string>('');
+  const [isInitialMovement, setIsInitialMovement] = useState<boolean>(false);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -147,16 +159,94 @@ export function Ingredients() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [ingredientsData, suppliersData] = await Promise.all([
+      const [ingredientsData, suppliersData, stockMap] = await Promise.all([
         ingredientService.getAll(),
         supplierService.getAll(),
+        stockService.getSummaryAll(),
       ]);
-      setIngredients(ingredientsData);
+      
+      // Criar movimentações iniciais para ingredientes que têm volume mas não têm movimentações
+      for (const ingredient of ingredientsData) {
+        const movements = await stockService.getByIngredient(ingredient.id);
+        const stockSummary = stockMap[ingredient.id];
+        const hasMovements = movements.length > 0;
+        const volumeFromMovements = stockSummary ? stockSummary.quantityOnHand : 0;
+        
+        // Se o ingrediente tem volume original mas não tem movimentações registradas,
+        // ou se o volume original é diferente da soma das movimentações (e é maior que zero),
+        // criar movimentação inicial
+        if (ingredient.volume > 0 && (!hasMovements || (volumeFromMovements === 0 && ingredient.volume > 0))) {
+          try {
+            const unitCost = ingredient.pricePaid && ingredient.volume > 0 
+              ? ingredient.pricePaid / ingredient.volume 
+              : 0;
+            
+            await stockService.create({
+              ingredientId: ingredient.id,
+              type: 'IN',
+              quantity: ingredient.volume,
+              unitCost: unitCost,
+              isInitial: true,
+            });
+          } catch (error) {
+            console.error(`Error creating initial movement for ingredient ${ingredient.id}:`, error);
+          }
+        }
+      }
+      
+      // Recarregar resumo de estoque após criar movimentações iniciais
+      const updatedStockMap = await stockService.getSummaryAll();
+      
+      // Atualizar volumes dos ingredientes baseado nas movimentações (soma de todas)
+      const updatedIngredients = ingredientsData.map((ingredient) => {
+        const stockSummary = updatedStockMap[ingredient.id];
+        // O volume sempre reflete a soma das movimentações
+        const calculatedVolume = stockSummary ? stockSummary.quantityOnHand : 0;
+        return {
+          ...ingredient,
+          volume: calculatedVolume,
+        };
+      });
+      
+      setIngredients(updatedIngredients);
       setSuppliers(suppliersData);
+      const summaries: Record<string, { quantityOnHand: number; lastEntryUnitCost?: number }> = {};
+      Object.values(updatedStockMap).forEach((s: any) => {
+        summaries[s.ingredientId] = { quantityOnHand: s.quantityOnHand, lastEntryUnitCost: s.lastEntryUnitCost };
+      });
+      setStockSummaries(summaries);
+      
+      // Load movements for expanded ingredient if any
+      if (expandedIngredientId) {
+        const movements = await stockService.getByIngredient(expandedIngredientId);
+        setIngredientMovements(prev => ({ ...prev, [expandedIngredientId]: movements }));
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadMovementsForIngredient = async (ingredientId: string) => {
+    try {
+      const movements = await stockService.getByIngredient(ingredientId);
+      setIngredientMovements(prev => ({ ...prev, [ingredientId]: movements }));
+    } catch (error) {
+      console.error('Error loading movements:', error);
+    }
+  };
+
+  const toggleExpanded = async (ingredientId: string) => {
+    if (expandedIngredientId === ingredientId) {
+      setExpandedIngredientId(null);
+      setShowMovementForm(null);
+    } else {
+      setExpandedIngredientId(ingredientId);
+      if (!ingredientMovements[ingredientId]) {
+        await loadMovementsForIngredient(ingredientId);
+      }
+      setShowMovementForm(null);
     }
   };
 
@@ -210,10 +300,23 @@ export function Ingredients() {
         supplierId: finalSupplierId,
       };
 
+      let createdIngredient;
       if (editingId) {
-        await ingredientService.update(editingId, finalFormData);
+        createdIngredient = await ingredientService.update(editingId, finalFormData);
       } else {
-        await ingredientService.create(finalFormData);
+        createdIngredient = await ingredientService.create(finalFormData);
+        
+        // Criar movimentação inicial se o volume for maior que zero
+        if (finalFormData.volume > 0) {
+          const unitCost = finalFormData.pricePaid / finalFormData.volume;
+          await stockService.create({
+            ingredientId: createdIngredient.id,
+            type: 'IN',
+            quantity: finalFormData.volume,
+            unitCost: unitCost,
+            isInitial: true,
+          });
+        }
       }
       setShowForm(false);
       setEditingId(null);
@@ -363,6 +466,91 @@ export function Ingredients() {
 
   const handleApplyCorrectionFactor = (factor: number) => {
     setFormData({ ...formData, correctionFactor: factor });
+  };
+
+  const openMovementForm = (ingredientId: string) => {
+    // Determine if initial movement (no movements recorded for this ingredient)
+    const isInitial = !stockSummaries[ingredientId] || (stockSummaries[ingredientId]?.quantityOnHand === 0 && !ingredientMovements[ingredientId]?.length);
+    setIsInitialMovement(isInitial);
+    setMovementType('IN');
+    setMovementQuantity(0);
+    setMovementUnitCost(0);
+    setMovementDate('');
+    setShowMovementForm(ingredientId);
+  };
+
+  const cancelMovementForm = () => {
+    setShowMovementForm(null);
+    setMovementType('IN');
+    setMovementQuantity(0);
+    setMovementUnitCost(0);
+    setMovementDate('');
+    setIsInitialMovement(false);
+  };
+
+  const submitMovement = async (ingredientId: string) => {
+    if (movementQuantity <= 0) {
+      alert('Informe uma quantidade válida');
+      return;
+    }
+    if (movementType === 'IN' && movementUnitCost <= 0) {
+      alert('Informe o custo unitário da entrada');
+      return;
+    }
+
+    try {
+      // Criar a movimentação
+      await stockService.create({
+        ingredientId,
+        type: movementType,
+        quantity: movementQuantity,
+        unitCost: movementType === 'IN' ? movementUnitCost : undefined,
+        isInitial: isInitialMovement || undefined,
+        date: movementDate || undefined,
+      });
+      
+      // Recarregar o resumo de estoque e atualizar volume do ingrediente
+      const stockMap = await stockService.getSummaryAll();
+      const stockSummary = stockMap[ingredientId];
+      const summaries: Record<string, { quantityOnHand: number; lastEntryUnitCost?: number }> = {};
+      Object.values(stockMap).forEach((s: any) => {
+        summaries[s.ingredientId] = { quantityOnHand: s.quantityOnHand, lastEntryUnitCost: s.lastEntryUnitCost };
+      });
+      setStockSummaries(summaries);
+      
+      // Atualizar o volume do ingrediente no banco para manter consistência
+      if (stockSummary) {
+        const ingredient = ingredients.find(i => i.id === ingredientId);
+        if (ingredient && ingredient.volume !== stockSummary.quantityOnHand) {
+          await ingredientService.update(ingredientId, {
+            code: ingredient.code,
+            name: ingredient.name,
+            pricePaid: ingredient.pricePaid,
+            volume: stockSummary.quantityOnHand,
+            unit: ingredient.unit,
+            correctionFactor: ingredient.correctionFactor,
+            supplierId: ingredient.supplierId,
+          });
+        }
+      }
+      
+      cancelMovementForm();
+      await loadMovementsForIngredient(ingredientId);
+      await loadData(); // Recarrega todos os dados - o volume será calculado baseado nas movimentações
+    } catch (error) {
+      console.error('Error creating stock movement:', error);
+      alert('Erro ao registrar movimentação de estoque');
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
@@ -798,14 +986,33 @@ export function Ingredients() {
                     </td>
                   </tr>
                 ) : (
-                  filteredAndSortedIngredients.map((ingredient) => (
-                    <tr key={ingredient.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{ingredient.code}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">{ingredient.name}</div>
-                      </td>
+                  filteredAndSortedIngredients.map((ingredient) => {
+                    const isExpanded = expandedIngredientId === ingredient.id;
+                    const movements = ingredientMovements[ingredient.id] || [];
+                    const showFormForMovement = showMovementForm === ingredient.id;
+                    
+                    return (
+                      <>
+                        <tr key={ingredient.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">{ingredient.code}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => toggleExpanded(ingredient.id)}
+                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                                title={isExpanded ? 'Recolher' : 'Expandir'}
+                              >
+                                {isExpanded ? (
+                                  <MdExpandLess className="w-5 h-5" />
+                                ) : (
+                                  <MdExpandMore className="w-5 h-5" />
+                                )}
+                              </button>
+                              <div className="text-sm font-medium text-gray-900">{ingredient.name}</div>
+                            </div>
+                          </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="text-sm text-gray-900">{formatCurrency(ingredient.pricePaid)}</div>
                       </td>
@@ -842,14 +1049,155 @@ export function Ingredients() {
                             className="text-red-600 hover:text-red-800"
                             title="Excluir"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            <MdDelete className="w-5 h-5" />
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))
+                    {isExpanded && (
+                      <tr>
+                        <td colSpan={9} className="px-6 py-4 bg-gray-50">
+                          <div className="space-y-4">
+                            {/* Header do Submenu */}
+                            <div className="flex justify-between items-center">
+                              <h3 className="text-lg font-semibold text-gray-800">Movimentações de Estoque</h3>
+                              <button
+                                onClick={() => openMovementForm(ingredient.id)}
+                                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                              >
+                                <MdAdd className="w-5 h-5" />
+                                Nova Movimentação
+                              </button>
+                            </div>
+
+                            {/* Formulário de Nova Movimentação */}
+                            {showFormForMovement && (
+                              <div className="bg-white border border-gray-200 rounded-lg p-4">
+                                <h4 className="text-md font-semibold text-gray-800 mb-4">Nova Movimentação</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Tipo *</label>
+                                    <select
+                                      value={movementType}
+                                      onChange={(e) => setMovementType(e.target.value as StockMovementType)}
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    >
+                                      <option value="IN">Entrada</option>
+                                      <option value="OUT">Saída</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Quantidade *</label>
+                                    <input
+                                      type="number"
+                                      step="0.001"
+                                      min="0"
+                                      value={movementQuantity || ''}
+                                      onChange={(e) => setMovementQuantity(parseFloat(e.target.value) || 0)}
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    />
+                                  </div>
+                                  {movementType === 'IN' && (
+                                    <>
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Custo Unitário (R$) *</label>
+                                        <input
+                                          type="number"
+                                          step="0.01"
+                                          min="0"
+                                          value={movementUnitCost || ''}
+                                          onChange={(e) => setMovementUnitCost(parseFloat(e.target.value) || 0)}
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Data de Entrada (opcional)</label>
+                                        <input
+                                          type="date"
+                                          value={movementDate}
+                                          onChange={(e) => setMovementDate(e.target.value)}
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Se não informado, será usada a data atual.</p>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                                <div className="flex justify-end gap-2 mt-4">
+                                  <button
+                                    onClick={cancelMovementForm}
+                                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 flex items-center gap-2"
+                                  >
+                                    <MdRemove className="w-4 h-4" />
+                                    Cancelar
+                                  </button>
+                                  <button
+                                    onClick={() => submitMovement(ingredient.id)}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                                  >
+                                    <MdAdd className="w-4 h-4" />
+                                    Salvar
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Histórico de Movimentações */}
+                            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                              <table className="w-full text-sm">
+                                <thead className="bg-gray-100">
+                                  <tr>
+                                    <th className="px-4 py-2 text-left">Data</th>
+                                    <th className="px-4 py-2 text-left">Tipo</th>
+                                    <th className="px-4 py-2 text-right">Quantidade</th>
+                                    <th className="px-4 py-2 text-right">Custo Unitário</th>
+                                    <th className="px-4 py-2 text-right">Total</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {movements.length === 0 ? (
+                                    <tr>
+                                      <td colSpan={5} className="px-4 py-4 text-center text-gray-500">
+                                        Nenhuma movimentação registrada
+                                      </td>
+                                    </tr>
+                                  ) : (
+                                    movements
+                                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                                      .map((movement) => (
+                                        <tr key={movement.id} className="border-t hover:bg-gray-50">
+                                          <td className="px-4 py-2">{formatDate(movement.date)}</td>
+                                          <td className="px-4 py-2">
+                                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                              movement.type === 'IN' 
+                                                ? 'bg-green-100 text-green-800' 
+                                                : 'bg-red-100 text-red-800'
+                                            }`}>
+                                              {movement.type === 'IN' ? 'Entrada' : 'Saída'}
+                                            </span>
+                                          </td>
+                                          <td className="px-4 py-2 text-right">
+                                            {movement.type === 'IN' ? '+' : '-'}{movement.quantity} {ingredient.unit}
+                                          </td>
+                                          <td className="px-4 py-2 text-right">
+                                            {movement.unitCost ? formatCurrency(movement.unitCost) : '-'}
+                                          </td>
+                                          <td className="px-4 py-2 text-right">
+                                            {movement.unitCost ? formatCurrency(movement.unitCost * movement.quantity) : '-'}
+                                          </td>
+                                        </tr>
+                                      ))
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+                  })
                 )}
               </tbody>
             </table>

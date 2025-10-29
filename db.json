@@ -134,22 +134,30 @@
     {
       "name": "teste",
       "id": "PVfxQbv"
+    },
+    {
+      "name": "Teste Fornecedor",
+      "id": "-03T-Zs"
+    },
+    {
+      "name": "Teste Fornecedor",
+      "id": "-lNIZh4"
     }
   ],
   "ingredients": [
     {
-      "id": "1",
       "code": "1",
       "name": "BLEND BOVINO",
       "pricePaid": 49.46,
-      "volume": 1.549,
+      "volume": 7.5,
       "unit": "KG",
       "correctionFactor": 1,
       "supplierId": "1",
-      "supplierName": "MUNHOZ"
+      "finalValue": 6.594666666666667,
+      "supplierName": "MUNHOZ",
+      "id": "1"
     },
     {
-      "id": "2",
       "code": "2",
       "name": "PÃO BRIOCHE MAX",
       "pricePaid": 125,
@@ -157,7 +165,9 @@
       "unit": "UN",
       "correctionFactor": 1,
       "supplierId": "2",
-      "supplierName": "ATTIMINO"
+      "finalValue": 2.6041666666666665,
+      "supplierName": "ATTIMINO",
+      "id": "2"
     },
     {
       "id": "3",
@@ -510,6 +520,30 @@
       "correctionFactor": 1,
       "supplierId": "4",
       "supplierName": "FABRICAÇÃO"
+    },
+    {
+      "code": "35",
+      "name": "Produto Teste Movimentação",
+      "pricePaid": 150,
+      "volume": 10,
+      "unit": "UN",
+      "correctionFactor": 1,
+      "supplierId": "-lNIZh4",
+      "finalValue": 15,
+      "supplierName": "Teste Fornecedor",
+      "id": "2jKuhX0"
+    },
+    {
+      "code": "36",
+      "name": "Produto Primeira Movimentação",
+      "pricePaid": 125,
+      "volume": 2,
+      "unit": "KG",
+      "correctionFactor": 1,
+      "supplierId": "1",
+      "finalValue": 62.5,
+      "supplierName": "MUNHOZ",
+      "id": "UiMGlZv"
     }
   ],
   "recipes": [
@@ -588,6 +622,332 @@
       "id": "1",
       "markup": 3,
       "ifoodTaxPercentage": 15.2
+    }
+  ],
+  "stockMovements": [
+    {
+      "id": 1,
+      "ingredientId": "1",
+      "type": "IN",
+      "quantity": 7.5,
+      "unitCost": 6.594666666666667,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 2,
+      "ingredientId": "2",
+      "type": "IN",
+      "quantity": 48,
+      "unitCost": 2.6041666666666665,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 3,
+      "ingredientId": "3",
+      "type": "IN",
+      "quantity": 160,
+      "unitCost": 0.5191250000000001,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 4,
+      "ingredientId": "4",
+      "type": "IN",
+      "quantity": 0.9,
+      "unitCost": 9.744444444444444,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 5,
+      "ingredientId": "5",
+      "type": "IN",
+      "quantity": 0.356,
+      "unitCost": 12.612359550561798,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 6,
+      "ingredientId": "6",
+      "type": "IN",
+      "quantity": 0.079,
+      "unitCost": 4.556962025316455,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 7,
+      "ingredientId": "7",
+      "type": "IN",
+      "quantity": 0.3,
+      "unitCost": 56.6,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 8,
+      "ingredientId": "8",
+      "type": "IN",
+      "quantity": 7.5,
+      "unitCost": 37.88,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 9,
+      "ingredientId": "9",
+      "type": "IN",
+      "quantity": 1,
+      "unitCost": 8.35,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 10,
+      "ingredientId": "10",
+      "type": "IN",
+      "quantity": 1.1,
+      "unitCost": 18.090909090909086,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 11,
+      "ingredientId": "11",
+      "type": "IN",
+      "quantity": 18,
+      "unitCost": 15.99,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 12,
+      "ingredientId": "12",
+      "type": "IN",
+      "quantity": 0.528,
+      "unitCost": 18.52272727272727,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 13,
+      "ingredientId": "13",
+      "type": "IN",
+      "quantity": 0.5,
+      "unitCost": 9.6,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 14,
+      "ingredientId": "14",
+      "type": "IN",
+      "quantity": 1,
+      "unitCost": 8.35,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 15,
+      "ingredientId": "15",
+      "type": "IN",
+      "quantity": 1.033,
+      "unitCost": 17.32817037754114,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 16,
+      "ingredientId": "16",
+      "type": "IN",
+      "quantity": 1,
+      "unitCost": 18.4,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 17,
+      "ingredientId": "17",
+      "type": "IN",
+      "quantity": 10,
+      "unitCost": 3.316,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 18,
+      "ingredientId": "18",
+      "type": "IN",
+      "quantity": 1.01,
+      "unitCost": 10.871287128712872,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 19,
+      "ingredientId": "19",
+      "type": "IN",
+      "quantity": 1.5,
+      "unitCost": 31.653333333333332,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 20,
+      "ingredientId": "20",
+      "type": "IN",
+      "quantity": 0.35,
+      "unitCost": 79.71428571428571,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 21,
+      "ingredientId": "21",
+      "type": "IN",
+      "quantity": 1.504,
+      "unitCost": 53.58377659574468,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 22,
+      "ingredientId": "22",
+      "type": "IN",
+      "quantity": 6,
+      "unitCost": 3.69,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 23,
+      "ingredientId": "23",
+      "type": "IN",
+      "quantity": 1,
+      "unitCost": 15,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 24,
+      "ingredientId": "24",
+      "type": "IN",
+      "quantity": 2000,
+      "unitCost": 0.75,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 25,
+      "ingredientId": "25",
+      "type": "IN",
+      "quantity": 2000,
+      "unitCost": 0.55,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 26,
+      "ingredientId": "26",
+      "type": "IN",
+      "quantity": 3000,
+      "unitCost": 0.69,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 27,
+      "ingredientId": "27",
+      "type": "IN",
+      "quantity": 10000,
+      "unitCost": 0.3,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 28,
+      "ingredientId": "28",
+      "type": "IN",
+      "quantity": 1,
+      "unitCost": 630,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 29,
+      "ingredientId": "29",
+      "type": "IN",
+      "quantity": 1,
+      "unitCost": 350,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 30,
+      "ingredientId": "30",
+      "type": "IN",
+      "quantity": 1,
+      "unitCost": 67.99,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 31,
+      "ingredientId": "31",
+      "type": "IN",
+      "quantity": 1.5,
+      "unitCost": 46.6,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 32,
+      "ingredientId": "32",
+      "type": "IN",
+      "quantity": 1.03,
+      "unitCost": 13.097087378640776,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 33,
+      "ingredientId": "33",
+      "type": "IN",
+      "quantity": 0.1,
+      "unitCost": 50,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 34,
+      "ingredientId": "34",
+      "type": "IN",
+      "quantity": 0.36,
+      "unitCost": 37.38888888888889,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 35,
+      "ingredientId": "2jKuhX0",
+      "type": "IN",
+      "quantity": 10,
+      "unitCost": 15,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
+    },
+    {
+      "id": 36,
+      "ingredientId": "UiMGlZv",
+      "type": "IN",
+      "quantity": 2,
+      "unitCost": 62.5,
+      "isInitial": true,
+      "date": "2025-10-29T19:54:59.938Z"
     }
   ]
 }

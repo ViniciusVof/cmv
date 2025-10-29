@@ -5,6 +5,7 @@ import { FixedCost } from './pages/FixedCost';
 import { VariableCost } from './pages/VariableCost';
 import { Suppliers } from './pages/Suppliers';
 import { Ingredients } from './pages/Ingredients';
+import { BatchStockMovements } from './pages/BatchStockMovements';
 import { Recipes } from './pages/Recipes';
 import { BusinessSettings } from './pages/BusinessSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -57,6 +58,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Ingredients />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/estoque/movimentacoes-lote"
+          element={
+            <ProtectedRoute>
+              <BatchStockMovements />
             </ProtectedRoute>
           }
         />
