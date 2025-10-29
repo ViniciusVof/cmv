@@ -630,6 +630,36 @@
       "updatedAt": "2025-10-29T22:18:48.830Z"
     }
   ],
+  "productCategories": [
+    {
+      "name": "Lanches",
+      "description": "",
+      "isActive": true,
+      "createdAt": "2025-10-29T23:09:55.742Z",
+      "updatedAt": "2025-10-29T23:09:55.742Z",
+      "id": 1
+    }
+  ],
+  "pdvProducts": [
+    {
+      "code": "1",
+      "name": "Origin",
+      "description": "",
+      "recipeId": "1",
+      "sellingPrice": 29,
+      "ifoodPrice": 34,
+      "isActive": true,
+      "category": "Lanches",
+      "imageUrl": "",
+      "updatedAt": "2025-10-29T23:11:07.637Z",
+      "id": 1
+    }
+  ],
+  "customers": [],
+  "deliveryAreas": [],
+  "deliveryDrivers": [],
+  "paymentMethods": [],
+  "sales": [],
   "reconciliationReports": [
     {
       "date": "2025-10-29",

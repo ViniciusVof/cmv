@@ -9,8 +9,11 @@ import { BatchStockMovements } from './pages/BatchStockMovements';
 import { StockReconciliation } from './pages/StockReconciliation';
 import { ReconciliationReports } from './pages/ReconciliationReports';
 import { Recipes } from './pages/Recipes';
+import { PdvProducts } from './pages/PdvProducts';
+import { ProductCategories } from './pages/ProductCategories';
 import { BusinessSettings } from './pages/BusinessSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { Layout } from './components/Layout';
 import { useAuthStore } from './stores/authStore';
 
 function App() {
@@ -92,6 +95,87 @@ function App() {
           element={
             <ProtectedRoute>
               <Recipes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pdv"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <h1 className="text-3xl font-bold text-gray-800 mb-4">Ponto de Venda</h1>
+                  <p className="text-gray-600">Tela do PDV em desenvolvimento...</p>
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pdv/produtos"
+          element={
+            <ProtectedRoute>
+              <PdvProducts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pdv/categorias"
+          element={
+            <ProtectedRoute>
+              <ProductCategories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pdv/clientes"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <h1 className="text-3xl font-bold text-gray-800 mb-4">Clientes</h1>
+                  <p className="text-gray-600">Módulo em desenvolvimento...</p>
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pdv/areas-entrega"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <h1 className="text-3xl font-bold text-gray-800 mb-4">Áreas de Entrega</h1>
+                  <p className="text-gray-600">Módulo em desenvolvimento...</p>
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pdv/entregadores"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <h1 className="text-3xl font-bold text-gray-800 mb-4">Entregadores</h1>
+                  <p className="text-gray-600">Módulo em desenvolvimento...</p>
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pdv/formas-pagamento"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <h1 className="text-3xl font-bold text-gray-800 mb-4">Formas de Pagamento</h1>
+                  <p className="text-gray-600">Módulo em desenvolvimento...</p>
+                </div>
+              </Layout>
             </ProtectedRoute>
           }
         />

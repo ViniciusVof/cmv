@@ -10,7 +10,8 @@ import {
   MdTrendingDown, 
   MdSettings,
   MdExpandMore,
-  MdExpandLess
+  MdExpandLess,
+  MdPointOfSale
 } from 'react-icons/md';
 import type { IconType } from 'react-icons';
 
@@ -35,6 +36,19 @@ const menuItems: MenuItem[] = [
   },
   { name: 'Fornecedores', icon: MdBusiness, path: '/fornecedores' },
   { name: 'Fichas Técnicas', icon: MdReceipt, path: '/fichas-tecnicas' },
+  { 
+    name: 'PDV', 
+    icon: MdPointOfSale, 
+    subItems: [
+      { name: 'Ponto de Venda', path: '/pdv' },
+      { name: 'Produtos', path: '/pdv/produtos' },
+      { name: 'Categorias', path: '/pdv/categorias' },
+      { name: 'Clientes', path: '/pdv/clientes' },
+      { name: 'Áreas de Entrega', path: '/pdv/areas-entrega' },
+      { name: 'Entregadores', path: '/pdv/entregadores' },
+      { name: 'Formas de Pagamento', path: '/pdv/formas-pagamento' },
+    ]
+  },
   { name: 'Custo Fixo', icon: MdAttachMoney, path: '/custo-fixo' },
   { name: 'Custo Variável', icon: MdTrendingDown, path: '/custo-variavel' },
   { name: 'Configurações', icon: MdSettings, path: '/configuracoes' },
