@@ -624,7 +624,7 @@ export function Orders() {
                             >
                               <MdVisibility className="w-4 h-4" />
                             </button>
-                            {statusKey === 'kitchen' && (
+                            {(statusKey === 'kitchen' || statusKey === 'waiting_delivery') && (
                               <button
                                 onClick={() => startEditOrder(order)}
                                 className="text-gray-600 hover:text-gray-800"
@@ -633,6 +633,7 @@ export function Orders() {
                                 <MdEdit className="w-4 h-4" />
                               </button>
                             )}
+                          
                           <button
                             onClick={() => handleCancel(order.id)}
                             className="text-red-600 hover:text-red-800"
@@ -1278,44 +1279,44 @@ export function Orders() {
                 </div>
               )}
 
-              {/* Modal de Visualização do Pedido */}
-              {viewOrder && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-black/40" onClick={() => setViewOrder(null)} />
-                  <div className="relative bg-white w-full max-w-lg mx-4 rounded-lg shadow-xl border">
-                    <div className="flex items-center justify-between p-4 border-b">
-                      <div className="text-gray-800 font-semibold text-base">Pedido #{viewOrder.orderNumber || String(viewOrder.id).slice(0,8)}</div>
-                      <button className="text-gray-500 hover:text-gray-700" onClick={() => setViewOrder(null)}>
-                        <MdClose className="w-5 h-5" />
-                      </button>
-                    </div>
-                    <div className="p-4 flex flex-col gap-3">
-                      <div className="text-sm text-gray-800"><span className="font-medium">Cliente:</span> {viewOrder.customerName || '—'}</div>
-                      <div className="text-sm text-gray-700">{viewOrder.deliveryAreaName || '—'}</div>
-                      <div className="text-sm text-gray-700">{viewOrder.paymentMethodName || '—'}</div>
-                      <div className="border-t pt-3">
-                        <div className="text-xs font-medium text-gray-600 mb-2">Itens</div>
-                        <div className="flex flex-col gap-1 max-h-60 overflow-auto">
-                          {(viewOrder.items || []).map((it, idx) => (
-                            <div key={idx} className="text-xs text-gray-700">
-                              {it.quantity}x {it.productName} — {formatCurrency(it.unitPrice * it.quantity)}
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-3 text-sm flex justify-between text-gray-800">
-                          <span>Total</span>
-                          <span className="font-bold">{formatCurrency(viewOrder.total)}</span>
-                        </div>
+              {/* Modal de edição dedicado removido; edição usa a tela de pedido rápido reaberta */}
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Visualização do Pedido - fora do contexto showNewOrder */}
+        {viewOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setViewOrder(null)} />
+            <div className="relative bg-white w-full max-w-lg mx-4 rounded-lg shadow-xl border">
+              <div className="flex items-center justify-between p-4 border-b">
+                <div className="text-gray-800 font-semibold text-base">Pedido #{viewOrder.orderNumber || String(viewOrder.id).slice(0,8)}</div>
+                <button className="text-gray-500 hover:text-gray-700" onClick={() => setViewOrder(null)}>
+                  <MdClose className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-4 flex flex-col gap-3">
+                <div className="text-sm text-gray-800"><span className="font-medium">Cliente:</span> {viewOrder.customerName || '—'}</div>
+                <div className="text-sm text-gray-700">{viewOrder.deliveryAreaName || '—'}</div>
+                <div className="text-sm text-gray-700">{viewOrder.paymentMethodName || '—'}</div>
+                <div className="border-t pt-3">
+                  <div className="text-xs font-medium text-gray-600 mb-2">Itens</div>
+                  <div className="flex flex-col gap-1 max-h-60 overflow-auto">
+                    {(viewOrder.items || []).map((it, idx) => (
+                      <div key={idx} className="text-xs text-gray-700">
+                        {it.quantity}x {it.productName} — {formatCurrency(it.unitPrice * it.quantity)}
                       </div>
-                      {viewOrder.notes && (
-                        <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">{viewOrder.notes}</div>
-                      )}
-                    </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 text-sm flex justify-between text-gray-800">
+                    <span>Total</span>
+                    <span className="font-bold">{formatCurrency(viewOrder.total)}</span>
                   </div>
                 </div>
-              )}
-
-              {/* Modal de edição dedicado removido; edição usa a tela de pedido rápido reaberta */}
+                {viewOrder.notes && (
+                  <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">{viewOrder.notes}</div>
+                )}
+              </div>
             </div>
           </div>
         )}
