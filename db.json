@@ -1594,7 +1594,7 @@
     },
     {
       "orderNumber": "000002",
-      "status": "completed",
+      "status": "in_delivery",
       "customerId": 2,
       "deliveryAreaId": "1",
       "paymentMethodId": "2",
@@ -1618,7 +1618,7 @@
       "subtotal": 72,
       "total": 75,
       "createdAt": "2025-10-30T04:31:33.458Z",
-      "updatedAt": "2025-10-30T14:27:41.311Z",
+      "updatedAt": "2025-10-30T15:03:19.342Z",
       "id": 2,
       "paymentMethodKind": "pix",
       "deliveryDriverId": "1"
