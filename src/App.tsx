@@ -11,6 +11,8 @@ import { ReconciliationReports } from './pages/ReconciliationReports';
 import { Recipes } from './pages/Recipes';
 import { PdvProducts } from './pages/PdvProducts';
 import { ProductCategories } from './pages/ProductCategories';
+import { DeliveryAreas } from './pages/DeliveryAreas';
+import { DeliveryDrivers } from './pages/DeliveryDrivers';
 import { BusinessSettings } from './pages/BusinessSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
@@ -144,12 +146,7 @@ function App() {
           path="/pdv/areas-entrega"
           element={
             <ProtectedRoute>
-              <Layout>
-                <div className="p-8">
-                  <h1 className="text-3xl font-bold text-gray-800 mb-4">Áreas de Entrega</h1>
-                  <p className="text-gray-600">Módulo em desenvolvimento...</p>
-                </div>
-              </Layout>
+              <DeliveryAreas />
             </ProtectedRoute>
           }
         />
@@ -157,12 +154,7 @@ function App() {
           path="/pdv/entregadores"
           element={
             <ProtectedRoute>
-              <Layout>
-                <div className="p-8">
-                  <h1 className="text-3xl font-bold text-gray-800 mb-4">Entregadores</h1>
-                  <p className="text-gray-600">Módulo em desenvolvimento...</p>
-                </div>
-              </Layout>
+              <DeliveryDrivers />
             </ProtectedRoute>
           }
         />
