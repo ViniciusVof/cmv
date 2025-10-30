@@ -10,6 +10,9 @@ export interface Ingredient {
   supplierId: string;
   supplierName: string;
   isProduct?: boolean; // Se pode ser usado em outras fichas técnicas
+  minStock?: number; // nível mínimo recomendado
+  idealStock?: number; // nível ideal
+  maxStock?: number; // nível máximo permitido
 }
 
 export interface IngredientFormData {
@@ -20,5 +23,8 @@ export interface IngredientFormData {
   unit: string;
   correctionFactor: number;
   supplierId: string;
+  minStock?: number;
+  idealStock?: number;
+  maxStock?: number;
 }
 

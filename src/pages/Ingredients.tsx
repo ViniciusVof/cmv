@@ -27,10 +27,14 @@ export function Ingredients() {
     unit: 'KG',
     correctionFactor: 1.0,
     supplierId: '',
+    minStock: undefined,
+    idealStock: undefined,
+    maxStock: undefined,
   });
   const [supplierInput, setSupplierInput] = useState('');
   const [showSupplierSuggestions, setShowSupplierSuggestions] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [stockFilter, setStockFilter] = useState<'all' | 'below_min' | 'below_ideal' | 'above_max'>('all');
   const [sortField, setSortField] = useState<SortField>('code');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [showCalculator, setShowCalculator] = useState(false);
@@ -67,6 +71,17 @@ export function Ingredients() {
         ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         ingredient.supplierName.toLowerCase().includes(searchTerm.toLowerCase())
       );
+    }
+
+    // Apply stock filter
+    if (stockFilter !== 'all') {
+      filtered = filtered.filter((i) => {
+        const qty = stockSummaries[i.id]?.quantityOnHand ?? i.volume;
+        if (stockFilter === 'below_min' && typeof i.minStock === 'number') return qty < (i.minStock as number);
+        if (stockFilter === 'below_ideal' && typeof i.idealStock === 'number') return qty < (i.idealStock as number);
+        if (stockFilter === 'above_max' && typeof i.maxStock === 'number') return qty > (i.maxStock as number);
+        return false;
+      });
     }
 
     // Apply sorting
@@ -117,7 +132,7 @@ export function Ingredients() {
     });
 
     return sorted;
-  }, [ingredients, searchTerm, sortField, sortDirection]);
+  }, [ingredients, searchTerm, sortField, sortDirection, stockFilter, stockSummaries]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -347,6 +362,9 @@ export function Ingredients() {
       unit: ingredient.unit,
       correctionFactor: ingredient.correctionFactor,
       supplierId: ingredient.supplierId,
+      minStock: ingredient.minStock,
+      idealStock: ingredient.idealStock,
+      maxStock: ingredient.maxStock,
     });
     setSupplierInput(ingredient.supplierName);
     setEditingId(ingredient.id);
@@ -379,6 +397,9 @@ export function Ingredients() {
       unit: 'KG',
       correctionFactor: 1.0,
       supplierId: '',
+      minStock: undefined,
+      idealStock: undefined,
+      maxStock: undefined,
     });
   };
 
@@ -610,7 +631,7 @@ export function Ingredients() {
         </div>
 
         {/* Insights */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="bg-white rounded-lg shadow p-4">
             <div className="text-sm text-gray-500">Total de Insumos</div>
             <div className="text-2xl font-bold text-gray-900">{ingredients.length}</div>
@@ -627,6 +648,22 @@ export function Ingredients() {
             <div className="text-sm text-gray-500">Fornecedores Únicos</div>
             <div className="text-2xl font-bold text-gray-900">{new Set(ingredients.map(i => i.supplierId)).size}</div>
           </div>
+          {(() => {
+            const calcQty = (ing: Ingredient) => stockSummaries[ing.id]?.quantityOnHand ?? ing.volume;
+            const belowMin = ingredients.filter(i => typeof i.minStock === 'number' && calcQty(i) < (i.minStock as number)).length;
+            const aboveMax = ingredients.filter(i => typeof i.maxStock === 'number' && calcQty(i) > (i.maxStock as number)).length;
+            const belowIdeal = ingredients.filter(i => typeof i.idealStock === 'number' && calcQty(i) < (i.idealStock as number)).length;
+            return (
+              <div className="bg-white rounded-lg shadow p-4">
+                <div className="text-sm text-gray-500">Insights de Estoque</div>
+                <div className="text-xs text-gray-700 space-y-1 mt-1">
+                  <div><span className="inline-block w-3 h-3 bg-orange-400 rounded-full mr-2 align-middle"></span> Abaixo do mínimo: <span className="font-semibold">{belowMin}</span></div>
+                  <div><span className="inline-block w-3 h-3 bg-yellow-400 rounded-full mr-2 align-middle"></span> Abaixo do ideal: <span className="font-semibold">{belowIdeal}</span></div>
+                  <div><span className="inline-block w-3 h-3 bg-red-500 rounded-full mr-2 align-middle"></span> Acima do máximo: <span className="font-semibold">{aboveMax}</span></div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Form */}
@@ -834,6 +871,43 @@ export function Ingredients() {
                     </p>
                   )}
                 </div>
+                {/* Thresholds */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estoque Mínimo</label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    min="0"
+                    value={formData.minStock ?? ''}
+                    onChange={(e) => setFormData({ ...formData, minStock: e.target.value === '' ? undefined : (parseFloat(e.target.value) || 0) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estoque Ideal</label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    min="0"
+                    value={formData.idealStock ?? ''}
+                    onChange={(e) => setFormData({ ...formData, idealStock: e.target.value === '' ? undefined : (parseFloat(e.target.value) || 0) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estoque Máximo</label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    min="0"
+                    value={formData.maxStock ?? ''}
+                    onChange={(e) => setFormData({ ...formData, maxStock: e.target.value === '' ? undefined : (parseFloat(e.target.value) || 0) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    placeholder="0"
+                  />
+                </div>
                 <div className="md:col-span-2">
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex justify-between items-center">
@@ -867,9 +941,9 @@ export function Ingredients() {
           </div>
         )}
 
-        {/* Search */}
+        {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <div className="flex-1 relative">
               <input
                 type="text"
@@ -886,6 +960,19 @@ export function Ingredients() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
+            </div>
+            <div>
+              <select
+                value={stockFilter}
+                onChange={(e) => setStockFilter(e.target.value as any)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                title="Filtrar por nível de estoque"
+              >
+                <option value="all">Todos</option>
+                <option value="below_min">Abaixo do mínimo</option>
+                <option value="below_ideal">Abaixo do ideal</option>
+                <option value="above_max">Acima do máximo</option>
+              </select>
             </div>
             {searchTerm && (
               <button
@@ -979,6 +1066,9 @@ export function Ingredients() {
                       <SortIcon field="supplierName" />
                     </button>
                   </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Mín.</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Ideal</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Máx.</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                     Ações
                   </th>
@@ -987,7 +1077,7 @@ export function Ingredients() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredAndSortedIngredients.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={12} className="px-6 py-8 text-center text-gray-500">
                       {searchTerm
                         ? 'Nenhum insumo encontrado.'
                         : 'Nenhum insumo cadastrado.'}
@@ -1006,7 +1096,7 @@ export function Ingredients() {
                             <div className="text-sm font-medium text-gray-900">{ingredient.code}</div>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                               <button
                                 onClick={() => toggleExpanded(ingredient.id)}
                                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -1019,6 +1109,19 @@ export function Ingredients() {
                                 )}
                               </button>
                               <div className="text-sm font-medium text-gray-900">{ingredient.name}</div>
+                              {(() => {
+                                const qty = stockSummaries[ingredient.id]?.quantityOnHand ?? ingredient.volume;
+                                const minS = ingredient.minStock ?? undefined;
+                                const idealS = ingredient.idealStock ?? undefined;
+                                const maxS = ingredient.maxStock ?? undefined;
+                                let badge: { label: string; cls: string } | null = null;
+                                if (typeof maxS === 'number' && qty > maxS) badge = { label: 'Acima do máximo', cls: 'bg-red-100 text-red-800 border border-red-300' };
+                                else if (typeof minS === 'number' && qty < minS) badge = { label: 'Abaixo do mínimo', cls: 'bg-orange-100 text-orange-800 border border-orange-300' };
+                                else if (typeof idealS === 'number' && qty < idealS) badge = { label: 'Abaixo do ideal', cls: 'bg-yellow-100 text-yellow-800 border border-yellow-300' };
+                                return badge ? (
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${badge.cls}`}>{badge.label}</span>
+                                ) : null;
+                              })()}
                             </div>
                           </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -1040,6 +1143,15 @@ export function Ingredients() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-600">{ingredient.supplierName}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="text-sm text-gray-900">{typeof ingredient.minStock === 'number' ? ingredient.minStock.toFixed(2) : '-'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="text-sm text-gray-900">{typeof ingredient.idealStock === 'number' ? ingredient.idealStock.toFixed(2) : '-'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="text-sm text-gray-900">{typeof ingredient.maxStock === 'number' ? ingredient.maxStock.toFixed(2) : '-'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="flex justify-center gap-2">
@@ -1064,7 +1176,7 @@ export function Ingredients() {
                     </tr>
                     {isExpanded && (
                       <tr>
-                        <td colSpan={9} className="px-6 py-4 bg-gray-50">
+                        <td colSpan={12} className="px-6 py-4 bg-gray-50">
                           <div className="space-y-4">
                             {/* Header do Submenu */}
                             <div className="flex justify-between items-center">

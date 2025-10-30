@@ -5,6 +5,10 @@ import { deliveryAreaService } from './deliveryAreaService';
 import { deliveryDriverService } from './deliveryDriverService';
 import { paymentMethodService } from './paymentMethodService';
 import { cashRegisterService } from './cashRegisterService';
+import { pdvProductService } from './pdvProductService';
+import { recipeService } from './recipeService';
+import { ingredientService } from './ingredientService';
+import { stockService } from './stockService';
 // import { businessSettingsService } from './businessSettingsService';
 
 export const orderService = {
@@ -138,6 +142,46 @@ export const orderService = {
       });
     }
     
+    // Dar baixa no estoque com base nas fichas técnicas (receitas) dos produtos
+    try {
+      // Helper recursivo para baixar ingredientes, expandindo sub-recitas
+      const deductRecipe = async (recipeId: string, multiplier: number, visited: Set<string> = new Set()) => {
+        if (visited.has(recipeId)) return; // evita ciclos
+        visited.add(recipeId);
+        const recipe = await recipeService.getById(String(recipeId));
+        if (!recipe) return;
+        for (const rItem of recipe.items) {
+          const ing = await ingredientService.getById(String(rItem.ingredientId));
+          const qty = (rItem.netQuantity || 0) * multiplier;
+          if (ing) {
+            if (qty > 0) {
+              await stockService.create({
+                ingredientId: String(ing.id),
+                type: 'OUT',
+                quantity: qty,
+                note: `Pedido #${nextOrderNumber} - baixa automática`,
+              });
+            }
+          } else {
+            // Pode ser uma sub-receita (produto) – expandir
+            await deductRecipe(String(rItem.ingredientId), qty, visited);
+          }
+        }
+      };
+
+      // Percorrer itens do pedido e baixar estoque
+      for (const it of itemsWithTotals) {
+        const product = await pdvProductService.getById(String(it.productId));
+        if (product && product.recipeId) {
+          const multiplier = it.quantity;
+          await deductRecipe(String(product.recipeId), multiplier);
+        }
+      }
+    } catch (e) {
+      console.error('Erro ao dar baixa de estoque para o pedido', e);
+      // Não interromper criação do pedido caso a baixa falhe
+    }
+
     // Enrich with names
     const [customer, area, driver, paymentMethod] = await Promise.all([
       order.customerId ? customerService.getById(order.customerId) : null,

@@ -14,21 +14,67 @@ const calculateFinalValue = (
 export const ingredientService = {
   getAll: async (): Promise<Ingredient[]> => {
     const response = await api.get<Ingredient[]>('/ingredients');
-    // Calculate final values for all ingredients
-    return response.data.map((ingredient) => ({
-      ...ingredient,
-      finalValue: calculateFinalValue(
+    // helper to create deterministic pseudo-random numbers based on id
+    const seededRand = (seed: string) => {
+      let h = 2166136261;
+      for (let i = 0; i < seed.length; i++) {
+        h ^= seed.charCodeAt(i);
+        h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+      }
+      return Math.abs(h);
+    };
+    // Calculate final values for all ingredients and inject thresholds if missing
+    return response.data.map((ingredient) => {
+      const finalValue = calculateFinalValue(
         ingredient.pricePaid,
         ingredient.volume,
         ingredient.correctionFactor
-      ),
-    }));
+      );
+      let { minStock, idealStock, maxStock } = ingredient as any;
+      if (minStock === undefined || idealStock === undefined || maxStock === undefined) {
+        const base = seededRand(String(ingredient.id || ingredient.code));
+        const a = (base % 5) + 1; // 1..5
+        const b = ((base >> 3) % 5) + 1;
+        const c = ((base >> 7) % 5) + 1;
+        const arr = [a, b, c].sort((x, y) => x - y);
+        minStock = arr[0];
+        idealStock = arr[1];
+        maxStock = arr[2];
+      }
+      return {
+        ...ingredient,
+        finalValue,
+        minStock,
+        idealStock,
+        maxStock,
+      } as Ingredient;
+    });
   },
 
   getById: async (id: string): Promise<Ingredient | null> => {
     try {
       const response = await api.get<Ingredient>(`/ingredients/${id}`);
-      const ingredient = response.data;
+      const ingredient = response.data as any;
+      // derive thresholds if missing (same deterministic rule as getAll)
+      const seededRand = (seed: string) => {
+        let h = 2166136261;
+        for (let i = 0; i < seed.length; i++) {
+          h ^= seed.charCodeAt(i);
+          h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+        }
+        return Math.abs(h);
+      };
+      let { minStock, idealStock, maxStock } = ingredient;
+      if (minStock === undefined || idealStock === undefined || maxStock === undefined) {
+        const base = seededRand(String(ingredient.id || ingredient.code));
+        const a = (base % 5) + 1;
+        const b = ((base >> 3) % 5) + 1;
+        const c = ((base >> 7) % 5) + 1;
+        const arr = [a, b, c].sort((x, y) => x - y);
+        minStock = arr[0];
+        idealStock = arr[1];
+        maxStock = arr[2];
+      }
       return {
         ...ingredient,
         finalValue: calculateFinalValue(
@@ -36,7 +82,10 @@ export const ingredientService = {
           ingredient.volume,
           ingredient.correctionFactor
         ),
-      };
+        minStock,
+        idealStock,
+        maxStock,
+      } as Ingredient;
     } catch (error: any) {
       if (error.response?.status === 404) {
         return null;

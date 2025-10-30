@@ -1580,6 +1580,46 @@
       "date": "2025-10-29T00:00:00.000Z",
       "note": "Ajuste de conciliação física - Estoque sistema: 0.079, Estoque físico: 1",
       "id": 44
+    },
+    {
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 3,
+      "date": "2025-10-30T17:20:30.026Z",
+      "note": "Pedido #000006 - baixa automática",
+      "id": 45
+    },
+    {
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.44999999999999996,
+      "date": "2025-10-30T17:20:30.053Z",
+      "note": "Pedido #000006 - baixa automática",
+      "id": 46
+    },
+    {
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 6,
+      "date": "2025-10-30T17:20:30.096Z",
+      "note": "Pedido #000006 - baixa automática",
+      "id": 47
+    },
+    {
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.06,
+      "date": "2025-10-30T17:20:30.150Z",
+      "note": "Pedido #000006 - baixa automática",
+      "id": 48
+    },
+    {
+      "ingredientId": "22",
+      "type": "OUT",
+      "quantity": 3,
+      "date": "2025-10-30T17:20:30.267Z",
+      "note": "Pedido #000006 - baixa automática",
+      "id": 49
     }
   ],
   "cashTransactions": [
@@ -1638,6 +1678,14 @@
       "description": "Pagamento entregadores - Moto 01",
       "createdAt": "2025-10-30T17:13:40.345Z",
       "id": 7
+    },
+    {
+      "cashRegisterId": 5,
+      "type": "in",
+      "amount": 106.9011,
+      "description": "Pedido #000006 - PIX (Taxa: R$ 1,10)",
+      "createdAt": "2025-10-30T17:20:29.920Z",
+      "id": 8
     }
   ],
   "cashRegisters": [
@@ -1684,6 +1732,13 @@
       "expectedBalance": 224.4032,
       "actualBalance": 178,
       "difference": -46.4032
+    },
+    {
+      "openedAt": "2025-10-30T17:17:14.907Z",
+      "openingBalance": 200,
+      "notes": "",
+      "status": "open",
+      "id": 5
     }
   ],
   "orders": [
@@ -1846,6 +1901,41 @@
       "createdAt": "2025-10-30T17:03:45.643Z",
       "updatedAt": "2025-10-30T17:15:49.589Z",
       "id": 5,
+      "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000006",
+      "status": "in_delivery",
+      "customerId": 1,
+      "deliveryAreaId": "1",
+      "paymentMethodId": "4",
+      "paymentMethodKind": "pix",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 3,
+          "unitPrice": 29,
+          "totalPrice": 87
+        },
+        {
+          "productId": 2,
+          "productName": "Coca Cola",
+          "quantity": 3,
+          "unitPrice": 7,
+          "totalPrice": 21
+        }
+      ],
+      "subtotal": 108,
+      "total": 111,
+      "cashRegisterId": 5,
+      "cardFee": 1.0989,
+      "deliveryFeeDriverAmount": 3,
+      "netAmount": 106.9011,
+      "createdAt": "2025-10-30T17:20:29.894Z",
+      "updatedAt": "2025-10-30T17:20:36.138Z",
+      "id": 6,
       "deliveryDriverId": "1"
     }
   ]
