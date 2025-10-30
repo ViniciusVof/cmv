@@ -678,7 +678,40 @@
       "id": 1
     }
   ],
-  "paymentMethods": [],
+  "paymentMethods": [
+    {
+      "name": "PagSeguro",
+      "type": "maquininha",
+      "creditFee": 4.99,
+      "debitFee": 2.39,
+      "processingFeePercentage": 0.99,
+      "requiresChange": false,
+      "isActive": true,
+      "updatedAt": "2025-10-30T00:34:59.764Z",
+      "id": 2
+    },
+    {
+      "name": "Ton",
+      "type": "maquininha",
+      "creditFee": 3.86,
+      "debitFee": 1.69,
+      "processingFeePercentage": 0.99,
+      "requiresChange": false,
+      "isActive": true,
+      "createdAt": "2025-10-30T00:00:00.000Z",
+      "updatedAt": "2025-10-30T00:00:00.000Z",
+      "id": 4
+    },
+    {
+      "name": "Dinheiro",
+      "type": "dinheiro",
+      "requiresChange": true,
+      "isActive": true,
+      "createdAt": "2025-10-30T00:00:00.000Z",
+      "updatedAt": "2025-10-30T00:00:00.000Z",
+      "id": 5
+    }
+  ],
   "sales": [],
   "reconciliationReports": [
     {

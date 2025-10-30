@@ -13,6 +13,7 @@ import { PdvProducts } from './pages/PdvProducts';
 import { ProductCategories } from './pages/ProductCategories';
 import { DeliveryAreas } from './pages/DeliveryAreas';
 import { DeliveryDrivers } from './pages/DeliveryDrivers';
+import { PaymentMethods } from './pages/PaymentMethods';
 import { BusinessSettings } from './pages/BusinessSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
@@ -162,12 +163,7 @@ function App() {
           path="/pdv/formas-pagamento"
           element={
             <ProtectedRoute>
-              <Layout>
-                <div className="p-8">
-                  <h1 className="text-3xl font-bold text-gray-800 mb-4">Formas de Pagamento</h1>
-                  <p className="text-gray-600">Módulo em desenvolvimento...</p>
-                </div>
-              </Layout>
+              <PaymentMethods />
             </ProtectedRoute>
           }
         />
