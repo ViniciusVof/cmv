@@ -96,18 +96,28 @@ O JSON Server cria automaticamente os seguintes endpoints REST:
 - ✅ Autenticação com API REST
 - ✅ Dashboard inicial
 - ✅ Rotas protegidas
-- ✅ Layout com Header e Sidebar expansível
-- ✅ Módulo de Custo Fixo (CRUD completo)
-- ✅ Módulo de Custo Variável (CRUD completo)
-- ✅ JSON Server para simulação de API REST
+- ✅ Layout com Header e Sidebar
+- ✅ Custos Fixos (CRUD + insights e ordenação)
+- ✅ Custos Variáveis (CRUD + insights e ordenação)
+- ✅ Insumos/Estoque: cadastro, cálculo de valor final (R$ Pago ÷ Volume × Fator de Correção) e movimentações de estoque (Entradas/Saídas)
+- ✅ Calculadora de Fator de Correção integrada
+- ✅ Conciliação de Estoque: comparação físico vs sistema, geração de ajustes e relatório
+- ✅ Produtos do PDV: cadastro com vínculo opcional à Ficha Técnica e categorias com autocomplete/criação rápida
+- ✅ Categorias de Produto: criação e uso no PDV
+- ✅ JSON Server (API REST simulada)
 
-## 📦 Próximos Módulos
+## 🧭 Roadmap
 
-- [ ] PDV (Ponto de Venda)
-- [ ] Controle de Estoque
-- [ ] Gestão de Fornecedores
-- [ ] Cálculo de CMV
-- [ ] CMV Global
-- [ ] Controle de Custo Fixo
-- [ ] Relatórios
+### Em progresso
+- [ ] Fichas Técnicas avançadas e CMV por produto
+- [ ] Relatórios consolidados (vendas, CMV, conciliações)
+- [ ] Movimentações em lote e melhorias no inventário
+
+### Planejado
+- [ ] PDV (Caixa) e fluxo de vendas
+- [ ] Integrações (ex.: iFood)
+- [ ] Módulo de Pedidos e Entregas (áreas de entrega e entregadores)
+- [ ] Gestão de Clientes
+- [ ] Permissões e perfis de usuário (além de Admin)
+- [ ] CMV global e dashboards gerenciais
 
