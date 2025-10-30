@@ -40,7 +40,7 @@ const menuItems: MenuItem[] = [
     name: 'PDV', 
     icon: MdPointOfSale, 
     subItems: [
-      { name: 'Ponto de Venda', path: '/pdv' },
+      { name: 'Gestão de Pedidos', path: '/pdv' },
       { name: 'Produtos', path: '/pdv/produtos' },
       { name: 'Categorias', path: '/pdv/categorias' },
       { name: 'Clientes', path: '/pdv/clientes' },
