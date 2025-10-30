@@ -6,6 +6,7 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  notes?: string;
 }
 
 export interface Order {
@@ -21,6 +22,9 @@ export interface Order {
   deliveryDriverName?: string;
   paymentMethodId?: string;
   paymentMethodName?: string;
+  paymentMethodKind?: 'credit' | 'debit' | 'pix' | 'cash' | 'other';
+  changeFor?: number; // Valor recebido em dinheiro (para cálculo de troco)
+  changeAmount?: number; // Valor de troco a enviar
   items: OrderItem[];
   subtotal: number;
   total: number;
@@ -33,7 +37,10 @@ export interface OrderFormData {
   customerId?: string;
   deliveryAreaId?: string;
   deliveryDriverId?: string;
-  paymentMethodId: string;
+  paymentMethodId?: string;
+  paymentMethodKind?: 'credit' | 'debit' | 'pix' | 'cash' | 'other';
+  changeFor?: number;
+  changeAmount?: number;
   items: Omit<OrderItem, 'totalPrice'>[];
   notes?: string;
 }

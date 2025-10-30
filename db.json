@@ -619,6 +619,38 @@
       "createdAt": "2025-10-29T18:55:22.411Z",
       "updatedAt": "2025-10-29T22:18:57.030Z",
       "id": 1
+    },
+    {
+      "code": "2",
+      "name": "Coca Cola",
+      "description": "",
+      "isProduct": true,
+      "items": [
+        {
+          "id": "1761794009604-0",
+          "ingredientId": "22",
+          "ingredientCode": "22",
+          "ingredientName": "COCA LATA",
+          "netQuantity": 1,
+          "unit": "UN",
+          "correctionFactor": 1,
+          "unitCost": 3.69,
+          "totalCost": 3.69,
+          "percentage": 100
+        }
+      ],
+      "markup": 3,
+      "recipeCost": 3.69,
+      "suggestedPrice": 11.07,
+      "suggestedIfoodPrice": 13.054245283018869,
+      "currentPrice": 7,
+      "currentIfoodPrice": 9,
+      "isCombo": false,
+      "grossProfit": 7.380000000000001,
+      "cmv": 33.33333333333333,
+      "createdAt": "2025-10-30T03:13:29.673Z",
+      "updatedAt": "2025-10-30T03:13:29.673Z",
+      "id": 2
     }
   ],
   "businessSettings": [
@@ -638,6 +670,13 @@
       "createdAt": "2025-10-29T23:09:55.742Z",
       "updatedAt": "2025-10-29T23:09:55.742Z",
       "id": 1
+    },
+    {
+      "name": "Bebidas",
+      "isActive": true,
+      "createdAt": "2025-10-30T03:48:18.178Z",
+      "updatedAt": "2025-10-30T03:48:18.178Z",
+      "id": 2
     }
   ],
   "pdvProducts": [
@@ -653,6 +692,19 @@
       "imageUrl": "",
       "updatedAt": "2025-10-29T23:11:07.637Z",
       "id": 1
+    },
+    {
+      "code": "2",
+      "name": "Coca Cola",
+      "description": "",
+      "recipeId": "2",
+      "sellingPrice": 7,
+      "ifoodPrice": 9,
+      "isActive": true,
+      "category": "Bebidas",
+      "imageUrl": "",
+      "updatedAt": "2025-10-30T03:48:21.186Z",
+      "id": 2
     }
   ],
   "customers": [
@@ -668,6 +720,19 @@
       "createdAt": "2025-10-30T01:21:59.332Z",
       "updatedAt": "2025-10-30T01:21:59.332Z",
       "id": 1
+    },
+    {
+      "name": "Eliana Aparecida da Silveira Oliveira",
+      "phone": "47992284390",
+      "addresses": [
+        {
+          "address": "Rua do Gasômetro, 425",
+          "deliveryAreaId": "1"
+        }
+      ],
+      "createdAt": "2025-10-30T04:31:17.312Z",
+      "updatedAt": "2025-10-30T04:31:17.312Z",
+      "id": 2
     }
   ],
   "deliveryAreas": [
@@ -1494,5 +1559,69 @@
       "id": 44
     }
   ],
-  "orders": []
+  "orders": [
+    {
+      "orderNumber": "000001",
+      "status": "completed",
+      "customerId": 1,
+      "deliveryAreaId": "1",
+      "paymentMethodId": 5,
+      "changeFor": 100,
+      "changeAmount": 61,
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        },
+        {
+          "productId": 2,
+          "productName": "Coca Cola",
+          "quantity": 1,
+          "unitPrice": 7,
+          "totalPrice": 7
+        }
+      ],
+      "subtotal": 36,
+      "total": 39,
+      "createdAt": "2025-10-30T04:30:57.788Z",
+      "updatedAt": "2025-10-30T04:46:52.064Z",
+      "id": 1,
+      "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000002",
+      "status": "completed",
+      "customerId": 2,
+      "deliveryAreaId": "1",
+      "paymentMethodId": "2",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 2,
+          "unitPrice": 29,
+          "totalPrice": 58
+        },
+        {
+          "productId": 2,
+          "productName": "Coca Cola",
+          "quantity": 2,
+          "unitPrice": 7,
+          "totalPrice": 14
+        }
+      ],
+      "subtotal": 72,
+      "total": 75,
+      "createdAt": "2025-10-30T04:31:33.458Z",
+      "updatedAt": "2025-10-30T14:27:41.311Z",
+      "id": 2,
+      "paymentMethodKind": "pix",
+      "deliveryDriverId": "1"
+    }
+  ]
 }

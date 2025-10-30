@@ -1,4 +1,4 @@
-import type { Order, OrderFormData } from '../types/order';
+import type { Order, OrderFormData, OrderStatus } from '../types/order';
 import { api } from '../config/api';
 import { customerService } from './customerService';
 import { deliveryAreaService } from './deliveryAreaService';
@@ -72,6 +72,9 @@ export const orderService = {
       deliveryAreaId: data.deliveryAreaId,
       deliveryDriverId: data.deliveryDriverId,
       paymentMethodId: data.paymentMethodId,
+      paymentMethodKind: data.paymentMethodKind,
+      changeFor: data.changeFor,
+      changeAmount: data.changeAmount,
       deliveryFee,
       items: itemsWithTotals,
       subtotal,
@@ -88,7 +91,7 @@ export const orderService = {
       order.customerId ? customerService.getById(order.customerId) : null,
       order.deliveryAreaId ? deliveryAreaService.getById(order.deliveryAreaId) : null,
       order.deliveryDriverId ? deliveryDriverService.getById(order.deliveryDriverId) : null,
-      paymentMethodService.getById(order.paymentMethodId),
+      order.paymentMethodId ? paymentMethodService.getById(order.paymentMethodId) : null,
     ]);
 
     return {
@@ -101,10 +104,45 @@ export const orderService = {
   },
 
   update: async (id: string, data: Partial<OrderFormData> & { status?: OrderStatus }): Promise<Order> => {
-    const response = await api.put<Order>(`/orders/${id}`, {
-      ...data,
+    // Fetch current order to merge and recalc if needed
+    const current = await orderService.getById(id);
+    if (!current) throw new Error('Pedido não encontrado');
+
+    let items = current.items;
+    if (data.items) {
+      items = data.items.map(item => ({
+        ...item,
+        totalPrice: item.quantity * item.unitPrice,
+      }));
+    }
+    const subtotal = items.reduce((s, i) => s + i.totalPrice, 0);
+    let deliveryFee = current.deliveryFee || 0;
+    const deliveryAreaId = data.deliveryAreaId ?? current.deliveryAreaId;
+    if (deliveryAreaId) {
+      const area = await deliveryAreaService.getById(deliveryAreaId);
+      deliveryFee = area?.deliveryFee || 0;
+    }
+    const total = subtotal + deliveryFee;
+
+    const payload: Order = {
+      ...current,
+      customerId: data.customerId ?? current.customerId,
+      deliveryAreaId,
+      deliveryDriverId: data.deliveryDriverId ?? current.deliveryDriverId,
+      paymentMethodId: data.paymentMethodId ?? current.paymentMethodId,
+      paymentMethodKind: data.paymentMethodKind ?? current.paymentMethodKind,
+      changeFor: data.changeFor ?? current.changeFor,
+      changeAmount: data.changeAmount ?? current.changeAmount,
+      items,
+      subtotal,
+      deliveryFee,
+      total,
+      notes: data.notes ?? current.notes,
+      status: (data as any).status ?? current.status,
       updatedAt: new Date().toISOString(),
-    });
+    };
+
+    const response = await api.put<Order>(`/orders/${id}`, payload);
     return response.data;
   },
 
@@ -120,7 +158,7 @@ export const orderService = {
       order.customerId ? customerService.getById(order.customerId) : null,
       order.deliveryAreaId ? deliveryAreaService.getById(order.deliveryAreaId) : null,
       order.deliveryDriverId ? deliveryDriverService.getById(order.deliveryDriverId) : null,
-      paymentMethodService.getById(order.paymentMethodId),
+      order.paymentMethodId ? paymentMethodService.getById(order.paymentMethodId) : null,
     ]);
 
     return {
