@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Layout } from '../components/Layout';
 import type { Order, OrderStatus } from '../types/order';
 import { orderService } from '../services/orderService';
+import { confirmAsync, notifySuccess, notifyError } from '../utils/alerts';
 import type { Customer } from '../types/customer';
 import { customerService } from '../services/customerService';
 import type { PdvProduct } from '../types/pdvProduct';
@@ -35,7 +36,7 @@ import { paymentMethodService } from '../services/paymentMethodService';
 import type { DeliveryDriver } from '../types/deliveryDriver';
 import { deliveryDriverService } from '../services/deliveryDriverService';
 
-const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; icon: typeof MdRestaurant }> = {
+const STATUS_CONFIG: Partial<Record<OrderStatus, { label: string; color: string; icon: typeof MdRestaurant }>> = {
   kitchen: { label: 'Cozinha', color: 'bg-orange-100 border-orange-300 text-orange-800', icon: MdRestaurant },
   waiting_delivery: { label: 'Aguardando Entrega', color: 'bg-yellow-100 border-yellow-300 text-yellow-800', icon: MdSchedule },
   in_delivery: { label: 'Em Entrega', color: 'bg-blue-100 border-blue-300 text-blue-800', icon: MdLocalShipping },
@@ -270,7 +271,7 @@ export function Orders() {
   };
 
   const ordersByStatus = useMemo(() => {
-    const grouped: Record<OrderStatus, Order[]> = {
+    const grouped: Partial<Record<OrderStatus, Order[]>> = {
       kitchen: [],
       waiting_delivery: [],
       in_delivery: [],
@@ -278,8 +279,9 @@ export function Orders() {
     };
     orders.forEach(order => {
       const st = (order.status as OrderStatus);
+      if (st === 'cancelled') return; // não exibir cancelados no quadro
       const safeStatus: OrderStatus = (st in grouped ? st : 'kitchen');
-      grouped[safeStatus].push(order);
+      (grouped[safeStatus] as Order[]).push(order);
     });
     return grouped;
   }, [orders]);
@@ -462,18 +464,20 @@ export function Orders() {
       await loadData();
     } catch (error) {
       console.error('Error updating status:', error);
-      alert('Erro ao atualizar status do pedido');
+      notifyError('Erro ao atualizar status do pedido');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este pedido?')) return;
+  const handleCancel = async (id: string) => {
+    const ok = await confirmAsync('Tem certeza que deseja cancelar este pedido?');
+    if (!ok) return;
     try {
-      await orderService.delete(id);
+      await orderService.updateStatus(id, 'cancelled');
       await loadData();
+      notifySuccess('Pedido cancelado.');
     } catch (error) {
-      console.error('Error deleting order:', error);
-      alert('Erro ao excluir pedido');
+      console.error('Error cancelling order:', error);
+      notifyError('Erro ao cancelar pedido');
     }
   };
 
@@ -554,7 +558,7 @@ export function Orders() {
           {Object.entries(STATUS_CONFIG).map(([status, config]) => {
             const statusKey = status as OrderStatus;
             const Icon = config.icon;
-            const columnOrders = ordersByStatus[statusKey];
+            const columnOrders = (ordersByStatus[statusKey] ?? []) as Order[];
 
             return (
               <div key={status} className="bg-white rounded-lg shadow border border-gray-200 flex flex-col h-[calc(100vh-250px)] min-h-[600px]">
@@ -630,9 +634,9 @@ export function Orders() {
                               </button>
                             )}
                           <button
-                            onClick={() => handleDelete(order.id)}
+                            onClick={() => handleCancel(order.id)}
                             className="text-red-600 hover:text-red-800"
-                            title="Excluir"
+                            title="Cancelar"
                           >
                             <MdDelete className="w-4 h-4" />
                           </button>

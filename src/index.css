@@ -15,3 +15,20 @@ body {
   min-height: 100vh;
 }
 
+@layer utilities {
+  .animate-slide-up {
+    animation: slide-up 0.25s ease-out both;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+

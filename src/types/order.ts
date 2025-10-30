@@ -1,4 +1,4 @@
-export type OrderStatus = 'kitchen' | 'waiting_delivery' | 'in_delivery' | 'completed';
+export type OrderStatus = 'kitchen' | 'waiting_delivery' | 'in_delivery' | 'completed' | 'cancelled';
 
 export interface OrderItem {
   productId: string;

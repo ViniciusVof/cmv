@@ -1562,7 +1562,7 @@
   "orders": [
     {
       "orderNumber": "000001",
-      "status": "completed",
+      "status": "cancelled",
       "customerId": 1,
       "deliveryAreaId": "1",
       "paymentMethodId": 5,
@@ -1588,7 +1588,7 @@
       "subtotal": 36,
       "total": 39,
       "createdAt": "2025-10-30T04:30:57.788Z",
-      "updatedAt": "2025-10-30T04:46:52.064Z",
+      "updatedAt": "2025-10-30T14:41:37.143Z",
       "id": 1,
       "deliveryDriverId": "1"
     },

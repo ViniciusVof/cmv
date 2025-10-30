@@ -2,6 +2,8 @@ import { ReactNode } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { useUiStore } from '../stores/uiStore';
+import { Toaster } from './Toaster';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface LayoutProps {
   children: ReactNode;
@@ -23,6 +25,8 @@ export function Layout({ children }: LayoutProps) {
           {children}
         </main>
       </div>
+      <Toaster />
+      <ConfirmDialog />
     </div>
   );
 }
