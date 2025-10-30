@@ -1,29 +1,53 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Layout } from '../components/Layout';
 import type { CashRegister as CashRegisterType, CashTransaction } from '../types/cashRegister';
+import type { Order } from '../types/order';
 import { cashRegisterService } from '../services/cashRegisterService';
 import { cashTransactionService } from '../services/cashTransactionService';
-import { MdAdd, MdClose, MdCheckCircle, MdAttachMoney, MdTrendingUp, MdTrendingDown, MdDelete } from 'react-icons/md';
-import { notifySuccess, notifyError, confirmAsync } from '../utils/alerts';
+import { deliveryDriverService } from '../services/deliveryDriverService';
+import { api } from '../config/api';
+import { paymentMethodService } from '../services/paymentMethodService';
+import { MdAdd, MdClose, MdCheckCircle, MdAttachMoney, MdTrendingUp, MdTrendingDown, MdReceipt, MdRemoveRedEye, MdVisibility } from 'react-icons/md';
+import { notifySuccess, notifyError } from '../utils/alerts';
 
 export function CashRegister() {
   const [cashRegisters, setCashRegisters] = useState<CashRegisterType[]>([]);
   const [openCashRegister, setOpenCashRegister] = useState<CashRegisterType | null>(null);
-  const [transactions, setTransactions] = useState<CashTransaction[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [showOpenModal, setShowOpenModal] = useState(false);
   const [showCloseModal, setShowCloseModal] = useState(false);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [selectedReportCash, setSelectedReportCash] = useState<CashRegisterType | null>(null);
   const [openingBalance, setOpeningBalance] = useState('');
   const [actualBalance, setActualBalance] = useState('');
   const [notes, setNotes] = useState('');
   const [transactionType, setTransactionType] = useState<'in' | 'out'>('in');
   const [transactionAmount, setTransactionAmount] = useState('');
   const [transactionDescription, setTransactionDescription] = useState('');
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [reportTransactions, setReportTransactions] = useState<CashTransaction[]>([]);
+  const [reportOrders, setReportOrders] = useState<Order[]>([]);
+  const hasOpenOrders = useMemo(() => reportOrders.some(o => o.status !== 'completed'), [reportOrders]);
 
   useEffect(() => {
     loadData();
   }, []);
+
+  // Lock body scroll when report modal is open
+  useEffect(() => {
+    if (showReport) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [showReport]);
+
+  // Removido aviso automático ao abrir relatório; agora aparece apenas ao clicar em Fechar Caixa
 
   const loadData = async () => {
     try {
@@ -35,18 +59,57 @@ export function CashRegister() {
       setCashRegisters(all.sort((a, b) => new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime()));
       setOpenCashRegister(open);
       
-      // Carregar transações do caixa aberto
+      // Carregar transações e pedidos do caixa aberto
       if (open) {
-        const trans = await cashTransactionService.getByCashRegisterId(open.id);
-        setTransactions(trans.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+        const [ordersResp, drivers, paymentMethods] = await Promise.all([
+          api.get<Order[]>('/orders'),
+          deliveryDriverService.getAll(),
+          paymentMethodService.getAll(),
+        ]);
+        const cashOrdersRaw = ordersResp.data.filter(o => String(o.cashRegisterId) === String(open.id) && o.status !== 'cancelled');
+        const driverMap = new Map(drivers.map(d => [String(d.id), d.name]));
+        const pmMap = new Map(paymentMethods.map(pm => [String(pm.id), pm]));
+        const cashOrders = cashOrdersRaw.map(o => ({
+          ...o,
+          deliveryDriverName: o.deliveryDriverName || (o.deliveryDriverId ? driverMap.get(String(o.deliveryDriverId)) : undefined),
+          paymentMethodName: o.paymentMethodName || (o.paymentMethodId ? (pmMap.get(String(o.paymentMethodId))?.name) : undefined),
+        }));
+        setOrders(cashOrders);
+        // Default seleção do relatório para o caixa aberto
+        setSelectedReportCash(open);
       } else {
-        setTransactions([]);
+        setOrders([]);
       }
     } catch (error) {
       console.error('Error loading cash registers:', error);
       notifyError('Erro ao carregar caixas');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadReportData = async (cashRegisterId: string) => {
+    try {
+      const [trans, ordersResp, drivers, paymentMethods] = await Promise.all([
+        cashTransactionService.getByCashRegisterId(cashRegisterId),
+        api.get<Order[]>('/orders'),
+        deliveryDriverService.getAll(),
+        paymentMethodService.getAll(),
+      ]);
+      const transSorted = trans.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setReportTransactions(transSorted);
+      const cashOrdersRaw = ordersResp.data.filter(o => String(o.cashRegisterId) === String(cashRegisterId) && o.status !== 'cancelled');
+      const driverMap = new Map(drivers.map(d => [String(d.id), d.name]));
+      const pmMap = new Map(paymentMethods.map(pm => [String(pm.id), pm]));
+      const cashOrders = cashOrdersRaw.map(o => ({
+        ...o,
+        deliveryDriverName: o.deliveryDriverName || (o.deliveryDriverId ? driverMap.get(String(o.deliveryDriverId)) : undefined),
+        paymentMethodName: o.paymentMethodName || (o.paymentMethodId ? (pmMap.get(String(o.paymentMethodId))?.name) : undefined),
+      }));
+      setReportOrders(cashOrders);
+    } catch (e) {
+      console.error('Erro ao carregar dados do relatório', e);
+      notifyError('Erro ao carregar relatório do caixa');
     }
   };
 
@@ -68,6 +131,12 @@ export function CashRegister() {
   const handleClose = async () => {
     if (!openCashRegister) return;
     try {
+      // Impedir fechamento se houver pedidos em aberto (não concluídos)
+      const hasOpenOrders = orders.some(o => o.status !== 'completed');
+      if (hasOpenOrders) {
+        notifyError('Não é possível fechar o caixa com pedidos em aberto. Conclua todos os pedidos.');
+        return;
+      }
       const balance = Number(actualBalance) || 0;
       await cashRegisterService.close(openCashRegister.id, { actualBalance: balance, notes });
       notifySuccess('Caixa fechado com sucesso!');
@@ -121,25 +190,81 @@ export function CashRegister() {
     }
   };
 
-  const handleDeleteTransaction = async (id: string) => {
-    const ok = await confirmAsync('Tem certeza que deseja excluir esta transação?');
-    if (!ok) return;
-    try {
-      await cashTransactionService.delete(id);
-      notifySuccess('Transação excluída com sucesso!');
-      await loadData();
-    } catch (error) {
-      console.error('Error deleting transaction:', error);
-      notifyError('Erro ao excluir transação');
-    }
-  };
+  // delete handler removido da visão principal; exclusões ocorrem no relatório
 
   const calculateCurrentBalance = () => {
-    if (!openCashRegister) return 0;
-    const transIn = transactions.filter(t => t.type === 'in').reduce((sum, t) => sum + t.amount, 0);
-    const transOut = transactions.filter(t => t.type === 'out').reduce((sum, t) => sum + t.amount, 0);
-    return openCashRegister.openingBalance + transIn - transOut;
+    if (!selectedReportCash) return 0;
+    const transIn = reportTransactions.filter(t => t.type === 'in').reduce((sum, t) => sum + t.amount, 0);
+    const transOut = reportTransactions.filter(t => t.type === 'out').reduce((sum, t) => sum + t.amount, 0);
+    return selectedReportCash.openingBalance + transIn - transOut;
   };
+
+  const calculateReport = () => {
+    const salesTotal = reportOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+    const salesNet = reportOrders.reduce((sum, o) => sum + (o.netAmount || o.total || 0), 0);
+    const cardFeesCredit = reportOrders.filter(o => o.paymentMethodKind === 'credit').reduce((s, o) => s + (o.cardFee || 0), 0);
+    const cardFeesDebit = reportOrders.filter(o => o.paymentMethodKind === 'debit').reduce((s, o) => s + (o.cardFee || 0), 0);
+    const cardFeesPix = reportOrders.filter(o => o.paymentMethodKind === 'pix').reduce((s, o) => s + (o.cardFee || 0), 0);
+    const cardFees = cardFeesCredit + cardFeesDebit + cardFeesPix;
+    const deliveryFees = reportOrders.reduce((sum, o) => sum + (o.deliveryFee || 0), 0);
+    // Pagamento aos entregadores = 100% da taxa de entrega
+    const deliveryDriverFees = reportOrders.reduce((sum, o) => sum + (o.deliveryFee || 0), 0);
+    
+    const byPaymentMethod: Record<string, { total: number; count: number; fee: number; net: number }> = {};
+    reportOrders.forEach(o => {
+      const key = o.paymentMethodKind || 'other';
+      if (!byPaymentMethod[key]) {
+        byPaymentMethod[key] = { total: 0, count: 0, fee: 0, net: 0 };
+      }
+      byPaymentMethod[key].total += o.total || 0;
+      byPaymentMethod[key].count += 1;
+      byPaymentMethod[key].fee += o.cardFee || 0;
+      byPaymentMethod[key].net += o.netAmount || o.total || 0;
+    });
+
+    // Pagamentos por entregador
+    const byDriver: Record<string, number> = {};
+    reportOrders.forEach(o => {
+      const key = o.deliveryDriverName || o.deliveryDriverId || 'Sem entregador';
+      const fee = o.deliveryFee || 0;
+      if (!byDriver[key]) byDriver[key] = 0;
+      byDriver[key] += fee;
+    });
+
+    // Pagamentos por maquininha (somente métodos do tipo maquininha)
+    const byMachine: Record<string, { credit: number; debit: number; pix: number; total: number }> = {};
+    reportOrders.forEach(o => {
+      const name = o.paymentMethodName || '—';
+      if (!name) return;
+      if (!byMachine[name]) byMachine[name] = { credit: 0, debit: 0, pix: 0, total: 0 };
+      if (o.paymentMethodKind === 'credit') byMachine[name].credit += o.cardFee || 0;
+      if (o.paymentMethodKind === 'debit') byMachine[name].debit += o.cardFee || 0;
+      if (o.paymentMethodKind === 'pix') byMachine[name].pix += o.cardFee || 0;
+      byMachine[name].total += o.cardFee || 0;
+    });
+
+    return {
+      salesTotal,
+      salesNet,
+      cardFees,
+      cardFeesCredit,
+      cardFeesDebit,
+      cardFeesPix,
+      deliveryFees,
+      deliveryDriverFees,
+      byPaymentMethod,
+      byDriver,
+      byMachine,
+      ordersCount: reportOrders.length,
+    };
+  };
+
+  // Atualizar dados do relatório quando seleção mudar
+  useEffect(() => {
+    if (showReport && selectedReportCash) {
+      loadReportData(String(selectedReportCash.id));
+    }
+  }, [showReport, selectedReportCash]);
 
   if (loading) {
     return (
@@ -153,7 +278,7 @@ export function CashRegister() {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">Gestão de Caixa</h1>
           {!openCashRegister && (
@@ -180,14 +305,27 @@ export function CashRegister() {
                   Aberto em {formatDateTime(openCashRegister.openedAt)}
                 </p>
               </div>
-              <button
-                onClick={() => setShowCloseModal(true)}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-              >
-                Fechar Caixa
-              </button>
+
+              {/* Footer de ações removido da tela inicial; movido para o relatório */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { if (openCashRegister) { setSelectedReportCash(openCashRegister); } setShowReport(true); }}
+                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  <MdReceipt className="w-5 h-5" />
+                  Relatório
+                </button>
+                <button
+                  onClick={() => setShowTransactionModal(true)}
+                  className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+                >
+                  <MdAdd className="w-5 h-5" />
+                  Entrada/Saída
+                </button>
+                {/* Botão Fechar Caixa removido da tela inicial; disponível no relatório */}
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="bg-white rounded-lg p-4">
                 <div className="text-sm text-gray-600">Saldo Inicial</div>
                 <div className="text-2xl font-bold text-gray-800">
@@ -195,64 +333,14 @@ export function CashRegister() {
                 </div>
               </div>
               <div className="bg-white rounded-lg p-4">
-                <div className="text-sm text-gray-600">Saldo Atual (sem vendas)</div>
+                <div className="text-sm text-gray-600">Pedidos Registrados</div>
                 <div className="text-2xl font-bold text-blue-600">
-                  {formatCurrency(calculateCurrentBalance())}
+                  {orders.length}
                 </div>
-              </div>
-              <div className="bg-white rounded-lg p-4 flex items-center justify-center">
-                <button
-                  onClick={() => setShowTransactionModal(true)}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                >
-                  <MdAdd className="w-5 h-5" />
-                  Adicionar Entrada/Saída
-                </button>
               </div>
             </div>
 
-            {/* Transações */}
-            {transactions.length > 0 && (
-              <div className="bg-white rounded-lg p-4 mb-4">
-                <h3 className="text-sm font-semibold text-gray-800 mb-3">Transações do Caixa</h3>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {transactions.map(t => (
-                    <div key={t.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <div className="flex items-center gap-3">
-                        {t.type === 'in' ? (
-                          <MdTrendingUp className="w-5 h-5 text-green-600" />
-                        ) : (
-                          <MdTrendingDown className="w-5 h-5 text-red-600" />
-                        )}
-                        <div>
-                          <div className="text-sm font-medium text-gray-800">{t.description}</div>
-                          <div className="text-xs text-gray-500">{formatDateTime(t.createdAt)}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`text-sm font-semibold ${t.type === 'in' ? 'text-green-600' : 'text-red-600'}`}>
-                          {t.type === 'in' ? '+' : '-'} {formatCurrency(t.amount)}
-                        </span>
-                        <button
-                          onClick={() => handleDeleteTransaction(t.id)}
-                          className="text-red-600 hover:text-red-800"
-                          title="Excluir"
-                        >
-                          <MdDelete className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {openCashRegister.notes && (
-              <div className="p-3 bg-white rounded-lg">
-                <div className="text-xs font-medium text-gray-600 mb-1">Observações</div>
-                <div className="text-sm text-gray-700">{openCashRegister.notes}</div>
-              </div>
-            )}
+            {/* Transações do caixa e observações foram movidas para o relatório */}
           </div>
         )}
 
@@ -277,7 +365,7 @@ export function CashRegister() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {cashRegisters.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
                       Nenhum caixa registrado
                     </td>
                   </tr>
@@ -327,6 +415,16 @@ export function CashRegister() {
                           '—'
                         )}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <button
+                          className="px-3 py-1.5 border rounded hover:bg-gray-50 inline-flex items-center gap-1"
+                          title="Ver relatório"
+                          onClick={() => { setSelectedReportCash(cr); setShowReport(true); }}
+                        >
+                          <MdVisibility className="w-4 h-4" />
+                          Ver
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -349,7 +447,7 @@ export function CashRegister() {
                   <MdClose className="w-6 h-6" />
                 </button>
               </div>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Saldo Inicial (R$)
@@ -405,7 +503,7 @@ export function CashRegister() {
                   <MdClose className="w-6 h-6" />
                 </button>
               </div>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="text-sm text-gray-600">Saldo Inicial</div>
                   <div className="text-lg font-semibold text-gray-800">
@@ -467,7 +565,7 @@ export function CashRegister() {
                   <MdClose className="w-6 h-6" />
                 </button>
               </div>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Tipo de Transação
@@ -540,6 +638,329 @@ export function CashRegister() {
                     Adicionar
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Relatório */}
+        {showReport && selectedReportCash && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-0">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setShowReport(false)} />
+            <div className="relative bg-white w-full h-full rounded-none shadow-xl overflow-auto">
+              <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center z-10">
+                <h2 className="text-xl font-semibold text-gray-800">Relatório do Caixa</h2>
+                <button onClick={() => setShowReport(false)} className="text-gray-500 hover:text-gray-700">
+                  <MdClose className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="p-6 flex flex-col gap-6">
+                {/* Resumo Geral */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Resumo Geral</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-600">Total de Pedidos</div>
+                      <div className="text-2xl font-bold text-gray-800">{calculateReport().ordersCount}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">Vendas Brutas</div>
+                      <div className="text-2xl font-bold text-gray-800">{formatCurrency(calculateReport().salesTotal)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">Vendas Líquidas</div>
+                      <div className="text-2xl font-bold text-green-600">{formatCurrency(calculateReport().salesNet)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">Taxas Totais</div>
+                      <div className="text-2xl font-bold text-red-600">
+                        {formatCurrency(calculateReport().cardFees + calculateReport().deliveryDriverFees)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                
+
+                {/* Taxas Detalhadas */}
+                <div className="bg-white rounded-lg border p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Taxas Detalhadas</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex justify-between p-3 bg-red-50 rounded">
+                      <span className="text-gray-700">Taxas de Cartão (Crédito)</span>
+                      <span className="font-semibold text-red-600">{formatCurrency(calculateReport().cardFeesCredit)}</span>
+                    </div>
+                    <div className="flex justify-between p-3 bg-red-50 rounded">
+                      <span className="text-gray-700">Taxas de Cartão (Débito)</span>
+                      <span className="font-semibold text-red-600">{formatCurrency(calculateReport().cardFeesDebit)}</span>
+                    </div>
+                    <div className="flex justify-between p-3 bg-red-50 rounded">
+                      <span className="text-gray-700">Taxas PIX</span>
+                      <span className="font-semibold text-red-600">{formatCurrency(calculateReport().cardFeesPix)}</span>
+                    </div>
+                    <div className="flex justify-between p-3 bg-orange-50 rounded">
+                      <span className="text-gray-700">Pagamentos a Entregadores (Total)</span>
+                      <span className="font-semibold text-orange-600">{formatCurrency(calculateReport().deliveryDriverFees)}</span>
+                    </div>
+                    <div className="flex justify-between p-3 bg-blue-50 rounded">
+                      <span className="text-gray-700">Taxa de Entrega Cobrada (Clientes)</span>
+                      <span className="font-semibold text-blue-600">{formatCurrency(calculateReport().deliveryFees)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vendas por Forma de Pagamento */}
+                <div className="bg-white rounded-lg border p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Vendas por Forma de Pagamento</h3>
+                  <div className="space-y-3">
+                    {Object.entries(calculateReport().byPaymentMethod).map(([method, data]) => {
+                      const methodLabels: Record<string, string> = {
+                        credit: 'Crédito',
+                        debit: 'Débito',
+                        pix: 'PIX',
+                        cash: 'Dinheiro',
+                        other: 'Outro',
+                      };
+                      return (
+                        <div key={method} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-800">{methodLabels[method] || method}</div>
+                            <div className="text-xs text-gray-500">{data.count} pedido(s)</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-semibold text-gray-800">{formatCurrency(data.total)}</div>
+                            {data.fee > 0 && (
+                              <div className="text-xs text-red-600">Taxa: {formatCurrency(data.fee)}</div>
+                            )}
+                            <div className="text-xs text-green-600">Líquido: {formatCurrency(data.net)}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Taxas por Maquininha */}
+                <div className="bg-white rounded-lg border p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Taxas por Maquininha</h3>
+                  <div className="space-y-3">
+                    {Object.entries(calculateReport().byMachine).length === 0 ? (
+                      <p className="text-center text-gray-500 py-4">Nenhuma taxa registrada por maquininha</p>
+                    ) : (
+                      Object.entries(calculateReport().byMachine).map(([machine, data]) => (
+                        <div key={machine} className="p-3 bg-gray-50 rounded">
+                          <div className="flex justify-between items-center">
+                            <div className="font-medium text-gray-800">{machine}</div>
+                            <div className="text-sm text-gray-600">Total: <span className="font-semibold text-red-600">{formatCurrency(data.total)}</span></div>
+                          </div>
+                          <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                            <div className="flex justify-between p-2 bg-red-50 rounded"><span>Crédito</span><span className="font-semibold text-red-600">{formatCurrency(data.credit)}</span></div>
+                            <div className="flex justify-between p-2 bg-red-50 rounded"><span>Débito</span><span className="font-semibold text-red-600">{formatCurrency(data.debit)}</span></div>
+                            <div className="flex justify-between p-2 bg-red-50 rounded"><span>PIX</span><span className="font-semibold text-red-600">{formatCurrency(data.pix)}</span></div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Pagamentos por Entregador */}
+                <div className="bg-white rounded-lg border p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Pagamentos a Entregadores</h3>
+                  <div className="space-y-2">
+                    {Object.entries(calculateReport().byDriver).length === 0 ? (
+                      <p className="text-center text-gray-500 py-4">Nenhum pedido com entregador</p>
+                    ) : (
+                      Object.entries(calculateReport().byDriver).map(([driver, value]) => {
+                        const label = String(driver);
+                        const paid = reportTransactions
+                          .filter(t => t.type === 'out' && (t.description || '').toLowerCase().includes(`pagamento entregadores - ${label}`.toLowerCase()))
+                          .reduce((s, t) => s + (t.amount || 0), 0);
+                        const remaining = Math.max(0, value - paid);
+                        return (
+                          <div key={label} className="flex items-center justify-between p-2 bg-orange-50 rounded">
+                            <div className="text-sm font-medium text-gray-800">{label}</div>
+                            <div className="flex items-center gap-3">
+                              <div className={`text-sm font-semibold ${remaining > 0 ? 'text-orange-700' : 'text-green-700'}`}>
+                                {remaining > 0 ? formatCurrency(remaining) : 'Pago'}
+                              </div>
+                              {remaining > 0 && selectedReportCash?.status === 'open' && openCashRegister && String(selectedReportCash.id) === String(openCashRegister.id) && (
+                                <button
+                                  className="px-3 py-1.5 text-xs rounded border bg-white hover:bg-gray-50 text-gray-700"
+                                  onClick={async () => {
+                                    try {
+                                      await cashTransactionService.create(String(selectedReportCash.id), {
+                                        type: 'out',
+                                        amount: remaining,
+                                        description: `Pagamento entregadores - ${label}`,
+                                      });
+                                      notifySuccess('Pagamento ao entregador baixado.');
+                                      await loadReportData(String(selectedReportCash.id));
+                                    } catch (e) {
+                                      console.error(e);
+                                      notifyError('Erro ao dar baixa no pagamento do entregador');
+                                    }
+                                  }}
+                                >
+                                  Dar baixa
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                {/* Transações do Caixa */}
+                <div className="bg-white rounded-lg border p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Todas as Transações</h3>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {(() => {
+                      const opening = selectedReportCash ? [{
+                        id: 'opening',
+                        cashRegisterId: String(selectedReportCash.id),
+                        type: 'in' as const,
+                        amount: selectedReportCash.openingBalance,
+                        description: 'Saldo inicial',
+                        createdAt: selectedReportCash.openedAt,
+                      }] : [];
+                      const allTx = [...opening, ...reportTransactions];
+                      if (allTx.length === 0) {
+                        return <p className="text-center text-gray-500 py-4">Nenhuma transação registrada</p>;
+                      }
+                      return allTx.map((t) => {
+                        // Detecta pedido pelo número na descrição: "Pedido #123456"
+                        let linkedOrder: Order | undefined;
+                        const m = /Pedido\s*#(\d+)/i.exec(t.description || '');
+                        if (m) {
+                          const num = m[1];
+                          linkedOrder = reportOrders.find(o => String(o.orderNumber) === String(num));
+                        }
+                        return (
+                        <div key={`${t.id}`} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                          <div className="flex items-center gap-3">
+                            {t.type === 'in' ? (
+                              <MdTrendingUp className="w-5 h-5 text-green-600" />
+                            ) : (
+                              <MdTrendingDown className="w-5 h-5 text-red-600" />
+                            )}
+                            <div>
+                              <div className="text-sm font-medium text-gray-800">{t.description}</div>
+                              <div className="text-xs text-gray-500">{formatDateTime(t.createdAt)}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-semibold ${t.type === 'in' ? 'text-green-600' : 'text-red-600'}`}>
+                              {t.type === 'in' ? '+' : '-'} {formatCurrency(t.amount)}
+                            </span>
+                            {linkedOrder && (
+                              <button
+                                className="px-2 py-1 rounded border hover:bg-gray-100 text-gray-700"
+                                title={`Ver Pedido #${linkedOrder.orderNumber || String(linkedOrder.id).slice(0,6)}`}
+                                onClick={() => { setSelectedOrder(linkedOrder!); setShowOrderModal(true); }}
+                              >
+                                <MdRemoveRedEye className="w-5 h-5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+
+                {/* Saldo Esperado */}
+                <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="text-sm text-gray-600">Saldo Atual do Caixa</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Saldo inicial + Entradas - Saídas
+                      </div>
+                    </div>
+                    <div className="text-3xl font-bold text-blue-600">
+                      {formatCurrency(calculateCurrentBalance())}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer de ações no relatório */}
+              <div className="sticky bottom-0 bg-white border-t p-4 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowReport(false)}
+                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                >
+                  Voltar
+                </button>
+                {selectedReportCash?.status === 'open' && openCashRegister && String(selectedReportCash.id) === String(openCashRegister.id) && (
+                  <button
+                    onClick={() => {
+                      if (hasOpenOrders) {
+                        notifyError('Não é possível fechar o caixa com pedidos em aberto. Conclua todos os pedidos.');
+                        return;
+                      }
+                      setShowReport(false);
+                      setShowCloseModal(true);
+                    }}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  >
+                    Fechar Caixa
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Detalhes do Pedido */}
+        {showOrderModal && selectedOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => { setShowOrderModal(false); setSelectedOrder(null); }} />
+            <div className="relative bg-white w-full max-w-2xl mx-4 rounded-lg shadow-xl p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-800">Detalhes do Pedido</h2>
+                <button onClick={() => { setShowOrderModal(false); setSelectedOrder(null); }} className="text-gray-500 hover:text-gray-700">
+                  <MdClose className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-500">Número:</span> <span className="font-medium">{selectedOrder.orderNumber ?? selectedOrder.id}</span></div>
+                  <div><span className="text-gray-500">Status:</span> <span className="font-medium">{selectedOrder.status}</span></div>
+                  <div><span className="text-gray-500">Cliente:</span> <span className="font-medium">{selectedOrder.customerName || '—'}</span></div>
+                  <div><span className="text-gray-500">Entregador:</span> <span className="font-medium">{selectedOrder.deliveryDriverName || '—'}</span></div>
+                  <div><span className="text-gray-500">Pagamento:</span> <span className="font-medium">{selectedOrder.paymentMethodName || selectedOrder.paymentMethodKind || '—'}</span></div>
+                  <div><span className="text-gray-500">Criado em:</span> <span className="font-medium">{formatDateTime(selectedOrder.createdAt)}</span></div>
+                </div>
+                <div className="bg-gray-50 rounded p-3">
+                  <div className="font-semibold text-gray-800 mb-2">Itens</div>
+                  <div className="space-y-1 text-sm">
+                    {selectedOrder.items.map((it) => (
+                      <div key={`${it.productId}-${it.productName}`} className="flex justify-between">
+                        <div className="text-gray-700">{it.quantity}× {it.productName}</div>
+                        <div className="text-gray-800 font-medium">{formatCurrency(it.totalPrice)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-500">Subtotal:</span> <span className="font-medium">{formatCurrency(selectedOrder.subtotal)}</span></div>
+                  <div><span className="text-gray-500">Taxa de Entrega:</span> <span className="font-medium">{formatCurrency(selectedOrder.deliveryFee || 0)}</span></div>
+                  <div><span className="text-gray-500">Taxas Cartão/PIX:</span> <span className="font-medium">{formatCurrency(selectedOrder.cardFee || 0)}</span></div>
+                  <div><span className="text-gray-500">Total:</span> <span className="font-medium">{formatCurrency(selectedOrder.total)}</span></div>
+                  <div><span className="text-gray-500">Líquido:</span> <span className="font-medium">{formatCurrency(selectedOrder.netAmount || selectedOrder.total)}</span></div>
+                </div>
+                {selectedOrder.notes && (
+                  <div className="text-sm text-gray-700"><span className="text-gray-500">Obs.:</span> {selectedOrder.notes}</div>
+                )}
+              </div>
+              <div className="mt-5 flex justify-end">
+                <button onClick={() => { setShowOrderModal(false); setSelectedOrder(null); }} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Fechar</button>
               </div>
             </div>
           </div>

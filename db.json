@@ -566,9 +566,9 @@
           "netQuantity": 1,
           "unit": "UN",
           "correctionFactor": 1,
-          "unitCost": 0.6313131313131313,
-          "totalCost": 0.6313131313131313,
-          "percentage": 24.901265677860348
+          "unitCost": 3.69,
+          "totalCost": 3.69,
+          "percentage": 46.69953466296648
         },
         {
           "id": "1761764122350-1",
@@ -578,9 +578,9 @@
           "netQuantity": 0.15,
           "unit": "KG",
           "correctionFactor": 1,
-          "unitCost": 3.301650375026084,
-          "totalCost": 0.4952475562539126,
-          "percentage": 19.53434890375019
+          "unitCost": 2.5352652330215895,
+          "totalCost": 0.3802897849532384,
+          "percentage": 4.812833602817297
         },
         {
           "id": "1761764122351-2",
@@ -590,9 +590,9 @@
           "netQuantity": 2,
           "unit": "UN",
           "correctionFactor": 1,
-          "unitCost": 0.5191250000000001,
-          "totalCost": 1.0382500000000001,
-          "percentage": 40.952322718621005
+          "unitCost": 1.7304166666666667,
+          "totalCost": 3.4608333333333334,
+          "percentage": 43.79926997635497
         },
         {
           "id": "1761764122352-3",
@@ -604,20 +604,20 @@
           "correctionFactor": 1,
           "unitCost": 18.52272727272727,
           "totalCost": 0.3704545454545454,
-          "percentage": 14.612062699768453
+          "percentage": 4.688361757861256
         }
       ],
       "markup": 3,
-      "recipeCost": 2.5352652330215895,
-      "suggestedPrice": 7.605795699064768,
-      "suggestedIfoodPrice": 8.969098701727322,
+      "recipeCost": 7.901577663741117,
+      "suggestedPrice": 23.704732991223352,
+      "suggestedIfoodPrice": 27.95369456512188,
       "currentPrice": 28,
       "currentIfoodPrice": 33,
       "isCombo": false,
-      "grossProfit": 5.070530466043179,
+      "grossProfit": 15.803155327482235,
       "cmv": 33.33333333333333,
       "createdAt": "2025-10-29T18:55:22.411Z",
-      "updatedAt": "2025-10-29T22:18:57.030Z",
+      "updatedAt": "2025-10-30T16:20:52.148Z",
       "id": 1
     },
     {
@@ -649,7 +649,7 @@
       "grossProfit": 7.380000000000001,
       "cmv": 33.33333333333333,
       "createdAt": "2025-10-30T03:13:29.673Z",
-      "updatedAt": "2025-10-30T03:13:29.673Z",
+      "updatedAt": "2025-10-30T16:20:52.272Z",
       "id": 2
     }
   ],
@@ -733,6 +733,29 @@
       "createdAt": "2025-10-30T04:31:17.312Z",
       "updatedAt": "2025-10-30T04:31:17.312Z",
       "id": 2
+    },
+    {
+      "name": "Thaila",
+      "addresses": [
+        {
+          "address": "Rua Mineirão 878",
+          "deliveryAreaId": "1"
+        }
+      ],
+      "updatedAt": "2025-10-30T16:27:15.940Z",
+      "id": 3
+    },
+    {
+      "name": "Thaila Taiane",
+      "phone": "45998461890",
+      "addresses": [
+        {
+          "address": "Rua Mineirão 878",
+          "deliveryAreaId": "1"
+        }
+      ],
+      "updatedAt": "2025-10-30T16:32:11.169Z",
+      "id": 4
     }
   ],
   "deliveryAreas": [
@@ -1559,7 +1582,64 @@
       "id": 44
     }
   ],
-  "cashTransactions": [],
+  "cashTransactions": [
+    {
+      "cashRegisterId": 3,
+      "type": "in",
+      "amount": 39,
+      "description": "Pedido #000003 - Pagamento",
+      "createdAt": "2025-10-30T16:21:24.206Z",
+      "id": 1
+    },
+    {
+      "cashRegisterId": 3,
+      "type": "in",
+      "amount": 138.3258,
+      "description": "Pedido #000004 - Crédito (Taxa: R$ 5,67)",
+      "createdAt": "2025-10-30T16:32:22.164Z",
+      "id": 2
+    },
+    {
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 100,
+      "description": "Manutenção Fritadeira",
+      "createdAt": "2025-10-30T16:33:34.728Z",
+      "id": 3
+    },
+    {
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 10,
+      "description": "Cebola",
+      "createdAt": "2025-10-30T16:33:48.828Z",
+      "id": 4
+    },
+    {
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 39,
+      "description": "Cancelamento Pedido #000003 - R$ 39,00",
+      "createdAt": "2025-10-30T16:44:00.591Z",
+      "id": 5
+    },
+    {
+      "cashRegisterId": 4,
+      "type": "in",
+      "amount": 27.4032,
+      "description": "Pedido #000005 - Crédito (Taxa: R$ 1,60)",
+      "createdAt": "2025-10-30T17:03:45.654Z",
+      "id": 6
+    },
+    {
+      "cashRegisterId": "4",
+      "type": "out",
+      "amount": 3,
+      "description": "Pagamento entregadores - Moto 01",
+      "createdAt": "2025-10-30T17:13:40.345Z",
+      "id": 7
+    }
+  ],
   "cashRegisters": [
     {
       "openedAt": "2025-10-30T16:04:23.233Z",
@@ -1576,8 +1656,34 @@
       "openedAt": "2025-10-30T16:08:36.958Z",
       "openingBalance": 200,
       "notes": "",
-      "status": "open",
-      "id": 2
+      "status": "closed",
+      "id": 2,
+      "closedAt": "2025-10-30T16:19:01.369Z",
+      "expectedBalance": 200,
+      "actualBalance": 0,
+      "difference": -200
+    },
+    {
+      "openedAt": "2025-10-30T16:21:10.421Z",
+      "openingBalance": 150,
+      "notes": "",
+      "status": "closed",
+      "id": 3,
+      "closedAt": "2025-10-30T17:02:33.584Z",
+      "expectedBalance": 178.32579999999996,
+      "actualBalance": 1500,
+      "difference": 1321.6742
+    },
+    {
+      "openedAt": "2025-10-30T17:02:43.990Z",
+      "openingBalance": 200,
+      "notes": "",
+      "status": "closed",
+      "id": 4,
+      "closedAt": "2025-10-30T17:16:01.328Z",
+      "expectedBalance": 224.4032,
+      "actualBalance": 178,
+      "difference": -46.4032
     }
   ],
   "orders": [
@@ -1615,7 +1721,7 @@
     },
     {
       "orderNumber": "000002",
-      "status": "kitchen",
+      "status": "cancelled",
       "customerId": 2,
       "deliveryAreaId": "1",
       "paymentMethodId": "2",
@@ -1639,9 +1745,107 @@
       "subtotal": 72,
       "total": 75,
       "createdAt": "2025-10-30T04:31:33.458Z",
-      "updatedAt": "2025-10-30T16:08:40.729Z",
+      "updatedAt": "2025-10-30T16:26:47.733Z",
       "id": 2,
       "paymentMethodKind": "pix",
+      "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000003",
+      "status": "cancelled",
+      "customerId": 1,
+      "deliveryAreaId": "1",
+      "paymentMethodId": "2",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        },
+        {
+          "productId": 2,
+          "productName": "Coca Cola",
+          "quantity": 1,
+          "unitPrice": 7,
+          "totalPrice": 7
+        }
+      ],
+      "subtotal": 36,
+      "total": 39,
+      "cashRegisterId": 3,
+      "cardFee": 0,
+      "deliveryFeeDriverAmount": 0,
+      "netAmount": 39,
+      "createdAt": "2025-10-30T16:21:24.190Z",
+      "updatedAt": "2025-10-30T16:44:00.571Z",
+      "id": 3,
+      "deliveryDriverId": "1",
+      "paymentMethodKind": "pix"
+    },
+    {
+      "orderNumber": "000004",
+      "status": "completed",
+      "customerId": 4,
+      "deliveryAreaId": "1",
+      "paymentMethodId": "4",
+      "paymentMethodKind": "credit",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 4,
+          "unitPrice": 29,
+          "totalPrice": 116
+        },
+        {
+          "productId": 2,
+          "productName": "Coca Cola",
+          "quantity": 4,
+          "unitPrice": 7,
+          "totalPrice": 28
+        }
+      ],
+      "subtotal": 144,
+      "total": 147,
+      "cashRegisterId": 3,
+      "cardFee": 5.6742,
+      "deliveryFeeDriverAmount": 3,
+      "netAmount": 138.3258,
+      "createdAt": "2025-10-30T16:32:22.141Z",
+      "updatedAt": "2025-10-30T17:02:26.509Z",
+      "id": 4,
+      "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000005",
+      "status": "completed",
+      "customerId": 1,
+      "deliveryAreaId": "1",
+      "paymentMethodId": "2",
+      "paymentMethodKind": "pix",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        }
+      ],
+      "subtotal": 29,
+      "total": 32,
+      "cashRegisterId": 4,
+      "cardFee": 1.5968,
+      "deliveryFeeDriverAmount": 3,
+      "netAmount": 27.4032,
+      "createdAt": "2025-10-30T17:03:45.643Z",
+      "updatedAt": "2025-10-30T17:15:49.589Z",
+      "id": 5,
       "deliveryDriverId": "1"
     }
   ]

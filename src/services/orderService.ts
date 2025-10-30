@@ -4,6 +4,8 @@ import { customerService } from './customerService';
 import { deliveryAreaService } from './deliveryAreaService';
 import { deliveryDriverService } from './deliveryDriverService';
 import { paymentMethodService } from './paymentMethodService';
+import { cashRegisterService } from './cashRegisterService';
+// import { businessSettingsService } from './businessSettingsService';
 
 export const orderService = {
   getAll: async (): Promise<Order[]> => {
@@ -61,6 +63,33 @@ export const orderService = {
 
     const total = subtotal + deliveryFee;
 
+    // Get open cash register
+    const openCashRegister = await cashRegisterService.getOpenCashRegister();
+    
+    // Get payment method to calculate fees
+    let cardFee = 0;
+    let deliveryFeeDriverAmount = 0;
+    
+    if (data.paymentMethodId) {
+      const paymentMethod = await paymentMethodService.getById(data.paymentMethodId);
+      if (paymentMethod) {
+        if (data.paymentMethodKind === 'credit' && paymentMethod.creditFee) {
+          cardFee = (total * paymentMethod.creditFee) / 100;
+        } else if (data.paymentMethodKind === 'debit' && paymentMethod.debitFee) {
+          cardFee = (total * paymentMethod.debitFee) / 100;
+        } else if (data.paymentMethodKind === 'pix' && paymentMethod.processingFeePercentage) {
+          cardFee = (total * paymentMethod.processingFeePercentage) / 100;
+        }
+      }
+    }
+    
+    // Repasse ao entregador: 100% da taxa de entrega
+    if (deliveryFee > 0) {
+      deliveryFeeDriverAmount = deliveryFee;
+    }
+    
+    const netAmount = total - cardFee - deliveryFeeDriverAmount;
+
     // Generate order number
     const allOrders = await api.get<Order[]>('/orders').then(r => r.data);
     const nextOrderNumber = (allOrders.length + 1).toString().padStart(6, '0');
@@ -79,12 +108,35 @@ export const orderService = {
       items: itemsWithTotals,
       subtotal,
       total,
+      cashRegisterId: openCashRegister?.id,
+      cardFee,
+      deliveryFeeDriverAmount,
+      netAmount,
       notes: data.notes,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     const response = await api.post<Order>('/orders', order);
+    
+    // Registrar entrada no caixa imediatamente após criar o pedido
+    if (openCashRegister && netAmount > 0) {
+      const paymentLabel = data.paymentMethodKind 
+        ? { credit: 'Crédito', debit: 'Débito', pix: 'PIX', cash: 'Dinheiro', other: 'Outro' }[data.paymentMethodKind]
+        : 'Pagamento';
+      
+      const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+      };
+      
+      await api.post('/cashTransactions', {
+        cashRegisterId: openCashRegister.id,
+        type: 'in',
+        amount: netAmount,
+        description: `Pedido #${nextOrderNumber} - ${paymentLabel}${cardFee > 0 ? ` (Taxa: ${formatCurrency(cardFee)})` : ''}`,
+        createdAt: new Date().toISOString(),
+      });
+    }
     
     // Enrich with names
     const [customer, area, driver, paymentMethod] = await Promise.all([
@@ -147,10 +199,28 @@ export const orderService = {
   },
 
   updateStatus: async (id: string, status: OrderStatus): Promise<Order> => {
+    // Buscar pedido antes de atualizar
+    const currentOrder = await orderService.getById(id);
+    
     const response = await api.patch<Order>(`/orders/${id}`, {
       status,
       updatedAt: new Date().toISOString(),
     });
+    
+    // Se o pedido foi cancelado e tinha um caixa vinculado, registrar saída
+    if (status === 'cancelled' && currentOrder && currentOrder.cashRegisterId && currentOrder.netAmount) {
+      const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+      };
+      
+      await api.post('/cashTransactions', {
+        cashRegisterId: currentOrder.cashRegisterId,
+        type: 'out',
+        amount: currentOrder.netAmount,
+        description: `Cancelamento Pedido #${currentOrder.orderNumber || id.slice(0, 6)} - ${formatCurrency(currentOrder.netAmount)}`,
+        createdAt: new Date().toISOString(),
+      });
+    }
     
     // Enrich with names
     const order = response.data;

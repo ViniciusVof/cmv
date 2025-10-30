@@ -52,6 +52,7 @@ export function Orders() {
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [now, setNow] = useState<number>(Date.now());
   const [cashRegisterOpen, setCashRegisterOpen] = useState<boolean | null>(null);
+  const [openCashRegisterId, setOpenCashRegisterId] = useState<string | null>(null);
   const [showOpenCashModal, setShowOpenCashModal] = useState(false);
   const [cashOpeningBalance, setCashOpeningBalance] = useState('');
   const [cashNotes, setCashNotes] = useState('');
@@ -85,13 +86,14 @@ export function Orders() {
 
   type PaymentOption = { id: string; kind: 'credit' | 'debit' | 'pix' | 'cash' | 'other'; label: string };
   const buildPaymentOptions = useMemo<PaymentOption[]>(() => {
+    const fmtPct = (v?: number) => (typeof v === 'number' ? ` (${v.toFixed(2)}%)` : '');
     return paymentMethods.flatMap<PaymentOption>(pm => {
       const type = (pm as any).type || pm.name;
       if (String(type).toLowerCase() === 'maquininha') {
         return [
-          { id: String(pm.id), kind: 'credit' as const, label: `${pm.name} - Crédito` },
-          { id: String(pm.id), kind: 'debit' as const, label: `${pm.name} - Débito` },
-          { id: String(pm.id), kind: 'pix' as const, label: `${pm.name} - Pix` },
+          { id: String(pm.id), kind: 'credit' as const, label: `${pm.name} - Crédito${fmtPct(pm.creditFee)}` },
+          { id: String(pm.id), kind: 'debit' as const, label: `${pm.name} - Débito${fmtPct(pm.debitFee)}` },
+          { id: String(pm.id), kind: 'pix' as const, label: `${pm.name} - Pix${fmtPct(pm.processingFeePercentage)}` },
         ];
       }
       if (String(type).toLowerCase() === 'dinheiro') {
@@ -102,7 +104,10 @@ export function Orders() {
   }, [paymentMethods]);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string>('');
+  const [selectedPaymentKind, setSelectedPaymentKind] = useState<'credit' | 'debit' | 'pix' | 'cash' | 'other' | ''>('');
   const [cashChangeAmount, setCashChangeAmount] = useState<string>('');
+  const [paymentSearch, setPaymentSearch] = useState<string>('');
+  const [paymentOptionsOpen, setPaymentOptionsOpen] = useState<boolean>(false);
   const [editOrderId, setEditOrderId] = useState<string | null>(null);
   // legacy state (removed dedicated edit modal)
   const [viewOrder, setViewOrder] = useState<Order | null>(null);
@@ -213,9 +218,11 @@ export function Orders() {
     try {
       const openCash = await cashRegisterService.getOpenCashRegister();
       setCashRegisterOpen(!!openCash);
+      setOpenCashRegisterId(openCash ? String(openCash.id) : null);
     } catch (error) {
       console.error('Error checking cash register:', error);
       setCashRegisterOpen(false);
+      setOpenCashRegisterId(null);
     }
   };
 
@@ -295,14 +302,15 @@ export function Orders() {
       in_delivery: [],
       completed: [],
     };
-    orders.forEach(order => {
+    const visible = openCashRegisterId ? orders.filter(o => String(o.cashRegisterId) === String(openCashRegisterId)) : [];
+    visible.forEach(order => {
       const st = (order.status as OrderStatus);
       if (st === 'cancelled') return; // não exibir cancelados no quadro
       const safeStatus: OrderStatus = (st in grouped ? st : 'kitchen');
       (grouped[safeStatus] as Order[]).push(order);
     });
     return grouped;
-  }, [orders]);
+  }, [orders, openCashRegisterId]);
 
   const filteredCustomers = useMemo(() => {
     if (!customerQuery.trim()) return [];
@@ -383,6 +391,7 @@ export function Orders() {
         deliveryAreaId: selectedAreaId,
         deliveryDriverId: undefined,
         paymentMethodId,
+        paymentMethodKind: (selectedPaymentKind || 'other') as any,
         changeFor,
         changeAmount,
         items: cartItems.map(ci => ({
@@ -613,7 +622,7 @@ export function Orders() {
                   <MdClose className="w-6 h-6" />
                 </button>
               </div>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Saldo Inicial (R$)
@@ -1314,25 +1323,41 @@ export function Orders() {
                       </button>
                     </div>
                     <div className="p-4">
-                      <div className="text-sm text-gray-700 mb-3">Selecione a forma de pagamento</div>
-                      <div className="flex flex-col gap-2 max-h-56 overflow-auto">
-                        {paymentMethods.map(pm => (
-                          <label key={pm.id} className="flex items-center gap-2 p-2 rounded border hover:bg-gray-50 cursor-pointer">
-                            <input
-                              type="radio"
-                              name="paymentMethod"
-                              value={pm.id}
-                              checked={selectedPaymentMethodId === pm.id}
-                              onChange={() => setSelectedPaymentMethodId(pm.id)}
-                            />
-                            <span className="text-sm text-gray-800">{pm.name}</span>
-                          </label>
-                        ))}
-                        {paymentMethods.length === 0 && (
-                          <div className="text-xs text-gray-500">Nenhuma forma de pagamento cadastrada</div>
+                      <div className="text-sm text-gray-700 mb-2">Selecione a forma de pagamento</div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={paymentSearch}
+                          onChange={(e) => { setPaymentSearch(e.target.value); setPaymentOptionsOpen(true); }}
+                          onFocus={() => setPaymentOptionsOpen(true)}
+                          onBlur={() => setTimeout(() => setPaymentOptionsOpen(false), 150)}
+                          placeholder="Buscar forma de pagamento..."
+                          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        />
+                        {paymentOptionsOpen && (
+                          <div className="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow max-h-56 overflow-auto">
+                            {buildPaymentOptions
+                              .filter(opt => opt.label.toLowerCase().includes(paymentSearch.toLowerCase()))
+                              .map(opt => (
+                                <button
+                                  type="button"
+                                  key={`${opt.id}-${opt.kind}`}
+                                  onClick={() => { setSelectedPaymentMethodId(opt.id); setSelectedPaymentKind(opt.kind); setPaymentSearch(opt.label); setPaymentOptionsOpen(false); }}
+                                  className={`w-full text-left px-3 py-2 hover:bg-gray-50 ${selectedPaymentMethodId === opt.id && selectedPaymentKind === opt.kind ? 'bg-blue-50' : ''}`}
+                                >
+                                  <div className="text-sm text-gray-800">{opt.label}</div>
+                                </button>
+                              ))}
+                            {buildPaymentOptions.length === 0 && (
+                              <div className="text-xs text-gray-500 px-3 py-2">Nenhuma forma de pagamento cadastrada</div>
+                            )}
+                          </div>
+                        )}
+                        {!paymentOptionsOpen && buildPaymentOptions.length === 0 && (
+                            <div className="text-xs text-gray-500 px-3 py-2">Nenhuma forma de pagamento cadastrada</div>
                         )}
                       </div>
-                      {selectedPaymentMethodId && paymentMethods.find(pm => pm.id === selectedPaymentMethodId)?.requiresChange && (
+                      {selectedPaymentMethodId && (paymentMethods.find(pm => pm.id === selectedPaymentMethodId)?.requiresChange || selectedPaymentKind === 'cash') && (
                         <div className="mt-3">
                           <label className="block text-xs text-gray-600 mb-1">Troco para quanto? (opcional)</label>
                           <input
@@ -1374,6 +1399,7 @@ export function Orders() {
                               customerId: selectedCustomerId,
                               deliveryAreaId: selectedAreaId,
                               paymentMethodId: selectedPaymentMethodId,
+                              paymentMethodKind: (selectedPaymentKind || 'other') as any,
                               ...(paymentMethods.find(p => p.id === selectedPaymentMethodId)?.requiresChange && cashChangeAmount.trim()
                                 ? { changeFor: Number(cashChangeAmount), changeAmount: Math.max(0, (parseFloat(cashChangeAmount || '0') || 0) - total) }
                                 : {}),

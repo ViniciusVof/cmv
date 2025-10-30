@@ -14,6 +14,10 @@ export const businessSettingsService = {
         markup: 3.0,
         ifoodTaxPercentage: 15.2,
         costCalculationMethod: 'current',
+        creditCardFeePercentage: 3.5,
+        debitCardFeePercentage: 2.0,
+        pixFeePercentage: 1.0,
+        deliveryDriverFeePercentage: 70,
       };
     } catch (error) {
       // Return default settings on error
@@ -22,6 +26,10 @@ export const businessSettingsService = {
         markup: 3.0,
         ifoodTaxPercentage: 15.2,
         costCalculationMethod: 'current',
+        creditCardFeePercentage: 3.5,
+        debitCardFeePercentage: 2.0,
+        pixFeePercentage: 1.0,
+        deliveryDriverFeePercentage: 70,
       };
     }
   },

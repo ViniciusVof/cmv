@@ -29,6 +29,10 @@ export interface Order {
   subtotal: number;
   total: number;
   notes?: string; // Observações do pedido
+  cashRegisterId?: string; // ID do caixa vinculado
+  cardFee?: number; // Taxa de cartão (crédito/débito/pix)
+  deliveryFeeDriverAmount?: number; // Valor da taxa de entrega pago ao entregador
+  netAmount?: number; // Valor líquido recebido (total - taxas)
   createdAt: string;
   updatedAt: string;
 }

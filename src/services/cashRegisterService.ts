@@ -48,21 +48,8 @@ export const cashRegisterService = {
     if (!current) throw new Error('Caixa não encontrado');
     if (current.status === 'closed') throw new Error('Caixa já está fechado');
 
-    // Calcular saldo esperado (abertura + vendas + entradas - saídas)
-    const [ordersResponse, transactionsResponse] = await Promise.all([
-      api.get('/orders'),
-      api.get('/cashTransactions'),
-    ]);
-
-    const orders = ordersResponse.data || [];
-    const salesTotal = orders
-      .filter((o: any) => {
-        if (!o.createdAt || o.status === 'cancelled') return false;
-        const orderDate = new Date(o.createdAt);
-        const openDate = new Date(current.openedAt);
-        return orderDate >= openDate;
-      })
-      .reduce((sum: number, o: any) => sum + (o.total || 0), 0);
+    // Calcular saldo esperado (abertura + entradas - saídas)
+    const transactionsResponse = await api.get('/cashTransactions');
 
     const transactions = transactionsResponse.data || [];
     const cashTransactions = transactions.filter((t: any) => String(t.cashRegisterId) === String(id));
@@ -73,7 +60,9 @@ export const cashRegisterService = {
       .filter((t: any) => t.type === 'out')
       .reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
 
-    const expectedBalance = current.openingBalance + salesTotal + transactionsIn - transactionsOut;
+    // O saldo esperado agora é: saldo inicial + entradas - saídas
+    // (As vendas já foram registradas como transações de entrada)
+    const expectedBalance = current.openingBalance + transactionsIn - transactionsOut;
     const difference = data.actualBalance - expectedBalance;
 
     const updated: CashRegister = {
