@@ -655,7 +655,21 @@
       "id": 1
     }
   ],
-  "customers": [],
+  "customers": [
+    {
+      "name": "Vinicius Oliveira de Freitas",
+      "phone": "45998530063",
+      "addresses": [
+        {
+          "address": "Rua Pedro Bento Da Silva, 891",
+          "deliveryAreaId": "1"
+        }
+      ],
+      "createdAt": "2025-10-30T01:21:59.332Z",
+      "updatedAt": "2025-10-30T01:21:59.332Z",
+      "id": 1
+    }
+  ],
   "deliveryAreas": [
     {
       "name": "Centro",
