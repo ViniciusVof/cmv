@@ -16,6 +16,7 @@ import { DeliveryDrivers } from './pages/DeliveryDrivers';
 import { PaymentMethods } from './pages/PaymentMethods';
 import { Customers } from './pages/Customers';
 import { Orders } from './pages/Orders';
+import { CashRegister } from './pages/CashRegister';
 import { BusinessSettings } from './pages/BusinessSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
@@ -108,6 +109,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Orders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pdv/caixa"
+          element={
+            <ProtectedRoute>
+              <CashRegister />
             </ProtectedRoute>
           }
         />

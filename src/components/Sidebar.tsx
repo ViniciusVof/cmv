@@ -40,6 +40,7 @@ const menuItems: MenuItem[] = [
     name: 'PDV', 
     icon: MdPointOfSale, 
     subItems: [
+      { name: 'Gestão de Caixa', path: '/pdv/caixa' },
       { name: 'Gestão de Pedidos', path: '/pdv' },
       { name: 'Produtos', path: '/pdv/produtos' },
       { name: 'Categorias', path: '/pdv/categorias' },

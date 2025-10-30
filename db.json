@@ -1559,6 +1559,27 @@
       "id": 44
     }
   ],
+  "cashTransactions": [],
+  "cashRegisters": [
+    {
+      "openedAt": "2025-10-30T16:04:23.233Z",
+      "openingBalance": 200,
+      "notes": "",
+      "status": "closed",
+      "id": 1,
+      "closedAt": "2025-10-30T16:04:45.354Z",
+      "expectedBalance": 200,
+      "actualBalance": 3000,
+      "difference": 2800
+    },
+    {
+      "openedAt": "2025-10-30T16:08:36.958Z",
+      "openingBalance": 200,
+      "notes": "",
+      "status": "open",
+      "id": 2
+    }
+  ],
   "orders": [
     {
       "orderNumber": "000001",
@@ -1594,7 +1615,7 @@
     },
     {
       "orderNumber": "000002",
-      "status": "in_delivery",
+      "status": "kitchen",
       "customerId": 2,
       "deliveryAreaId": "1",
       "paymentMethodId": "2",
@@ -1618,7 +1639,7 @@
       "subtotal": 72,
       "total": 75,
       "createdAt": "2025-10-30T04:31:33.458Z",
-      "updatedAt": "2025-10-30T15:03:19.342Z",
+      "updatedAt": "2025-10-30T16:08:40.729Z",
       "id": 2,
       "paymentMethodKind": "pix",
       "deliveryDriverId": "1"

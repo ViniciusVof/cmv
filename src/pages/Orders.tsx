@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import type { Order, OrderStatus } from '../types/order';
 import { orderService } from '../services/orderService';
 import { confirmAsync, notifySuccess, notifyError } from '../utils/alerts';
+import { cashRegisterService } from '../services/cashRegisterService';
 import type { Customer } from '../types/customer';
 import { customerService } from '../services/customerService';
 import type { PdvProduct } from '../types/pdvProduct';
@@ -27,7 +29,7 @@ import {
   MdRemove,
   MdPerson,
   MdShoppingCart,
-  
+  MdAttachMoney,
   MdNotes,
   MdVisibility
 } from 'react-icons/md';
@@ -44,10 +46,15 @@ const STATUS_CONFIG: Partial<Record<OrderStatus, { label: string; color: string;
 };
 
 export function Orders() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [now, setNow] = useState<number>(Date.now());
+  const [cashRegisterOpen, setCashRegisterOpen] = useState<boolean | null>(null);
+  const [showOpenCashModal, setShowOpenCashModal] = useState(false);
+  const [cashOpeningBalance, setCashOpeningBalance] = useState('');
+  const [cashNotes, setCashNotes] = useState('');
 
   // Fast order data
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -198,8 +205,19 @@ export function Orders() {
   }, [areas, selectedAreaId]);
 
   useEffect(() => {
+    checkCashRegister();
     loadData();
   }, []);
+
+  const checkCashRegister = async () => {
+    try {
+      const openCash = await cashRegisterService.getOpenCashRegister();
+      setCashRegisterOpen(!!openCash);
+    } catch (error) {
+      console.error('Error checking cash register:', error);
+      setCashRegisterOpen(false);
+    }
+  };
 
   // Tick every second for kitchen timers
   useEffect(() => {
@@ -532,6 +550,113 @@ export function Orders() {
         <div className="flex justify-center items-center h-64">
           <div className="text-gray-600">Carregando...</div>
         </div>
+      </Layout>
+    );
+  }
+
+  const handleOpenCash = async () => {
+    try {
+      const balance = Number(cashOpeningBalance) || 0;
+      await cashRegisterService.open({ openingBalance: balance, notes: cashNotes });
+      notifySuccess('Caixa aberto com sucesso!');
+      setShowOpenCashModal(false);
+      setCashOpeningBalance('');
+      setCashNotes('');
+      await checkCashRegister();
+    } catch (error: any) {
+      console.error('Error opening cash register:', error);
+      notifyError(error.message || 'Erro ao abrir caixa');
+    }
+  };
+
+  // Se o caixa não estiver aberto, mostrar aviso
+  if (cashRegisterOpen === false) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center max-w-md">
+            <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-8">
+              <MdSchedule className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Caixa Fechado</h2>
+              <p className="text-gray-600 mb-6">
+                Para gerenciar pedidos, é necessário abrir o caixa primeiro.
+              </p>
+              <div className="flex flex-col gap-3 justify-center">
+                <button
+                  onClick={() => setShowOpenCashModal(true)}
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Abrir Caixa Agora
+                </button>
+                <button
+                  onClick={() => navigate('/pdv/caixa')}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Ir para Gestão de Caixa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Abrir Caixa */}
+        {showOpenCashModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setShowOpenCashModal(false)} />
+            <div className="relative bg-white w-full max-w-md mx-4 rounded-lg shadow-xl p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                  <MdAttachMoney className="w-6 h-6 text-green-600" />
+                  Abrir Caixa
+                </h2>
+                <button onClick={() => setShowOpenCashModal(false)} className="text-gray-500 hover:text-gray-700">
+                  <MdClose className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Saldo Inicial (R$)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={cashOpeningBalance}
+                    onChange={(e) => setCashOpeningBalance(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Observações (opcional)
+                  </label>
+                  <textarea
+                    value={cashNotes}
+                    onChange={(e) => setCashNotes(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    rows={3}
+                    placeholder="Observações sobre a abertura do caixa"
+                  />
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => setShowOpenCashModal(false)}
+                    className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleOpenCash}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  >
+                    Abrir Caixa
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </Layout>
     );
   }
