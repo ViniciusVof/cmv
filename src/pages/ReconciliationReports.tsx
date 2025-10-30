@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
 import type { ReconciliationReport } from '../types/reconciliationReport';
 import { reconciliationReportService } from '../services/reconciliationReportService';
-import { MdDateRange, MdInfo, MdDelete, MdVisibility, MdClose } from 'react-icons/md';
+import { MdDateRange, MdDelete, MdVisibility, MdClose } from 'react-icons/md';
 
 export function ReconciliationReports() {
   const [reports, setReports] = useState<ReconciliationReport[]>([]);

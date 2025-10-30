@@ -19,7 +19,7 @@ export const reconciliationReportService = {
     }
   },
 
-  create: async (report: Omit<ReconciliationReport, 'id'>): Promise<ReconciliationReport> => {
+  create: async (report: Omit<ReconciliationReport, 'id' | 'reconciledAt'>): Promise<ReconciliationReport> => {
     const response = await api.post<ReconciliationReport>('/reconciliationReports', {
       ...report,
       reconciledAt: new Date().toISOString(),

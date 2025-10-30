@@ -19,7 +19,6 @@ import { Orders } from './pages/Orders';
 import { CashRegister } from './pages/CashRegister';
 import { BusinessSettings } from './pages/BusinessSettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { Layout } from './components/Layout';
 import { useAuthStore } from './stores/authStore';
 
 function App() {

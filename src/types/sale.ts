@@ -44,6 +44,7 @@ export interface SaleFormData {
   deliveryAreaId?: string;
   deliveryAddress?: string;
   deliveryDriverId?: string;
+  deliveryFee?: number;
   discount?: number;
   payments: Omit<SalePayment, 'id' | 'paymentMethodName'>[];
   notes?: string;

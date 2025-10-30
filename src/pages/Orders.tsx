@@ -111,7 +111,6 @@ export function Orders() {
   const [editOrderId, setEditOrderId] = useState<string | null>(null);
   // legacy state (removed dedicated edit modal)
   const [viewOrder, setViewOrder] = useState<Order | null>(null);
-  const [isWalkIn, setIsWalkIn] = useState<boolean>(false);
 
   // Open fast order modal prefilled to edit an existing order
   const startEditOrder = async (order: Order) => {
@@ -120,7 +119,7 @@ export function Orders() {
     try {
       // Prefill customer reliably (independente do estado atual de customers)
       if (order.customerId) {
-        setIsWalkIn(false);
+        
         const customer = await customerService.getById(String(order.customerId));
         if (customer) {
           setSelectedCustomerId(String(customer.id));
@@ -147,7 +146,7 @@ export function Orders() {
           setSelectedAddressIndex(undefined);
         }
       } else {
-        setIsWalkIn(true);
+        
         setSelectedCustomerId(undefined);
         setCustomerQuery('');
         setSelectedCustomerAddresses([]);
@@ -288,7 +287,6 @@ export function Orders() {
       setNotes('');
       setSelectedPaymentMethodId('');
       setCashChangeAmount('');
-      setIsWalkIn(false);
     } catch (error) {
       console.error('Error loading fast order data:', error);
       alert('Erro ao carregar dados para novo pedido');
@@ -544,14 +542,7 @@ export function Orders() {
     return '-';
   };
 
-  const getPaymentKind = (pmName?: string, pmType?: string) => {
-    const name = (pmName || '').toLowerCase();
-    if ((pmType || '').toLowerCase() === 'dinheiro') return 'Dinheiro';
-    if (name.includes('crédito') || name.includes('credito')) return 'Crédito';
-    if (name.includes('débito') || name.includes('debito')) return 'Débito';
-    if (name.includes('pix')) return 'PIX';
-    return 'Outro';
-  };
+  // removed unused helper getPaymentKind
 
   if (loading) {
     return (

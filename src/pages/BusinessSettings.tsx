@@ -8,6 +8,10 @@ export function BusinessSettings() {
     markup: 3.0,
     ifoodTaxPercentage: 15.2,
     costCalculationMethod: 'current',
+    creditCardFeePercentage: 0,
+    debitCardFeePercentage: 0,
+    pixFeePercentage: 0,
+    deliveryDriverFeePercentage: 0,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -24,6 +28,10 @@ export function BusinessSettings() {
         markup: data.markup,
         ifoodTaxPercentage: data.ifoodTaxPercentage,
         costCalculationMethod: data.costCalculationMethod || 'current',
+        creditCardFeePercentage: data.creditCardFeePercentage ?? 0,
+        debitCardFeePercentage: data.debitCardFeePercentage ?? 0,
+        pixFeePercentage: data.pixFeePercentage ?? 0,
+        deliveryDriverFeePercentage: data.deliveryDriverFeePercentage ?? 0,
       });
     } catch (error) {
       console.error('Error loading settings:', error);
