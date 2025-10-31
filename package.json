@@ -8,7 +8,10 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "server": "node backend/server.js",
-    "dev:all": "concurrently \"npm run dev\" \"npm run server\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
+    "reset:db": "node backend/scripts/reset-db.js",
+    "reset:hard": "node backend/scripts/hard-reset-db.js",
+    "reset:only-users": "node backend/scripts/only-users-reset-db.js"
   },
   "dependencies": {
     "react": "^18.2.0",

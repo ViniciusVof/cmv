@@ -18,6 +18,7 @@ import { Customers } from './pages/Customers';
 import { Orders } from './pages/Orders';
 import { CashRegister } from './pages/CashRegister';
 import { BusinessSettings } from './pages/BusinessSettings';
+import { GlobalCMV } from './pages/GlobalCMV';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './stores/authStore';
 
@@ -172,6 +173,14 @@ function App() {
           element={
             <ProtectedRoute>
               <BusinessSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cmv-global"
+          element={
+            <ProtectedRoute>
+              <GlobalCMV />
             </ProtectedRoute>
           }
         />

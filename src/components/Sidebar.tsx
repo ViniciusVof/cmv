@@ -8,6 +8,7 @@ import {
   MdReceipt, 
   MdAttachMoney, 
   MdTrendingDown, 
+  MdTrendingUp,
   MdSettings,
   MdExpandMore,
   MdExpandLess,
@@ -52,6 +53,7 @@ const menuItems: MenuItem[] = [
   },
   { name: 'Custo Fixo', icon: MdAttachMoney, path: '/custo-fixo' },
   { name: 'Custo Variável', icon: MdTrendingDown, path: '/custo-variavel' },
+  { name: 'CMV Global', icon: MdTrendingUp, path: '/cmv-global' },
   { name: 'Configurações', icon: MdSettings, path: '/configuracoes' },
 ];
 
