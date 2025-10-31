@@ -815,435 +815,61 @@
     }
   ],
   "sales": [],
-  "reconciliationReports": [
-    {
-      "date": "2025-10-29",
-      "items": [
-        {
-          "ingredientId": "1",
-          "ingredientCode": "1",
-          "ingredientName": "BLEND BOVINO",
-          "unit": "KG",
-          "systemStock": 6.5,
-          "physicalStock": 6,
-          "difference": -0.5,
-          "adjustmentType": "OUT"
-        },
-        {
-          "ingredientId": "2",
-          "ingredientCode": "2",
-          "ingredientName": "PÃO BRIOCHE MAX",
-          "unit": "UN",
-          "systemStock": 198,
-          "physicalStock": 149.999,
-          "difference": -48.001000000000005,
-          "adjustmentType": "OUT"
-        },
-        {
-          "ingredientId": "3",
-          "ingredientCode": "3",
-          "ingredientName": "QUEIJO CHEDDAR VIGOR/POLENGUI",
-          "unit": "UN",
-          "systemStock": 160,
-          "physicalStock": 48,
-          "difference": -112,
-          "adjustmentType": "OUT"
-        },
-        {
-          "ingredientId": "4",
-          "ingredientCode": "4",
-          "ingredientName": "CEBOLA CARAMELIZADA",
-          "unit": "KG",
-          "systemStock": 0.9,
-          "physicalStock": 1,
-          "difference": 0.09999999999999998,
-          "adjustmentType": "IN"
-        },
-        {
-          "ingredientId": "5",
-          "ingredientCode": "5",
-          "ingredientName": "ALFACE",
-          "unit": "KG",
-          "systemStock": 0.356,
-          "physicalStock": 0.5,
-          "difference": 0.14400000000000002,
-          "adjustmentType": "IN"
-        },
-        {
-          "ingredientId": "6",
-          "ingredientCode": "6",
-          "ingredientName": "CEBOLA",
-          "unit": "KG",
-          "systemStock": 0.079,
-          "physicalStock": 1,
-          "difference": 0.921,
-          "adjustmentType": "IN"
-        },
-        {
-          "ingredientId": "7",
-          "ingredientCode": "7",
-          "ingredientName": "DORITOS",
-          "unit": "KG",
-          "systemStock": 0.3,
-          "physicalStock": 0.3,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "8",
-          "ingredientCode": "8",
-          "ingredientName": "BACON",
-          "unit": "KG",
-          "systemStock": 7.5,
-          "physicalStock": 7.5,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "9",
-          "ingredientCode": "9",
-          "ingredientName": "CEBOLA CRISPY",
-          "unit": "KG",
-          "systemStock": 1,
-          "physicalStock": 1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "10",
-          "ingredientCode": "10",
-          "ingredientName": "ANÉIS DE CEBOLA",
-          "unit": "KG",
-          "systemStock": 1.1,
-          "physicalStock": 1.1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "11",
-          "ingredientCode": "11",
-          "ingredientName": "BATATA CONGELADA",
-          "unit": "KG",
-          "systemStock": 18,
-          "physicalStock": 18,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "12",
-          "ingredientCode": "12",
-          "ingredientName": "MAIONESE BASE",
-          "unit": "KG",
-          "systemStock": 0.528,
-          "physicalStock": 0.528,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "13",
-          "ingredientCode": "13",
-          "ingredientName": "PICLES ARTESANAL",
-          "unit": "KG",
-          "systemStock": 0.5,
-          "physicalStock": 0.5,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "14",
-          "ingredientCode": "14",
-          "ingredientName": "CEBOLA CRISPY",
-          "unit": "KG",
-          "systemStock": 1,
-          "physicalStock": 1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "15",
-          "ingredientCode": "15",
-          "ingredientName": "KETCHUP",
-          "unit": "KG",
-          "systemStock": 1.033,
-          "physicalStock": 1.033,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "16",
-          "ingredientCode": "16",
-          "ingredientName": "MOSTARDA",
-          "unit": "KG",
-          "systemStock": 1,
-          "physicalStock": 1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "17",
-          "ingredientCode": "17",
-          "ingredientName": "HAMBURGUER DE FRANGO",
-          "unit": "UN",
-          "systemStock": 10,
-          "physicalStock": 10,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "18",
-          "ingredientCode": "18",
-          "ingredientName": "BARBECUE",
-          "unit": "UN",
-          "systemStock": 1.01,
-          "physicalStock": 1.01,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "19",
-          "ingredientCode": "19",
-          "ingredientName": "CHEDDAR MELT POLENGHI",
-          "unit": "UN",
-          "systemStock": 1.5,
-          "physicalStock": 1.5,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "20",
-          "ingredientCode": "20",
-          "ingredientName": "JALAPENO EM CONSERVA",
-          "unit": "UN",
-          "systemStock": 0.35,
-          "physicalStock": 0.35,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "21",
-          "ingredientCode": "21",
-          "ingredientName": "BLEND COSTELA",
-          "unit": "UN",
-          "systemStock": 1.504,
-          "physicalStock": 1.504,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "22",
-          "ingredientCode": "22",
-          "ingredientName": "COCA LATA",
-          "unit": "UN",
-          "systemStock": 6,
-          "physicalStock": 6,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "23",
-          "ingredientCode": "23",
-          "ingredientName": "COMBO BATATA + COCA",
-          "unit": "UN",
-          "systemStock": 1,
-          "physicalStock": 1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "24",
-          "ingredientCode": "24",
-          "ingredientName": "EMBALAGEM BOX ZIPER",
-          "unit": "UN",
-          "systemStock": 2000,
-          "physicalStock": 2000,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "25",
-          "ingredientCode": "25",
-          "ingredientName": "EMBALAGEM FRITAS",
-          "unit": "UN",
-          "systemStock": 2000,
-          "physicalStock": 2000,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "26",
-          "ingredientCode": "26",
-          "ingredientName": "SACO KRAFT M",
-          "unit": "UN",
-          "systemStock": 3000,
-          "physicalStock": 3000,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "27",
-          "ingredientCode": "27",
-          "ingredientName": "PAPEL ACOPLADO 30X40",
-          "unit": "UN",
-          "systemStock": 10000,
-          "physicalStock": 10000,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "28",
-          "ingredientCode": "28",
-          "ingredientName": "CLICHE SACO KRAFT",
-          "unit": "UN",
-          "systemStock": 1,
-          "physicalStock": 1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "29",
-          "ingredientCode": "29",
-          "ingredientName": "CLICHE ACOPLADO",
-          "unit": "UN",
-          "systemStock": 1,
-          "physicalStock": 1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "30",
-          "ingredientCode": "30",
-          "ingredientName": "COSTELA ALFAMA",
-          "unit": "KG",
-          "systemStock": 1,
-          "physicalStock": 1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "31",
-          "ingredientCode": "31",
-          "ingredientName": "CATUPIRY",
-          "unit": "KG",
-          "systemStock": 1.5,
-          "physicalStock": 1.5,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "32",
-          "ingredientCode": "32",
-          "ingredientName": "CREME DE LEITE",
-          "unit": "UN",
-          "systemStock": 1.03,
-          "physicalStock": 1.03,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "33",
-          "ingredientCode": "33",
-          "ingredientName": "TEMPERO EM GERAL",
-          "unit": "UN",
-          "systemStock": 0.1,
-          "physicalStock": 0.1,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "34",
-          "ingredientCode": "34",
-          "ingredientName": "SOUR CREAM",
-          "unit": "UN",
-          "systemStock": 0.36,
-          "physicalStock": 0.36,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "2jKuhX0",
-          "ingredientCode": "35",
-          "ingredientName": "Produto Teste Movimentação",
-          "unit": "UN",
-          "systemStock": 10,
-          "physicalStock": 10,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        },
-        {
-          "ingredientId": "UiMGlZv",
-          "ingredientCode": "36",
-          "ingredientName": "Produto Primeira Movimentação",
-          "unit": "KG",
-          "systemStock": 2,
-          "physicalStock": 2,
-          "difference": 0,
-          "adjustmentType": "NONE"
-        }
-      ],
-      "summary": {
-        "totalItems": 36,
-        "itemsWithDifference": 6,
-        "totalEntries": 1.165,
-        "totalExits": 160.501
-      },
-      "reconciledAt": "2025-10-29T22:33:00.310Z",
-      "id": 1
-    }
-  ],
+  "reconciliationReports": [],
   "stockMovements": [
     {
       "id": 1,
       "ingredientId": "1",
       "type": "IN",
-      "quantity": 7.5,
-      "unitCost": 6.594666666666667,
+      "quantity": 6,
+      "unitCost": 8.243333333333334,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 2,
       "ingredientId": "2",
       "type": "IN",
-      "quantity": 48,
-      "unitCost": 2.6041666666666665,
+      "quantity": 149.999,
+      "unitCost": 0.8333388889259262,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 3,
       "ingredientId": "3",
       "type": "IN",
-      "quantity": 160,
-      "unitCost": 0.5191250000000001,
+      "quantity": 48,
+      "unitCost": 1.7304166666666667,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 4,
       "ingredientId": "4",
       "type": "IN",
-      "quantity": 0.9,
-      "unitCost": 9.744444444444444,
+      "quantity": 1,
+      "unitCost": 8.77,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 5,
       "ingredientId": "5",
       "type": "IN",
-      "quantity": 0.356,
-      "unitCost": 12.612359550561798,
+      "quantity": 0.5,
+      "unitCost": 8.98,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 6,
       "ingredientId": "6",
       "type": "IN",
-      "quantity": 0.079,
-      "unitCost": 4.556962025316455,
+      "quantity": 1,
+      "unitCost": 0.36,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 7,
@@ -1252,7 +878,7 @@
       "quantity": 0.3,
       "unitCost": 56.6,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 8,
@@ -1261,7 +887,7 @@
       "quantity": 7.5,
       "unitCost": 37.88,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 9,
@@ -1270,7 +896,7 @@
       "quantity": 1,
       "unitCost": 8.35,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 10,
@@ -1279,7 +905,7 @@
       "quantity": 1.1,
       "unitCost": 18.090909090909086,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 11,
@@ -1288,7 +914,7 @@
       "quantity": 18,
       "unitCost": 15.99,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 12,
@@ -1297,7 +923,7 @@
       "quantity": 0.528,
       "unitCost": 18.52272727272727,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 13,
@@ -1306,7 +932,7 @@
       "quantity": 0.5,
       "unitCost": 9.6,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 14,
@@ -1315,7 +941,7 @@
       "quantity": 1,
       "unitCost": 8.35,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 15,
@@ -1324,7 +950,7 @@
       "quantity": 1.033,
       "unitCost": 17.32817037754114,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 16,
@@ -1333,7 +959,7 @@
       "quantity": 1,
       "unitCost": 18.4,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 17,
@@ -1342,7 +968,7 @@
       "quantity": 10,
       "unitCost": 3.316,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 18,
@@ -1351,7 +977,7 @@
       "quantity": 1.01,
       "unitCost": 10.871287128712872,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 19,
@@ -1360,7 +986,7 @@
       "quantity": 1.5,
       "unitCost": 31.653333333333332,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 20,
@@ -1369,7 +995,7 @@
       "quantity": 0.35,
       "unitCost": 79.71428571428571,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 21,
@@ -1378,7 +1004,7 @@
       "quantity": 1.504,
       "unitCost": 53.58377659574468,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 22,
@@ -1387,7 +1013,7 @@
       "quantity": 6,
       "unitCost": 3.69,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 23,
@@ -1396,7 +1022,7 @@
       "quantity": 1,
       "unitCost": 15,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 24,
@@ -1405,7 +1031,7 @@
       "quantity": 2000,
       "unitCost": 0.75,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 25,
@@ -1414,7 +1040,7 @@
       "quantity": 2000,
       "unitCost": 0.55,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 26,
@@ -1423,7 +1049,7 @@
       "quantity": 3000,
       "unitCost": 0.69,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 27,
@@ -1432,7 +1058,7 @@
       "quantity": 10000,
       "unitCost": 0.3,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 28,
@@ -1441,7 +1067,7 @@
       "quantity": 1,
       "unitCost": 630,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 29,
@@ -1450,7 +1076,7 @@
       "quantity": 1,
       "unitCost": 350,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 30,
@@ -1459,7 +1085,7 @@
       "quantity": 1,
       "unitCost": 67.99,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 31,
@@ -1468,7 +1094,7 @@
       "quantity": 1.5,
       "unitCost": 46.6,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 32,
@@ -1477,7 +1103,7 @@
       "quantity": 1.03,
       "unitCost": 13.097087378640776,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 33,
@@ -1486,7 +1112,7 @@
       "quantity": 0.1,
       "unitCost": 50,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 34,
@@ -1495,7 +1121,7 @@
       "quantity": 0.36,
       "unitCost": 37.38888888888889,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 35,
@@ -1504,7 +1130,7 @@
       "quantity": 10,
       "unitCost": 15,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
+      "date": "2025-10-31T16:54:39.372Z"
     },
     {
       "id": 36,
@@ -1513,430 +1139,10 @@
       "quantity": 2,
       "unitCost": 62.5,
       "isInitial": true,
-      "date": "2025-10-29T19:54:59.938Z"
-    },
-    {
-      "ingredientId": "1",
-      "type": "OUT",
-      "quantity": 1,
-      "date": "2025-10-29T22:05:39.300Z",
-      "id": 37
-    },
-    {
-      "ingredientId": "2",
-      "type": "IN",
-      "quantity": 150,
-      "unitCost": 1,
-      "date": "2025-10-29T22:11:04.807Z",
-      "id": 38
-    },
-    {
-      "ingredientId": "1",
-      "type": "OUT",
-      "quantity": 0.5,
-      "date": "2025-10-29T00:00:00.000Z",
-      "note": "Ajuste de conciliação física - Estoque sistema: 6.5, Estoque físico: 6",
-      "id": 39
-    },
-    {
-      "ingredientId": "2",
-      "type": "OUT",
-      "quantity": 48.001000000000005,
-      "date": "2025-10-29T00:00:00.000Z",
-      "note": "Ajuste de conciliação física - Estoque sistema: 198, Estoque físico: 149.999",
-      "id": 40
-    },
-    {
-      "ingredientId": "3",
-      "type": "OUT",
-      "quantity": 112,
-      "date": "2025-10-29T00:00:00.000Z",
-      "note": "Ajuste de conciliação física - Estoque sistema: 160, Estoque físico: 48",
-      "id": 41
-    },
-    {
-      "ingredientId": "4",
-      "type": "IN",
-      "quantity": 0.09999999999999998,
-      "unitCost": 0,
-      "date": "2025-10-29T00:00:00.000Z",
-      "note": "Ajuste de conciliação física - Estoque sistema: 0.9, Estoque físico: 1",
-      "id": 42
-    },
-    {
-      "ingredientId": "5",
-      "type": "IN",
-      "quantity": 0.14400000000000002,
-      "unitCost": 0,
-      "date": "2025-10-29T00:00:00.000Z",
-      "note": "Ajuste de conciliação física - Estoque sistema: 0.356, Estoque físico: 0.5",
-      "id": 43
-    },
-    {
-      "ingredientId": "6",
-      "type": "IN",
-      "quantity": 0.921,
-      "unitCost": 0,
-      "date": "2025-10-29T00:00:00.000Z",
-      "note": "Ajuste de conciliação física - Estoque sistema: 0.079, Estoque físico: 1",
-      "id": 44
-    },
-    {
-      "ingredientId": "2",
-      "type": "OUT",
-      "quantity": 3,
-      "date": "2025-10-30T17:20:30.026Z",
-      "note": "Pedido #000006 - baixa automática",
-      "id": 45
-    },
-    {
-      "ingredientId": "1",
-      "type": "OUT",
-      "quantity": 0.44999999999999996,
-      "date": "2025-10-30T17:20:30.053Z",
-      "note": "Pedido #000006 - baixa automática",
-      "id": 46
-    },
-    {
-      "ingredientId": "3",
-      "type": "OUT",
-      "quantity": 6,
-      "date": "2025-10-30T17:20:30.096Z",
-      "note": "Pedido #000006 - baixa automática",
-      "id": 47
-    },
-    {
-      "ingredientId": "12",
-      "type": "OUT",
-      "quantity": 0.06,
-      "date": "2025-10-30T17:20:30.150Z",
-      "note": "Pedido #000006 - baixa automática",
-      "id": 48
-    },
-    {
-      "ingredientId": "22",
-      "type": "OUT",
-      "quantity": 3,
-      "date": "2025-10-30T17:20:30.267Z",
-      "note": "Pedido #000006 - baixa automática",
-      "id": 49
+      "date": "2025-10-31T16:54:39.372Z"
     }
   ],
-  "cashTransactions": [
-    {
-      "cashRegisterId": 3,
-      "type": "in",
-      "amount": 39,
-      "description": "Pedido #000003 - Pagamento",
-      "createdAt": "2025-10-30T16:21:24.206Z",
-      "id": 1
-    },
-    {
-      "cashRegisterId": 3,
-      "type": "in",
-      "amount": 138.3258,
-      "description": "Pedido #000004 - Crédito (Taxa: R$ 5,67)",
-      "createdAt": "2025-10-30T16:32:22.164Z",
-      "id": 2
-    },
-    {
-      "cashRegisterId": 3,
-      "type": "out",
-      "amount": 100,
-      "description": "Manutenção Fritadeira",
-      "createdAt": "2025-10-30T16:33:34.728Z",
-      "id": 3
-    },
-    {
-      "cashRegisterId": 3,
-      "type": "out",
-      "amount": 10,
-      "description": "Cebola",
-      "createdAt": "2025-10-30T16:33:48.828Z",
-      "id": 4
-    },
-    {
-      "cashRegisterId": 3,
-      "type": "out",
-      "amount": 39,
-      "description": "Cancelamento Pedido #000003 - R$ 39,00",
-      "createdAt": "2025-10-30T16:44:00.591Z",
-      "id": 5
-    },
-    {
-      "cashRegisterId": 4,
-      "type": "in",
-      "amount": 27.4032,
-      "description": "Pedido #000005 - Crédito (Taxa: R$ 1,60)",
-      "createdAt": "2025-10-30T17:03:45.654Z",
-      "id": 6
-    },
-    {
-      "cashRegisterId": "4",
-      "type": "out",
-      "amount": 3,
-      "description": "Pagamento entregadores - Moto 01",
-      "createdAt": "2025-10-30T17:13:40.345Z",
-      "id": 7
-    },
-    {
-      "cashRegisterId": 5,
-      "type": "in",
-      "amount": 106.9011,
-      "description": "Pedido #000006 - PIX (Taxa: R$ 1,10)",
-      "createdAt": "2025-10-30T17:20:29.920Z",
-      "id": 8
-    }
-  ],
-  "cashRegisters": [
-    {
-      "openedAt": "2025-10-30T16:04:23.233Z",
-      "openingBalance": 200,
-      "notes": "",
-      "status": "closed",
-      "id": 1,
-      "closedAt": "2025-10-30T16:04:45.354Z",
-      "expectedBalance": 200,
-      "actualBalance": 3000,
-      "difference": 2800
-    },
-    {
-      "openedAt": "2025-10-30T16:08:36.958Z",
-      "openingBalance": 200,
-      "notes": "",
-      "status": "closed",
-      "id": 2,
-      "closedAt": "2025-10-30T16:19:01.369Z",
-      "expectedBalance": 200,
-      "actualBalance": 0,
-      "difference": -200
-    },
-    {
-      "openedAt": "2025-10-30T16:21:10.421Z",
-      "openingBalance": 150,
-      "notes": "",
-      "status": "closed",
-      "id": 3,
-      "closedAt": "2025-10-30T17:02:33.584Z",
-      "expectedBalance": 178.32579999999996,
-      "actualBalance": 1500,
-      "difference": 1321.6742
-    },
-    {
-      "openedAt": "2025-10-30T17:02:43.990Z",
-      "openingBalance": 200,
-      "notes": "",
-      "status": "closed",
-      "id": 4,
-      "closedAt": "2025-10-30T17:16:01.328Z",
-      "expectedBalance": 224.4032,
-      "actualBalance": 178,
-      "difference": -46.4032
-    },
-    {
-      "openedAt": "2025-10-30T17:17:14.907Z",
-      "openingBalance": 200,
-      "notes": "",
-      "status": "open",
-      "id": 5
-    }
-  ],
-  "orders": [
-    {
-      "orderNumber": "000001",
-      "status": "cancelled",
-      "customerId": 1,
-      "deliveryAreaId": "1",
-      "paymentMethodId": 5,
-      "changeFor": 100,
-      "changeAmount": 61,
-      "deliveryFee": 3,
-      "items": [
-        {
-          "productId": 1,
-          "productName": "Origin",
-          "quantity": 1,
-          "unitPrice": 29,
-          "totalPrice": 29
-        },
-        {
-          "productId": 2,
-          "productName": "Coca Cola",
-          "quantity": 1,
-          "unitPrice": 7,
-          "totalPrice": 7
-        }
-      ],
-      "subtotal": 36,
-      "total": 39,
-      "createdAt": "2025-10-30T04:30:57.788Z",
-      "updatedAt": "2025-10-30T14:41:37.143Z",
-      "id": 1,
-      "deliveryDriverId": "1"
-    },
-    {
-      "orderNumber": "000002",
-      "status": "cancelled",
-      "customerId": 2,
-      "deliveryAreaId": "1",
-      "paymentMethodId": "2",
-      "deliveryFee": 3,
-      "items": [
-        {
-          "productId": 1,
-          "productName": "Origin",
-          "quantity": 2,
-          "unitPrice": 29,
-          "totalPrice": 58
-        },
-        {
-          "productId": 2,
-          "productName": "Coca Cola",
-          "quantity": 2,
-          "unitPrice": 7,
-          "totalPrice": 14
-        }
-      ],
-      "subtotal": 72,
-      "total": 75,
-      "createdAt": "2025-10-30T04:31:33.458Z",
-      "updatedAt": "2025-10-30T16:26:47.733Z",
-      "id": 2,
-      "paymentMethodKind": "pix",
-      "deliveryDriverId": "1"
-    },
-    {
-      "orderNumber": "000003",
-      "status": "cancelled",
-      "customerId": 1,
-      "deliveryAreaId": "1",
-      "paymentMethodId": "2",
-      "deliveryFee": 3,
-      "items": [
-        {
-          "productId": 1,
-          "productName": "Origin",
-          "quantity": 1,
-          "unitPrice": 29,
-          "totalPrice": 29
-        },
-        {
-          "productId": 2,
-          "productName": "Coca Cola",
-          "quantity": 1,
-          "unitPrice": 7,
-          "totalPrice": 7
-        }
-      ],
-      "subtotal": 36,
-      "total": 39,
-      "cashRegisterId": 3,
-      "cardFee": 0,
-      "deliveryFeeDriverAmount": 0,
-      "netAmount": 39,
-      "createdAt": "2025-10-30T16:21:24.190Z",
-      "updatedAt": "2025-10-30T16:44:00.571Z",
-      "id": 3,
-      "deliveryDriverId": "1",
-      "paymentMethodKind": "pix"
-    },
-    {
-      "orderNumber": "000004",
-      "status": "completed",
-      "customerId": 4,
-      "deliveryAreaId": "1",
-      "paymentMethodId": "4",
-      "paymentMethodKind": "credit",
-      "deliveryFee": 3,
-      "items": [
-        {
-          "productId": 1,
-          "productName": "Origin",
-          "quantity": 4,
-          "unitPrice": 29,
-          "totalPrice": 116
-        },
-        {
-          "productId": 2,
-          "productName": "Coca Cola",
-          "quantity": 4,
-          "unitPrice": 7,
-          "totalPrice": 28
-        }
-      ],
-      "subtotal": 144,
-      "total": 147,
-      "cashRegisterId": 3,
-      "cardFee": 5.6742,
-      "deliveryFeeDriverAmount": 3,
-      "netAmount": 138.3258,
-      "createdAt": "2025-10-30T16:32:22.141Z",
-      "updatedAt": "2025-10-30T17:02:26.509Z",
-      "id": 4,
-      "deliveryDriverId": "1"
-    },
-    {
-      "orderNumber": "000005",
-      "status": "completed",
-      "customerId": 1,
-      "deliveryAreaId": "1",
-      "paymentMethodId": "2",
-      "paymentMethodKind": "pix",
-      "deliveryFee": 3,
-      "items": [
-        {
-          "productId": 1,
-          "productName": "Origin",
-          "quantity": 1,
-          "unitPrice": 29,
-          "totalPrice": 29
-        }
-      ],
-      "subtotal": 29,
-      "total": 32,
-      "cashRegisterId": 4,
-      "cardFee": 1.5968,
-      "deliveryFeeDriverAmount": 3,
-      "netAmount": 27.4032,
-      "createdAt": "2025-10-30T17:03:45.643Z",
-      "updatedAt": "2025-10-30T17:15:49.589Z",
-      "id": 5,
-      "deliveryDriverId": "1"
-    },
-    {
-      "orderNumber": "000006",
-      "status": "in_delivery",
-      "customerId": 1,
-      "deliveryAreaId": "1",
-      "paymentMethodId": "4",
-      "paymentMethodKind": "pix",
-      "deliveryFee": 3,
-      "items": [
-        {
-          "productId": 1,
-          "productName": "Origin",
-          "quantity": 3,
-          "unitPrice": 29,
-          "totalPrice": 87
-        },
-        {
-          "productId": 2,
-          "productName": "Coca Cola",
-          "quantity": 3,
-          "unitPrice": 7,
-          "totalPrice": 21
-        }
-      ],
-      "subtotal": 108,
-      "total": 111,
-      "cashRegisterId": 5,
-      "cardFee": 1.0989,
-      "deliveryFeeDriverAmount": 3,
-      "netAmount": 106.9011,
-      "createdAt": "2025-10-30T17:20:29.894Z",
-      "updatedAt": "2025-10-30T17:20:36.138Z",
-      "id": 6,
-      "deliveryDriverId": "1"
-    }
-  ]
+  "cashTransactions": [],
+  "cashRegisters": [],
+  "orders": []
 }
