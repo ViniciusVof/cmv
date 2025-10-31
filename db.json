@@ -58,19 +58,22 @@
   ],
   "variableCosts": [
     {
-      "id": "1",
       "name": "Taxa de Cartão",
-      "percentage": 3
+      "percentage": 3,
+      "showInDRE": false,
+      "id": "1"
     },
     {
-      "id": "2",
       "name": "Simples Nacional",
-      "percentage": 7.5
+      "percentage": 7.5,
+      "showInDRE": true,
+      "id": "2"
     },
     {
-      "id": "3",
       "name": "Embalagem",
-      "percentage": 4.5
+      "percentage": 4.5,
+      "showInDRE": false,
+      "id": "3"
     }
   ],
   "users": [
@@ -651,6 +654,39 @@
       "createdAt": "2025-10-30T03:13:29.673Z",
       "updatedAt": "2025-10-30T16:20:52.272Z",
       "id": 2
+    },
+    {
+      "code": "3",
+      "name": "Teste Produto Faturamento",
+      "description": "",
+      "isProduct": true,
+      "lossPercentage": 10,
+      "items": [
+        {
+          "id": "1761933722171-0",
+          "ingredientId": "1",
+          "ingredientCode": "1",
+          "ingredientName": "BLEND BOVINO",
+          "netQuantity": 0.15,
+          "unit": "KG",
+          "correctionFactor": 1,
+          "unitCost": 7.901577663741117,
+          "totalCost": 1.1852366495611675,
+          "percentage": 100
+        }
+      ],
+      "markup": 3,
+      "recipeCost": 1.1852366495611675,
+      "suggestedPrice": 3.5557099486835027,
+      "suggestedIfoodPrice": 4.193054184768282,
+      "currentPrice": 8000,
+      "currentIfoodPrice": 9433.93,
+      "isCombo": false,
+      "grossProfit": 2.3704732991223354,
+      "cmv": 33.33333333333333,
+      "createdAt": "2025-10-31T18:02:02.207Z",
+      "updatedAt": "2025-10-31T18:02:02.207Z",
+      "id": 3
     }
   ],
   "businessSettings": [
@@ -705,6 +741,20 @@
       "imageUrl": "",
       "updatedAt": "2025-10-30T03:48:21.186Z",
       "id": 2
+    },
+    {
+      "code": "3",
+      "name": "Teste Produto Faturamento",
+      "description": "",
+      "recipeId": "3",
+      "sellingPrice": 8000,
+      "ifoodPrice": 9433.93,
+      "isActive": true,
+      "category": "Lanches",
+      "imageUrl": "",
+      "createdAt": "2025-10-31T18:02:22.174Z",
+      "updatedAt": "2025-10-31T18:02:22.174Z",
+      "id": 3
     }
   ],
   "customers": [
@@ -824,7 +874,7 @@
       "quantity": 6,
       "unitCost": 8.243333333333334,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.639Z"
     },
     {
       "id": 2,
@@ -833,7 +883,7 @@
       "quantity": 149.999,
       "unitCost": 0.8333388889259262,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 3,
@@ -842,7 +892,7 @@
       "quantity": 48,
       "unitCost": 1.7304166666666667,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 4,
@@ -851,7 +901,7 @@
       "quantity": 1,
       "unitCost": 8.77,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 5,
@@ -860,7 +910,7 @@
       "quantity": 0.5,
       "unitCost": 8.98,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 6,
@@ -869,7 +919,7 @@
       "quantity": 1,
       "unitCost": 0.36,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 7,
@@ -878,7 +928,7 @@
       "quantity": 0.3,
       "unitCost": 56.6,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 8,
@@ -887,7 +937,7 @@
       "quantity": 7.5,
       "unitCost": 37.88,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 9,
@@ -896,7 +946,7 @@
       "quantity": 1,
       "unitCost": 8.35,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 10,
@@ -905,7 +955,7 @@
       "quantity": 1.1,
       "unitCost": 18.090909090909086,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 11,
@@ -914,7 +964,7 @@
       "quantity": 18,
       "unitCost": 15.99,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 12,
@@ -923,7 +973,7 @@
       "quantity": 0.528,
       "unitCost": 18.52272727272727,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 13,
@@ -932,7 +982,7 @@
       "quantity": 0.5,
       "unitCost": 9.6,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 14,
@@ -941,7 +991,7 @@
       "quantity": 1,
       "unitCost": 8.35,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 15,
@@ -950,7 +1000,7 @@
       "quantity": 1.033,
       "unitCost": 17.32817037754114,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 16,
@@ -959,7 +1009,7 @@
       "quantity": 1,
       "unitCost": 18.4,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 17,
@@ -968,7 +1018,7 @@
       "quantity": 10,
       "unitCost": 3.316,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 18,
@@ -977,7 +1027,7 @@
       "quantity": 1.01,
       "unitCost": 10.871287128712872,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 19,
@@ -986,7 +1036,7 @@
       "quantity": 1.5,
       "unitCost": 31.653333333333332,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 20,
@@ -995,7 +1045,7 @@
       "quantity": 0.35,
       "unitCost": 79.71428571428571,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 21,
@@ -1004,7 +1054,7 @@
       "quantity": 1.504,
       "unitCost": 53.58377659574468,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 22,
@@ -1013,7 +1063,7 @@
       "quantity": 6,
       "unitCost": 3.69,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 23,
@@ -1022,7 +1072,7 @@
       "quantity": 1,
       "unitCost": 15,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 24,
@@ -1031,7 +1081,7 @@
       "quantity": 2000,
       "unitCost": 0.75,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 25,
@@ -1040,7 +1090,7 @@
       "quantity": 2000,
       "unitCost": 0.55,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 26,
@@ -1049,7 +1099,7 @@
       "quantity": 3000,
       "unitCost": 0.69,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 27,
@@ -1058,7 +1108,7 @@
       "quantity": 10000,
       "unitCost": 0.3,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 28,
@@ -1067,7 +1117,7 @@
       "quantity": 1,
       "unitCost": 630,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 29,
@@ -1076,7 +1126,7 @@
       "quantity": 1,
       "unitCost": 350,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 30,
@@ -1085,7 +1135,7 @@
       "quantity": 1,
       "unitCost": 67.99,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 31,
@@ -1094,7 +1144,7 @@
       "quantity": 1.5,
       "unitCost": 46.6,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 32,
@@ -1103,7 +1153,7 @@
       "quantity": 1.03,
       "unitCost": 13.097087378640776,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 33,
@@ -1112,7 +1162,7 @@
       "quantity": 0.1,
       "unitCost": 50,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 34,
@@ -1121,7 +1171,7 @@
       "quantity": 0.36,
       "unitCost": 37.38888888888889,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 35,
@@ -1130,7 +1180,7 @@
       "quantity": 10,
       "unitCost": 15,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
     },
     {
       "id": 36,
@@ -1139,10 +1189,642 @@
       "quantity": 2,
       "unitCost": 62.5,
       "isInitial": true,
-      "date": "2025-10-31T16:54:39.372Z"
+      "date": "2025-10-31T17:28:29.640Z"
+    },
+    {
+      "id": 37,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 1,
+      "date": "2025-10-31T17:41:07.099Z",
+      "note": "Pedido #000001 - baixa automática"
+    },
+    {
+      "id": 38,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.15,
+      "date": "2025-10-31T17:41:07.100Z",
+      "note": "Pedido #000001 - baixa automática"
+    },
+    {
+      "id": 39,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 2,
+      "date": "2025-10-31T17:41:07.101Z",
+      "note": "Pedido #000001 - baixa automática"
+    },
+    {
+      "id": 40,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.02,
+      "date": "2025-10-31T17:41:07.101Z",
+      "note": "Pedido #000001 - baixa automática"
+    },
+    {
+      "id": 41,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 61,
+      "date": "2025-10-31T17:44:46.769Z",
+      "note": "Pedido #000002 - baixa automática"
+    },
+    {
+      "id": 42,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 9.15,
+      "date": "2025-10-31T17:44:46.777Z",
+      "note": "Pedido #000002 - baixa automática"
+    },
+    {
+      "id": 43,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 122,
+      "date": "2025-10-31T17:44:46.780Z",
+      "note": "Pedido #000002 - baixa automática"
+    },
+    {
+      "id": 44,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 1.22,
+      "date": "2025-10-31T17:44:46.781Z",
+      "note": "Pedido #000002 - baixa automática"
+    },
+    {
+      "id": 45,
+      "ingredientId": "22",
+      "type": "OUT",
+      "quantity": 22,
+      "date": "2025-10-31T17:44:46.783Z",
+      "note": "Pedido #000002 - baixa automática"
+    },
+    {
+      "id": 46,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 36,
+      "date": "2025-10-31T17:45:35.306Z",
+      "note": "Pedido #000003 - baixa automática"
+    },
+    {
+      "id": 47,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 5.3999999999999995,
+      "date": "2025-10-31T17:45:35.307Z",
+      "note": "Pedido #000003 - baixa automática"
+    },
+    {
+      "id": 48,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 72,
+      "date": "2025-10-31T17:45:35.309Z",
+      "note": "Pedido #000003 - baixa automática"
+    },
+    {
+      "id": 49,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.72,
+      "date": "2025-10-31T17:45:35.310Z",
+      "note": "Pedido #000003 - baixa automática"
+    },
+    {
+      "id": 50,
+      "ingredientId": "22",
+      "type": "OUT",
+      "quantity": 27,
+      "date": "2025-10-31T17:45:35.315Z",
+      "note": "Pedido #000003 - baixa automática"
+    },
+    {
+      "id": 51,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.3,
+      "date": "2025-10-31T18:02:38.797Z",
+      "note": "Pedido #000004 - baixa automática"
     }
   ],
-  "cashTransactions": [],
-  "cashRegisters": [],
-  "orders": []
+  "cashTransactions": [
+    {
+      "id": 1,
+      "createdAt": "2025-10-31T17:41:07.098Z",
+      "cashRegisterId": 1,
+      "type": "in",
+      "amount": 28.2352,
+      "description": "Pedido #000001 - Débito (Taxa: R$ 0.76)"
+    },
+    {
+      "id": 2,
+      "createdAt": "2025-10-31T17:44:46.768Z",
+      "cashRegisterId": 1,
+      "type": "in",
+      "amount": 1890.4506,
+      "description": "Pedido #000002 - Débito (Taxa: R$ 32.55)"
+    },
+    {
+      "id": 3,
+      "createdAt": "2025-10-31T17:45:35.305Z",
+      "cashRegisterId": 1,
+      "type": "in",
+      "amount": 1220.7636,
+      "description": "Pedido #000003 - PIX (Taxa: R$ 12.24)"
+    },
+    {
+      "cashRegisterId": "1",
+      "type": "out",
+      "amount": 69,
+      "description": "Pagamento entregadores - Moto 01",
+      "createdAt": "2025-10-31T17:51:01.747Z",
+      "id": 4
+    },
+    {
+      "id": 5,
+      "createdAt": "2025-10-31T18:02:38.796Z",
+      "cashRegisterId": 2,
+      "type": "in",
+      "amount": 15841.6,
+      "description": "Pedido #000004 - PIX (Taxa: R$ 158.40)"
+    }
+  ],
+  "cashRegisters": [
+    {
+      "openedAt": "2025-10-31T17:40:51.092Z",
+      "openingBalance": 200,
+      "notes": "",
+      "status": "closed",
+      "id": 1,
+      "closedAt": "2025-10-31T17:51:10.717Z",
+      "expectedBalance": 3270.4494,
+      "actualBalance": 3690,
+      "difference": 419.55060000000003
+    },
+    {
+      "openedAt": "2025-10-31T18:02:10.809Z",
+      "openingBalance": 200,
+      "notes": "",
+      "status": "closed",
+      "id": 2,
+      "closedAt": "2025-10-31T18:03:09.173Z",
+      "expectedBalance": 16041.6,
+      "actualBalance": 14000,
+      "difference": -2041.6000000000004
+    }
+  ],
+  "orders": [
+    {
+      "orderNumber": "000001",
+      "status": "completed",
+      "customerId": 1,
+      "deliveryAreaId": "1",
+      "paymentMethodId": "2",
+      "paymentMethodKind": "debit",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        }
+      ],
+      "subtotal": 29,
+      "total": 32,
+      "cashRegisterId": 1,
+      "cardFee": 0.7648,
+      "deliveryFeeDriverAmount": 3,
+      "netAmount": 28.2352,
+      "createdAt": "2025-10-31T17:41:07.096Z",
+      "updatedAt": "2025-10-31T17:41:14.845Z",
+      "id": 1,
+      "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000002",
+      "status": "completed",
+      "customerId": 4,
+      "deliveryAreaId": "1",
+      "paymentMethodId": "4",
+      "paymentMethodKind": "debit",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 61,
+          "unitPrice": 29,
+          "totalPrice": 1769
+        },
+        {
+          "productId": 2,
+          "productName": "Coca Cola",
+          "quantity": 22,
+          "unitPrice": 7,
+          "totalPrice": 154
+        }
+      ],
+      "subtotal": 1923,
+      "total": 1926,
+      "cashRegisterId": 1,
+      "cardFee": 32.5494,
+      "deliveryFeeDriverAmount": 3,
+      "netAmount": 1890.4506,
+      "createdAt": "2025-10-31T17:44:46.767Z",
+      "updatedAt": "2025-10-31T17:44:51.143Z",
+      "id": 2,
+      "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000003",
+      "status": "completed",
+      "customerId": 2,
+      "deliveryAreaId": "1",
+      "paymentMethodId": "2",
+      "paymentMethodKind": "pix",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 36,
+          "unitPrice": 29,
+          "totalPrice": 1044
+        },
+        {
+          "productId": 2,
+          "productName": "Coca Cola",
+          "quantity": 27,
+          "unitPrice": 7,
+          "totalPrice": 189
+        }
+      ],
+      "subtotal": 1233,
+      "total": 1236,
+      "cashRegisterId": 1,
+      "cardFee": 12.236400000000001,
+      "deliveryFeeDriverAmount": 3,
+      "netAmount": 1220.7636,
+      "createdAt": "2025-10-31T17:45:35.303Z",
+      "updatedAt": "2025-10-31T17:45:39.483Z",
+      "id": 3,
+      "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000004",
+      "status": "completed",
+      "paymentMethodId": "2",
+      "paymentMethodKind": "debit",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": "3",
+          "productName": "Teste Produto Faturamento",
+          "quantity": 2,
+          "unitPrice": 8000,
+          "totalPrice": 16000
+        }
+      ],
+      "subtotal": 16000,
+      "total": 16003,
+      "cashRegisterId": 2,
+      "cardFee": 158.4,
+      "deliveryFeeDriverAmount": 0,
+      "netAmount": 15841.6,
+      "createdAt": "2025-10-31T18:02:38.794Z",
+      "updatedAt": "2025-10-31T18:02:56.527Z",
+      "id": 4,
+      "customerId": 1,
+      "deliveryAreaId": "1",
+      "deliveryDriverId": "1"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Vendas de Hambúrgueres",
+      "type": "revenue",
+      "description": "Receita bruta de vendas de hambúrgueres e combos",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.200Z",
+      "updatedAt": "2025-10-31T17:19:24.201Z",
+      "id": 1
+    },
+    {
+      "name": "Vendas de Bebidas",
+      "type": "revenue",
+      "description": "Receita bruta de vendas de bebidas (refrigerantes, sucos, etc)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.285Z",
+      "updatedAt": "2025-10-31T17:19:24.286Z",
+      "id": 2
+    },
+    {
+      "name": "Vendas de Acompanhamentos",
+      "type": "revenue",
+      "description": "Receita bruta de vendas de acompanhamentos (batatas fritas, anéis de cebola, etc)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.316Z",
+      "updatedAt": "2025-10-31T17:19:24.316Z",
+      "id": 3
+    },
+    {
+      "name": "Delivery - Próprio",
+      "type": "revenue",
+      "description": "Receita de entregas pelo delivery próprio (sem plataformas)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.345Z",
+      "updatedAt": "2025-10-31T17:19:24.345Z",
+      "id": 4
+    },
+    {
+      "name": "iFood",
+      "type": "revenue",
+      "description": "Receita líquida de vendas pela plataforma iFood (após taxas)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.377Z",
+      "updatedAt": "2025-10-31T17:19:24.377Z",
+      "id": 5
+    },
+    {
+      "name": "Outras Plataformas",
+      "type": "revenue",
+      "description": "Receita líquida de outras plataformas de delivery (Rappi, Uber Eats, etc)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.408Z",
+      "updatedAt": "2025-10-31T17:19:24.408Z",
+      "id": 6
+    },
+    {
+      "name": "Vendas no Balcão",
+      "type": "revenue",
+      "description": "Receita de vendas presenciais no balcão (sem delivery)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.456Z",
+      "updatedAt": "2025-10-31T17:19:24.456Z",
+      "id": 7
+    },
+    {
+      "name": "Outras Receitas",
+      "type": "revenue",
+      "description": "Outras receitas não operacionais",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.501Z",
+      "updatedAt": "2025-10-31T17:19:24.501Z",
+      "id": 8
+    },
+    {
+      "name": "Custos de Mercadorias Vendidas (CMV)",
+      "type": "expense",
+      "description": "Custo dos produtos vendidos - ingredientes e insumos utilizados nas vendas",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.548Z",
+      "updatedAt": "2025-10-31T17:19:24.548Z",
+      "id": 9
+    },
+    {
+      "name": "Salários e Encargos Sociais",
+      "type": "expense",
+      "description": "Salários, férias, décimo terceiro, INSS, FGTS e outros encargos trabalhistas",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.578Z",
+      "updatedAt": "2025-10-31T17:19:24.578Z",
+      "id": 10
+    },
+    {
+      "name": "Taxa de Entregadores",
+      "type": "expense",
+      "description": "Taxa diária e repasses para entregadores",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.619Z",
+      "updatedAt": "2025-10-31T17:19:24.619Z",
+      "id": 11
+    },
+    {
+      "name": "Aluguel e Condomínio",
+      "type": "expense",
+      "description": "Aluguel do imóvel e taxa de condomínio",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.646Z",
+      "updatedAt": "2025-10-31T17:19:24.646Z",
+      "id": 12
+    },
+    {
+      "name": "Energia Elétrica",
+      "type": "expense",
+      "description": "Conta de energia elétrica",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.677Z",
+      "updatedAt": "2025-10-31T17:19:24.677Z",
+      "id": 13
+    },
+    {
+      "name": "Água e Esgoto",
+      "type": "expense",
+      "description": "Conta de água e esgoto",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.711Z",
+      "updatedAt": "2025-10-31T17:19:24.711Z",
+      "id": 14
+    },
+    {
+      "name": "Gás",
+      "type": "expense",
+      "description": "Gás de cozinha",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.754Z",
+      "updatedAt": "2025-10-31T17:19:24.754Z",
+      "id": 15
+    },
+    {
+      "name": "Telefone e Internet",
+      "type": "expense",
+      "description": "Telefone, internet e serviços de comunicação",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.768Z",
+      "updatedAt": "2025-10-31T17:19:24.768Z",
+      "id": 16
+    },
+    {
+      "name": "Sistema e Software",
+      "type": "expense",
+      "description": "Assinaturas de sistemas, softwares e ferramentas de gestão",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.786Z",
+      "updatedAt": "2025-10-31T17:19:24.786Z",
+      "id": 17
+    },
+    {
+      "name": "Marketing e Publicidade",
+      "type": "expense",
+      "description": "Campanhas de marketing, publicidade e propaganda (redes sociais, mídia, etc)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.801Z",
+      "updatedAt": "2025-10-31T17:19:24.801Z",
+      "id": 18
+    },
+    {
+      "name": "Taxas de Cartão e Pagamento",
+      "type": "expense",
+      "description": "Taxas de maquininhas, processamento de pagamento (crédito, débito, PIX)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.814Z",
+      "updatedAt": "2025-10-31T17:19:24.814Z",
+      "id": 19
+    },
+    {
+      "name": "Taxas de Plataformas",
+      "type": "expense",
+      "description": "Taxas e comissões de plataformas de delivery (iFood, Rappi, etc)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.835Z",
+      "updatedAt": "2025-10-31T17:19:24.835Z",
+      "id": 20
+    },
+    {
+      "name": "Compras de Insumos",
+      "type": "expense",
+      "description": "Compras de ingredientes, insumos e mercadorias para revenda",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.876Z",
+      "updatedAt": "2025-10-31T17:19:24.876Z",
+      "id": 21
+    },
+    {
+      "name": "Embalagens",
+      "type": "expense",
+      "description": "Embalagens, sacolas e materiais descartáveis",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.908Z",
+      "updatedAt": "2025-10-31T17:19:24.908Z",
+      "id": 22
+    },
+    {
+      "name": "Material de Limpeza",
+      "type": "expense",
+      "description": "Produtos de limpeza, higiene e sanitização",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.939Z",
+      "updatedAt": "2025-10-31T17:19:24.939Z",
+      "id": 23
+    },
+    {
+      "name": "Manutenção de Equipamentos",
+      "type": "expense",
+      "description": "Manutenção preventiva e corretiva de equipamentos (fritadeiras, freezers, etc)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.956Z",
+      "updatedAt": "2025-10-31T17:19:24.956Z",
+      "id": 24
+    },
+    {
+      "name": "Reparos e Melhorias",
+      "type": "expense",
+      "description": "Reparos no estabelecimento e melhorias estruturais",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:24.987Z",
+      "updatedAt": "2025-10-31T17:19:24.987Z",
+      "id": 25
+    },
+    {
+      "name": "Impostos e Taxas",
+      "type": "expense",
+      "description": "Impostos, taxas e contribuições (ISS, ICMS, Simples Nacional, etc)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:25.018Z",
+      "updatedAt": "2025-10-31T17:19:25.018Z",
+      "id": 26
+    },
+    {
+      "name": "Despesas Administrativas",
+      "type": "expense",
+      "description": "Honorários contábeis, serviços bancários, taxas administrativas",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:25.049Z",
+      "updatedAt": "2025-10-31T17:19:25.049Z",
+      "id": 27
+    },
+    {
+      "name": "Frete e Transporte",
+      "type": "expense",
+      "description": "Frete de compras, transporte de mercadorias",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:25.085Z",
+      "updatedAt": "2025-10-31T17:19:25.085Z",
+      "id": 28
+    },
+    {
+      "name": "Seguros",
+      "type": "expense",
+      "description": "Seguros diversos (estabelecimento, equipamentos, etc)",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:25.128Z",
+      "updatedAt": "2025-10-31T17:19:25.128Z",
+      "id": 29
+    },
+    {
+      "name": "Outras Despesas Operacionais",
+      "type": "expense",
+      "description": "Outras despesas operacionais não categorizadas",
+      "isActive": true,
+      "createdAt": "2025-10-31T17:19:25.160Z",
+      "updatedAt": "2025-10-31T17:19:25.160Z",
+      "id": 30
+    }
+  ],
+  "accountPayables": [
+    {
+      "description": "Ifood",
+      "amount": 3000,
+      "dueDate": "2025-10-31",
+      "status": "paid",
+      "createdAt": "2025-10-31T18:53:23.655Z",
+      "updatedAt": "2025-10-31T19:01:01.363Z",
+      "id": 1,
+      "paidDate": "2025-10-31T19:01:01.327Z"
+    }
+  ],
+  "accountReceivables": [],
+  "dreCategoryMappings": [],
+  "dreAdjustments": [
+    {
+      "periodKey": "2025-10-01_2025-10-31",
+      "itemType": "expense",
+      "itemName": "Limpeza",
+      "originalAmount": 120,
+      "adjustedAmount": 120,
+      "notes": "",
+      "createdAt": "2025-10-31T18:27:33.928Z",
+      "updatedAt": "2025-10-31T18:27:42.436Z",
+      "id": 1
+    },
+    {
+      "periodKey": "2025-10-01_2025-10-31",
+      "itemType": "expense",
+      "itemName": "Despesas com Entregadores - Moto 01",
+      "originalAmount": 69,
+      "adjustedAmount": 70,
+      "notes": "",
+      "createdAt": "2025-10-31T18:55:37.798Z",
+      "updatedAt": "2025-10-31T18:56:12.581Z",
+      "id": 2
+    },
+    {
+      "periodKey": "2025-10-01_2025-10-31",
+      "itemType": "expense",
+      "itemName": "Aluguel",
+      "originalAmount": 2500,
+      "adjustedAmount": 2500,
+      "notes": "",
+      "createdAt": "2025-10-31T18:56:00.084Z",
+      "updatedAt": "2025-10-31T18:56:06.963Z",
+      "id": 3
+    }
+  ]
 }

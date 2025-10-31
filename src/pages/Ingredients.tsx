@@ -6,6 +6,7 @@ import type { Supplier } from '../types/supplier';
 import { ingredientService } from '../services/ingredientService';
 import { supplierService } from '../services/supplierService';
 import { stockService } from '../services/stockService';
+import { accountPayableService } from '../services/accountPayableService';
 import type { StockMovementType, StockMovement } from '../types/stock';
 import { MdAdd, MdRemove, MdDelete, MdExpandMore, MdExpandLess } from 'react-icons/md';
 
@@ -30,6 +31,8 @@ export function Ingredients() {
     minStock: undefined,
     idealStock: undefined,
     maxStock: undefined,
+    paymentType: 'cash',
+    paymentDays: undefined,
   });
   const [supplierInput, setSupplierInput] = useState('');
   const [showSupplierSuggestions, setShowSupplierSuggestions] = useState(false);
@@ -332,6 +335,27 @@ export function Ingredients() {
             isInitial: true,
           });
         }
+
+        // Se o pagamento for à prazo, criar conta a pagar automaticamente
+        if (finalFormData.paymentType === 'installment' && finalFormData.paymentDays && finalFormData.paymentDays > 0 && finalFormData.pricePaid > 0) {
+          try {
+            const baseDate = new Date();
+            const dueDate = new Date(baseDate);
+            dueDate.setDate(dueDate.getDate() + finalFormData.paymentDays);
+            
+            await accountPayableService.create({
+              supplierId: finalSupplierId,
+              description: `Compra de ${finalFormData.name}`,
+              amount: finalFormData.pricePaid,
+              dueDate: dueDate.toISOString().split('T')[0],
+              category: 'Compras',
+              notes: `Gerado automaticamente ao cadastrar o insumo ${createdIngredient.code} - ${createdIngredient.name}`,
+            });
+          } catch (error) {
+            console.error('Erro ao criar conta a pagar:', error);
+            // Não interromper o fluxo se falhar ao criar a conta a pagar
+          }
+        }
       }
       setShowForm(false);
       setEditingId(null);
@@ -345,6 +369,8 @@ export function Ingredients() {
         unit: 'KG',
         correctionFactor: 1.0,
         supplierId: '',
+        paymentType: 'cash',
+        paymentDays: undefined,
       });
       loadData();
     } catch (error) {
@@ -365,6 +391,8 @@ export function Ingredients() {
       minStock: ingredient.minStock,
       idealStock: ingredient.idealStock,
       maxStock: ingredient.maxStock,
+      paymentType: (ingredient as any).paymentType || 'cash',
+      paymentDays: (ingredient as any).paymentDays,
     });
     setSupplierInput(ingredient.supplierName);
     setEditingId(ingredient.id);
@@ -400,6 +428,8 @@ export function Ingredients() {
       minStock: undefined,
       idealStock: undefined,
       maxStock: undefined,
+      paymentType: 'cash',
+      paymentDays: undefined,
     });
   };
 
@@ -907,6 +937,56 @@ export function Ingredients() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     placeholder="0"
                   />
+                </div>
+                {/* Payment Fields */}
+                <div className="md:col-span-2 border-t pt-4">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Forma de Pagamento</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Pagamento
+                      </label>
+                      <select
+                        value={formData.paymentType || 'cash'}
+                        onChange={(e) => {
+                          const paymentType = e.target.value as 'cash' | 'installment';
+                          setFormData({
+                            ...formData,
+                            paymentType,
+                            paymentDays: paymentType === 'cash' ? undefined : formData.paymentDays,
+                          });
+                        }}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      >
+                        <option value="cash">À Vista</option>
+                        <option value="installment">À Prazo</option>
+                      </select>
+                    </div>
+                    {formData.paymentType === 'installment' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Prazo (dias) *
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={formData.paymentDays || ''}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              paymentDays: e.target.value ? parseInt(e.target.value) : undefined,
+                            })
+                          }
+                          required={formData.paymentType === 'installment'}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                          placeholder="Ex: 30, 60, 90"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Quantidade de dias para pagamento
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="md:col-span-2">
                   <div className="bg-gray-50 p-4 rounded-lg">

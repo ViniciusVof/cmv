@@ -5,7 +5,7 @@ import { deliveryAreaService } from './deliveryAreaService';
 import { deliveryDriverService } from './deliveryDriverService';
 import { paymentMethodService } from './paymentMethodService';
 import { cashRegisterService } from './cashRegisterService';
-import { pdvProductService } from './pdvProductService';
+import { accountReceivableService } from './accountReceivableService';
 // import { businessSettingsService } from './businessSettingsService';
 
 export const orderService = {
@@ -184,6 +184,7 @@ export const orderService = {
   updateStatus: async (id: string, status: OrderStatus): Promise<Order> => {
     // Buscar pedido antes de atualizar
     const currentOrder = await orderService.getById(id);
+    const previousStatus = currentOrder?.status;
     
     const response = await api.patch<Order>(`/orders/${id}`, {
       status,
@@ -203,6 +204,41 @@ export const orderService = {
         description: `Cancelamento Pedido #${currentOrder.orderNumber || id.slice(0, 6)} - ${formatCurrency(currentOrder.netAmount)}`,
         createdAt: new Date().toISOString(),
       });
+    }
+
+    // Se o pedido foi concluído e tem método de pagamento com prazo, criar conta a receber
+    if (status === 'completed' && previousStatus !== 'completed' && currentOrder) {
+      try {
+        const paymentMethod = currentOrder.paymentMethodId 
+          ? await paymentMethodService.getById(String(currentOrder.paymentMethodId))
+          : null;
+
+        // Só cria conta a receber se:
+        // 1. Tem método de pagamento configurado
+        // 2. O método tem prazo de recebimento (receivingDays > 0) OU é maquininha/dinheiro sem prazo
+        // 3. Tem valor líquido positivo
+        if (paymentMethod && currentOrder.netAmount && currentOrder.netAmount > 0) {
+          const shouldCreateReceivable = 
+            paymentMethod.receivingDays !== undefined && paymentMethod.receivingDays > 0;
+          
+          if (shouldCreateReceivable) {
+            const baseDate = new Date().toISOString().split('T')[0];
+            await accountReceivableService.create({
+              customerId: currentOrder.customerId ? String(currentOrder.customerId) : undefined,
+              description: `Pedido #${currentOrder.orderNumber || id}`,
+              amount: currentOrder.netAmount,
+              dueDate: baseDate,
+              paymentMethodId: String(paymentMethod.id),
+              receivingDays: paymentMethod.receivingDays,
+              category: 'Vendas',
+              notes: `Gerado automaticamente ao concluir o pedido #${currentOrder.orderNumber || id}`,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao criar conta a receber para o pedido:', error);
+        // Não interromper o fluxo se falhar ao criar a conta a receber
+      }
     }
     
     // Enrich with names

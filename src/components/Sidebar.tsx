@@ -12,7 +12,8 @@ import {
   MdSettings,
   MdExpandMore,
   MdExpandLess,
-  MdPointOfSale
+  MdPointOfSale,
+  MdAccountBalance
 } from 'react-icons/md';
 import type { IconType } from 'react-icons';
 
@@ -53,6 +54,16 @@ const menuItems: MenuItem[] = [
   },
   { name: 'Custo Fixo', icon: MdAttachMoney, path: '/custo-fixo' },
   { name: 'Custo Variável', icon: MdTrendingDown, path: '/custo-variavel' },
+    { 
+      name: 'Financeiro', 
+      icon: MdAccountBalance, 
+      subItems: [
+        { name: 'Contas a Pagar', path: '/financeiro/contas-a-pagar' },
+        { name: 'Contas a Receber', path: '/financeiro/contas-a-receber' },
+        { name: 'DRE', path: '/financeiro/dre' },
+        { name: 'Configurações DRE', path: '/financeiro/configuracoes-dre' },
+      ]
+    },
   { name: 'CMV Global', icon: MdTrendingUp, path: '/cmv-global' },
   { name: 'Configurações', icon: MdSettings, path: '/configuracoes' },
 ];

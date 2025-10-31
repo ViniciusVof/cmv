@@ -15,6 +15,8 @@ export interface Ingredient {
   maxStock?: number; // nível máximo permitido
 }
 
+export type PaymentType = 'cash' | 'installment';
+
 export interface IngredientFormData {
   code: string;
   name: string;
@@ -26,5 +28,7 @@ export interface IngredientFormData {
   minStock?: number;
   idealStock?: number;
   maxStock?: number;
+  paymentType?: PaymentType; // 'cash' para à vista, 'installment' para à prazo
+  paymentDays?: number; // Quantidade de dias para pagamento (quando à prazo)
 }
 

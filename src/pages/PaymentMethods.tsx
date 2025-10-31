@@ -121,6 +121,7 @@ export function PaymentMethods() {
       creditFee: method.creditFee,
       debitFee: method.debitFee,
       processingFeePercentage: method.processingFeePercentage,
+      receivingDays: method.receivingDays,
       requiresChange: method.requiresChange,
       isActive: method.isActive,
     });
@@ -136,6 +137,7 @@ export function PaymentMethods() {
       creditFee: undefined,
       debitFee: undefined,
       processingFeePercentage: undefined,
+      receivingDays: undefined,
       requiresChange: false,
       isActive: true,
     });
@@ -294,6 +296,20 @@ export function PaymentMethods() {
                       />
                       <p className="text-xs text-gray-500 mt-1">Taxa para pagamentos via PIX na maquininha</p>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Prazo de Recebimento (dias)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={formData.receivingDays || ''}
+                        onChange={(e) => setFormData({ ...formData, receivingDays: e.target.value ? parseInt(e.target.value) : undefined })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        placeholder="Ex: 30 para crédito, 1 para débito"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Dias para recebimento após a data da venda (ex: 30 dias para crédito, 1 dia para débito)</p>
+                    </div>
                   </>
                 )}
 
@@ -405,6 +421,9 @@ export function PaymentMethods() {
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                     Taxa PIX (%)
                   </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                    Prazo Recebimento
+                  </th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                     <button
                       onClick={() => handleSort('isActive')}
@@ -422,7 +441,7 @@ export function PaymentMethods() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredAndSortedMethods.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       {searchTerm ? 'Nenhuma forma de pagamento encontrada.' : 'Nenhuma forma de pagamento cadastrada.'}
                     </td>
                   </tr>
@@ -450,6 +469,11 @@ export function PaymentMethods() {
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="text-sm text-gray-900">
                           {method.processingFeePercentage !== undefined ? `${method.processingFeePercentage.toFixed(2)}%` : '-'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="text-sm text-gray-900">
+                          {method.receivingDays !== undefined ? `${method.receivingDays} dia${method.receivingDays !== 1 ? 's' : ''}` : '-'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">

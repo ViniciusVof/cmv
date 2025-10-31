@@ -30,6 +30,7 @@ export function CashRegister() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [reportTransactions, setReportTransactions] = useState<CashTransaction[]>([]);
   const [reportOrders, setReportOrders] = useState<Order[]>([]);
+  const [reportDrivers, setReportDrivers] = useState<import('../types/deliveryDriver').DeliveryDriver[]>([]);
   const hasOpenOrders = useMemo(() => reportOrders.some(o => o.status !== 'completed'), [reportOrders]);
 
   useEffect(() => {
@@ -107,6 +108,7 @@ export function CashRegister() {
         paymentMethodName: o.paymentMethodName || (o.paymentMethodId ? (pmMap.get(String(o.paymentMethodId))?.name) : undefined),
       }));
       setReportOrders(cashOrders);
+      setReportDrivers(drivers); // Guardar drivers para usar no calculateReport
     } catch (e) {
       console.error('Erro ao carregar dados do relatório', e);
       notifyError('Erro ao carregar relatório do caixa');
@@ -222,13 +224,56 @@ export function CashRegister() {
       byPaymentMethod[key].net += o.netAmount || o.total || 0;
     });
 
-    // Pagamentos por entregador
+    // Pagamentos por entregador (taxa de entrega + diária)
     const byDriver: Record<string, number> = {};
+    
+    // Primeiro, somar as taxas de entrega
     reportOrders.forEach(o => {
       const key = o.deliveryDriverName || o.deliveryDriverId || 'Sem entregador';
       const fee = o.deliveryFee || 0;
       if (!byDriver[key]) byDriver[key] = 0;
       byDriver[key] += fee;
+    });
+    
+    // Depois, adicionar a diária de cada entregador (uma vez por dia)
+    // Agrupar pedidos por entregador e por data para contar dias únicos
+    const driverDays = new Map<string, Set<string>>(); // Map<driverKey, Set<dates>>
+    reportOrders.forEach(o => {
+      const driverId = o.deliveryDriverId;
+      if (!driverId) return;
+      
+      const driver = reportDrivers.find(d => String(d.id) === String(driverId));
+      if (!driver || !driver.dailyRate || driver.dailyRate <= 0) return;
+      
+      const orderDate = new Date(o.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
+      const driverKey = o.deliveryDriverName || driverId;
+      
+      if (!driverDays.has(driverKey)) {
+        driverDays.set(driverKey, new Set());
+      }
+      driverDays.get(driverKey)!.add(orderDate);
+    });
+    
+    // Calcular diárias: uma diária por dia que o entregador trabalhou
+    driverDays.forEach((dates, driverKey) => {
+      // Tentar encontrar o entregador pelo nome ou ID
+      let driver = reportDrivers.find(d => d.name === driverKey || String(d.id) === driverKey);
+      
+      // Se não encontrou pelo nome, tentar encontrar pelo ID do pedido
+      if (!driver) {
+        const orderWithDriver = reportOrders.find(o => 
+          (o.deliveryDriverName === driverKey || String(o.deliveryDriverId) === driverKey) && o.deliveryDriverId
+        );
+        if (orderWithDriver && orderWithDriver.deliveryDriverId) {
+          driver = reportDrivers.find(d => String(d.id) === String(orderWithDriver.deliveryDriverId));
+        }
+      }
+      
+      if (driver && driver.dailyRate && driver.dailyRate > 0) {
+        const daysCount = dates.size;
+        if (!byDriver[driverKey]) byDriver[driverKey] = 0;
+        byDriver[driverKey] += driver.dailyRate * daysCount;
+      }
     });
 
     // Pagamentos por maquininha (somente métodos do tipo maquininha)

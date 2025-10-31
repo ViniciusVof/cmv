@@ -19,6 +19,12 @@ import { Orders } from './pages/Orders';
 import { CashRegister } from './pages/CashRegister';
 import { BusinessSettings } from './pages/BusinessSettings';
 import { GlobalCMV } from './pages/GlobalCMV';
+import { AccountPayables } from './pages/AccountPayables';
+import { AccountReceivables } from './pages/AccountReceivables';
+import { Categories } from './pages/Categories';
+import { DRE } from './pages/DRE';
+import { DRECategoryMapping } from './pages/DRECategoryMapping';
+import { DRESettings } from './pages/DRESettings';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuthStore } from './stores/authStore';
 
@@ -181,6 +187,54 @@ function App() {
           element={
             <ProtectedRoute>
               <GlobalCMV />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/financeiro/contas-a-pagar"
+          element={
+            <ProtectedRoute>
+              <AccountPayables />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/financeiro/contas-a-receber"
+          element={
+            <ProtectedRoute>
+              <AccountReceivables />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/financeiro/categorias"
+          element={
+            <ProtectedRoute>
+              <Categories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/financeiro/dre"
+          element={
+            <ProtectedRoute>
+              <DRE />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/financeiro/conciliacao-categorias"
+          element={
+            <ProtectedRoute>
+              <DRECategoryMapping />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/financeiro/configuracoes-dre"
+          element={
+            <ProtectedRoute>
+              <DRESettings />
             </ProtectedRoute>
           }
         />

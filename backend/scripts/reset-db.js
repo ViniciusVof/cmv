@@ -14,6 +14,7 @@ async function resetDb() {
     'stockMovements',
     'reconciliationReports',
     'cmvGlobal',
+    'dreCategoryMappings',
   ];
 
   toClear.forEach((key) => {
@@ -88,6 +89,40 @@ async function resetDb() {
       { id: '9', name: '24PRINT' },
       { id: '10', name: 'MERCADO LIVRE' },
       { id: '11', name: 'FITLAND' },
+    ];
+  }
+
+  // Garantir categorias iniciais
+  if (!Array.isArray(data.categories) || data.categories.length === 0) {
+    const now = new Date().toISOString();
+    data.categories = [
+      {
+        id: '1',
+        name: 'Custo Fixo',
+        type: 'expense',
+        description: 'Custos fixos do negócio',
+        isActive: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: '2',
+        name: 'Custo Variável',
+        type: 'expense',
+        description: 'Custos variáveis do negócio',
+        isActive: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: '3',
+        name: 'Outras Despesas',
+        type: 'expense',
+        description: 'Outras despesas operacionais',
+        isActive: true,
+        createdAt: now,
+        updatedAt: now,
+      },
     ];
   }
 

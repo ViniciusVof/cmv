@@ -7,6 +7,7 @@ export interface PaymentMethod {
   creditFee?: number; // Taxa de crédito (%) - apenas para maquininhas
   debitFee?: number; // Taxa de débito (%) - apenas para maquininhas
   processingFeePercentage?: number; // Taxa de processamento PIX em % (apenas para maquininhas)
+  receivingDays?: number; // Prazo de recebimento em dias (para maquininhas)
   requiresChange: boolean; // Se precisa de troco (ex: dinheiro)
   isActive: boolean;
   createdAt?: string;
@@ -19,6 +20,7 @@ export interface PaymentMethodFormData {
   creditFee?: number;
   debitFee?: number;
   processingFeePercentage?: number;
+  receivingDays?: number;
   requiresChange: boolean;
   isActive: boolean;
 }
