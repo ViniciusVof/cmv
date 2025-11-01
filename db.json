@@ -1726,6 +1726,13 @@
       "expectedBalance": 93.66910000000007,
       "actualBalance": 93.67,
       "difference": 0.0008999999999304009
+    },
+    {
+      "openedAt": "2025-11-01T04:57:41.983Z",
+      "openingBalance": 100,
+      "notes": "",
+      "status": "open",
+      "id": 4
     }
   ],
   "orders": [

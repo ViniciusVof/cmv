@@ -110,6 +110,26 @@ O JSON Server cria automaticamente os seguintes endpoints REST:
 - ✅ Validação de fechamento (impede fechar caixa com pedidos em aberto)
 - ✅ Histórico de caixas com visualização de relatórios anteriores
 - ✅ Baixa de pagamentos de entregadores
+- ✅ Contas a Pagar: cadastro, pagamento, relatório, categorização opcional
+- ✅ Contas a Receber: cadastro, recebimento, relatório, categorização opcional
+- ✅ Prazo de recebimento configurável por método de pagamento (maquininha)
+- ✅ Criação automática de contas a pagar ao cadastrar insumos "à prazo"
+- ✅ Criação automática de contas a receber ao completar pedidos com pagamento não à vista
+- ✅ DRE (Demonstrativo de Resultado do Exercício) completo:
+  - Receita total e por forma de pagamento (detalhado)
+  - Despesas variáveis (CMV, custos variáveis configurados, taxas de cartão, taxas de entrega)
+  - Despesas fixas (custos fixos configurados, diárias de entregadores, outras despesas)
+  - Lucro líquido com margem de lucro (%)
+  - Análise horizontal (AH) e vertical (AV) com comparação ao período anterior
+  - Total de geração de caixa (acumulado histórico)
+  - Furos do caixa (diferenças no fechamento)
+  - Ponto de equilíbrio
+  - Seções expandíveis/collapsíveis
+  - Ordenação independente por seção
+  - Edição manual de valores por período
+  - Configurações do DRE: toggle de exibição de custos, uso de valores automáticos vs configurados
+- ✅ Separação de taxas de entrega (variáveis) e diárias (fixas) no DRE
+- ✅ Correção de cálculos: taxas de dinheiro não são mais contabilizadas, apenas pagamentos de maquininha
 
 ### Estoque e Insumos
 - ✅ Gestão de Insumos: cadastro completo com cálculo de valor final (R$ Pago ÷ Volume × Fator de Correção)
@@ -134,12 +154,18 @@ O JSON Server cria automaticamente os seguintes endpoints REST:
 
 ### Pedidos e Entregas
 - ✅ Sistema de Pedidos completo: criação, edição, cancelamento
-- ✅ Kanban de Pedidos: visualização por status (cozinha, em entrega, concluído, cancelado)
+- ✅ Kanban de Pedidos: visualização por status (cozinha, aguardando entrega/retirada, em entrega, concluído, cancelado)
+- ✅ Tabs de tipo de pedido: Balcão, Retirada e Entrega
+- ✅ Criação automática de clientes ao digitar nome não cadastrado (obrigatório telefone para entrega)
 - ✅ Gestão de Clientes: cadastro com múltiplos endereços
 - ✅ Áreas de Entrega: cadastro com taxa de entrega e tempo estimado
 - ✅ Entregadores: cadastro com taxa diária e configuração de repasse de taxa de entrega
 - ✅ Métodos de Pagamento: suporte a dinheiro, cartão (crédito/débito), PIX com taxas configuráveis
-- ✅ Cálculo automático de taxas de cartão/PIX
+- ✅ Cálculo automático de taxas de cartão/PIX (apenas para pagamentos de maquininha)
+- ✅ Campo de troco para pagamentos em dinheiro
+- ✅ Badges de tipo de pedido no Kanban (Balcão, Retirada, Entrega)
+- ✅ Fluxo diferenciado no Kanban: pedidos balcão/retirada não passam por "Em Entrega"
+- ✅ Seleção de pagamento direto no Kanban para pedidos balcão/retirada
 - ✅ Vinculação de pedidos ao caixa aberto
 - ✅ Baixa automática de estoque ao criar pedidos (recursiva para sub-receitas)
 
