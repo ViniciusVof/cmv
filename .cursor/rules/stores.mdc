@@ -1,0 +1,296 @@
+---
+globs: **/*.store.ts
+alwaysApply: false
+---
+
+# Cursor Rules for Stores (.store.ts)
+
+## File Location and Naming
+- Must be located in `src/stores/`
+- Must have `.store.ts` extension
+- Must use snake_case naming convention
+- Examples: `auth.store.ts`, `user.store.ts`
+
+## Import Requirements
+```tsx
+import { create } from 'zustand';
+import { [Entity]Dto } from '../dtos/[entity].dto';
+```
+
+## Structure Pattern
+```tsx
+// src/stores/example.store.ts
+import { create } from 'zustand';
+import { ExampleDto } from '../dtos/example.dto';
+
+interface ExampleState {
+  data: ExampleDto[];
+  loading: boolean;
+  error: string | null;
+  selected: ExampleDto | null;
+  
+  // Actions
+  setData: (data: ExampleDto[]) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  setSelected: (selected: ExampleDto | null) => void;
+  reset: () => void;
+}
+
+export const use_example_store = create<ExampleState>((set) => ({
+  data: [],
+  loading: false,
+  error: null,
+  selected: null,
+  
+  setData: (data) => set({ data }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
+  setSelected: (selected) => set({ selected }),
+  reset: () => set({ data: [], loading: false, error: null, selected: null }),
+}));
+```
+
+## Key Rules
+1. **Zustand**: Use Zustand for state management
+2. **Interface Definition**: Define clear interfaces for state and actions
+3. **Type Safety**: Use proper TypeScript types
+4. **Action Naming**: Use descriptive action names
+5. **Reset Function**: Always provide a reset function
+6. **Async Actions**: Handle async operations in actions
+
+## Common Store Patterns
+
+### Auth Store
+```tsx
+// src/stores/auth.store.ts
+import { create } from 'zustand';
+import { UserDto } from '../dtos/user.dto';
+
+interface AuthState {
+  user: UserDto | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
+  
+  // Actions
+  login: (credentials: { email: string; password: string }) => Promise<void>;
+  logout: () => void;
+  setUser: (user: UserDto | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
+}
+
+export const use_auth_store = create<AuthState>((set) => ({
+  user: null,
+  isAuthenticated: false,
+  loading: false,
+  error: null,
+  
+  login: async (credentials) => {
+    set({ loading: true, error: null });
+    try {
+      // Login logic here
+      const user = await loginApi(credentials);
+      set({ user, isAuthenticated: true, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+  
+  logout: () => {
+    set({ user: null, isAuthenticated: false, error: null });
+  },
+  
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
+  reset: () => set({ user: null, isAuthenticated: false, loading: false, error: null }),
+}));
+```
+
+### Entity Store
+```tsx
+// src/stores/entity.store.ts
+import { create } from 'zustand';
+import { EntityDto } from '../dtos/entity.dto';
+import { EntityApi } from '../api/entity.api';
+
+interface EntityState {
+  data: EntityDto[];
+  selected: EntityDto | null;
+  loading: boolean;
+  error: string | null;
+  
+  // Actions
+  fetchAll: () => Promise<void>;
+  fetchById: (id: number) => Promise<void>;
+  create: (entity: EntityDto) => Promise<void>;
+  update: (entity: EntityDto) => Promise<void>;
+  remove: (id: number) => Promise<void>;
+  setSelected: (entity: EntityDto | null) => void;
+  reset: () => void;
+}
+
+export const use_entity_store = create<EntityState>((set, get) => ({
+  data: [],
+  selected: null,
+  loading: false,
+  error: null,
+  
+  fetchAll: async () => {
+    set({ loading: true, error: null });
+    try {
+      const data = await EntityApi.getAll();
+      if (data) {
+        set({ data, loading: false });
+      } else {
+        set({ error: 'Failed to fetch data', loading: false });
+      }
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+  
+  fetchById: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const entity = await EntityApi.getById(id);
+      if (entity) {
+        set({ selected: entity, loading: false });
+      } else {
+        set({ error: 'Entity not found', loading: false });
+      }
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+  
+  create: async (entity) => {
+    set({ loading: true, error: null });
+    try {
+      const newEntity = await EntityApi.create(entity);
+      if (newEntity) {
+        const { data } = get();
+        set({ data: [...data, newEntity], loading: false });
+      } else {
+        set({ error: 'Failed to create entity', loading: false });
+      }
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+  
+  update: async (entity) => {
+    set({ loading: true, error: null });
+    try {
+      const updatedEntity = await EntityApi.update(entity);
+      if (updatedEntity) {
+        const { data } = get();
+        const updatedData = data.map(item => 
+          item.id === updatedEntity.id ? updatedEntity : item
+        );
+        set({ data: updatedData, selected: updatedEntity, loading: false });
+      } else {
+        set({ error: 'Failed to update entity', loading: false });
+      }
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+  
+  remove: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const success = await EntityApi.delete(id);
+      if (success) {
+        const { data } = get();
+        const filteredData = data.filter(item => item.id !== id);
+        set({ data: filteredData, selected: null, loading: false });
+      } else {
+        set({ error: 'Failed to delete entity', loading: false });
+      }
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+  
+  setSelected: (entity) => set({ selected: entity }),
+  reset: () => set({ data: [], selected: null, loading: false, error: null }),
+}));
+```
+
+### UI Store
+```tsx
+// src/stores/ui.store.ts
+import { create } from 'zustand';
+
+interface UIState {
+  sidebarOpen: boolean;
+  theme: 'light' | 'dark';
+  notifications: Notification[];
+  
+  // Actions
+  toggleSidebar: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
+  addNotification: (notification: Notification) => void;
+  removeNotification: (id: string) => void;
+  clearNotifications: () => void;
+  reset: () => void;
+}
+
+export const use_ui_store = create<UIState>((set, get) => ({
+  sidebarOpen: false,
+  theme: 'light',
+  notifications: [],
+  
+  toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen })),
+  setTheme: (theme) => set({ theme }),
+  
+  addNotification: (notification) => {
+    const { notifications } = get();
+    set({ notifications: [...notifications, notification] });
+  },
+  
+  removeNotification: (id) => {
+    const { notifications } = get();
+    set({ notifications: notifications.filter(n => n.id !== id) });
+  },
+  
+  clearNotifications: () => set({ notifications: [] }),
+  reset: () => set({ sidebarOpen: false, theme: 'light', notifications: [] }),
+}));
+```
+
+## State Interface Patterns
+```tsx
+interface EntityState {
+  // Data
+  data: EntityDto[];
+  selected: EntityDto | null;
+  
+  // UI State
+  loading: boolean;
+  error: string | null;
+  
+  // Actions
+  fetchAll: () => Promise<void>;
+  fetchById: (id: number) => Promise<void>;
+  create: (entity: EntityDto) => Promise<void>;
+  update: (entity: EntityDto) => Promise<void>;
+  remove: (id: number) => Promise<void>;
+  setSelected: (entity: EntityDto | null) => void;
+  reset: () => void;
+}
+```
+
+## Best Practices
+1. **Clear Interfaces**: Define clear interfaces for state and actions
+2. **Async Actions**: Handle async operations properly in actions
+3. **Error Handling**: Always handle errors in async actions
+4. **Loading States**: Provide loading states for async operations
+5. **Reset Function**: Always provide a reset function
+6. **Type Safety**: Use proper TypeScript types
+7. **Separation of Concerns**: Keep stores focused on specific domains
+8. **Immutability**: Use immutable updates in Zustand

@@ -1,0 +1,252 @@
+---
+globs: **/*.hook.ts
+alwaysApply: false
+---
+
+# Cursor Rules for Hooks (.hook.ts)
+
+## File Location and Naming
+- Must be located in `src/hooks/`
+- Must have `.hook.ts` extension
+- Must use snake_case naming convention
+- Must follow React hooks naming convention (use_*)
+- Examples: `use_user_data.hook.ts`, `use_course_management.hook.ts`
+
+## Import Requirements
+```tsx
+import { useState, useEffect } from 'react';
+import { [Entity]Api } from '../api/[entity].api';
+import { [Entity]Dto } from '../dtos/[entity].dto';
+```
+
+## Structure Pattern
+```tsx
+// src/hooks/use_example_data.hook.ts
+import { useState, useEffect } from 'react';
+import { ExampleApi } from '../api/example.api';
+import { ExampleDto } from '../dtos/example.dto';
+
+export const use_example_data = (id?: string) => {
+  const [data, setData] = useState<ExampleDto | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    ExampleApi.getById(parseInt(id))
+      .then((response) => {
+        if (response) {
+          setData(response);
+        } else {
+          setError('Failed to fetch data');
+        }
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  return { data, loading, error };
+};
+```
+
+## Key Rules
+1. **Hook Naming**: Use `use_` prefix with snake_case
+2. **State Management**: Always return objects with data, loading, and error states
+3. **Error Handling**: Handle errors gracefully and provide meaningful error messages
+4. **Loading States**: Always provide loading states for async operations
+5. **Dependency Arrays**: Use proper dependency arrays in useEffect
+6. **Type Safety**: Use proper TypeScript types for all parameters and return values
+
+## Common Hook Patterns
+
+### Data Fetching Hook
+```tsx
+export const use_entity_data = (id?: string) => {
+  const [data, setData] = useState<EntityDto | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    EntityApi.getById(parseInt(id))
+      .then((response) => {
+        if (response) {
+          setData(response);
+        } else {
+          setError('Failed to fetch entity');
+        }
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  return { data, loading, error };
+};
+```
+
+### List Data Hook
+```tsx
+export const use_entity_list = (filters?: EntityFilterDto) => {
+  const [data, setData] = useState<EntityDto[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    
+    EntityApi.getAll(filters)
+      .then((response) => {
+        if (response) {
+          setData(response);
+        } else {
+          setError('Failed to fetch entities');
+        }
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [filters]);
+
+  return { data, loading, error };
+};
+```
+
+### Mutation Hook
+```tsx
+export const use_entity_mutation = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const create = async (entity: EntityDto) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await EntityApi.create(entity);
+      if (response) {
+        return response;
+      } else {
+        setError('Failed to create entity');
+        return null;
+      }
+    } catch (err) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const update = async (entity: EntityDto) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await EntityApi.update(entity);
+      if (response) {
+        return response;
+      } else {
+        setError('Failed to update entity');
+        return null;
+      }
+    } catch (err) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const remove = async (id: number) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const success = await EntityApi.delete(id);
+      if (success) {
+        return true;
+      } else {
+        setError('Failed to delete entity');
+        return false;
+      }
+    } catch (err) {
+      setError(err.message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { create, update, remove, loading, error };
+};
+```
+
+### Form Hook
+```tsx
+export const use_entity_form = (initialData?: EntityDto) => {
+  const [formData, setFormData] = useState<EntityDto>(initialData || {});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const updateField = (field: keyof EntityDto, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error for this field
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.name) {
+      newErrors.name = 'Name is required';
+    }
+    
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const reset = () => {
+    setFormData(initialData || {});
+    setErrors({});
+  };
+
+  return { formData, errors, updateField, validate, reset };
+};
+```
+
+## Return Type Patterns
+```tsx
+// Single entity hook
+return { data, loading, error };
+
+// List hook
+return { data, loading, error };
+
+// Mutation hook
+return { create, update, remove, loading, error };
+
+// Form hook
+return { formData, errors, updateField, validate, reset };
+```
+
+## Best Practices
+1. **Error Handling**: Always handle errors and provide meaningful messages
+2. **Loading States**: Always provide loading states for async operations
+3. **Type Safety**: Use proper TypeScript types
+4. **Dependency Arrays**: Use proper dependency arrays in useEffect
+5. **Cleanup**: Clean up subscriptions and timers in useEffect cleanup
+6. **Memoization**: Use useMemo and useCallback when appropriate
+7. **Custom Hooks**: Keep hooks focused on a single responsibility

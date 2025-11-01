@@ -1,0 +1,9 @@
+---
+globs: **/*.tsx, **/*.scss
+alwaysApply: false
+---
+
+# Cursor Rules for Styles (.tsx & .scss)
+
+- Never use margins
+- Remove every margin that comes by default in components

@@ -1,0 +1,155 @@
+---
+globs: **/*.api.ts
+alwaysApply: false
+---
+# Cursor Rules for APIs (.api.ts)
+
+## File Location and Naming
+- Must be located in `src/api/`
+- Must have `.api.ts` extension
+- Must use snake_case naming convention
+- Examples: `user.api.ts`, `course_management.api.ts`
+
+## Import Requirements
+```tsx
+import { Http } from '@/http/http';
+import { [Entity]Dto } from '@/dtos/[entity].dto';
+import { [Entity]FilterDto } from '@/dtos/[entity]_filter.dto';
+```
+
+## Structure Pattern
+```tsx
+// src/api/example.api.ts
+import { Http } from '@/http/http';
+import { ExampleDto } from '@/dtos/example.dto';
+import { ExampleFilterDto } from '@/dtos/example_filter.dto';
+
+export class ExampleApi {
+  static async getAll(filters?: ExampleFilterDto): Promise<ExampleDto[] | undefined> {
+    try {
+      const response = await Http.get<ExampleDto[]>('/example', { params: filters });
+      return response;
+    } catch (error) {
+      console.error('Erro ao buscar exemplos:', error);
+    }
+    return;
+  }
+
+  static async getById(id: number): Promise<ExampleDto | undefined> {
+    try {
+      const response = await Http.get<ExampleDto>(`/example/${id}`);
+      return response;
+    } catch (error) {
+      console.error('Erro ao buscar exemplo:', error);
+    }
+    return;
+  }
+
+  static async create(example: ExampleDto): Promise<ExampleDto | undefined> {
+    try {
+      const response = await Http.post<ExampleDto>('/example', example);
+      return response;
+    } catch (error) {
+      console.error('Erro ao criar exemplo:', error);
+    }
+    return;
+  }
+
+  static async update(example: ExampleDto): Promise<ExampleDto | undefined> {
+    try {
+      const response = await Http.put<ExampleDto>('/example', example);
+      return response;
+    } catch (error) {
+      console.error('Erro ao atualizar exemplo:', error);
+    }
+    return;
+  }
+
+  static async delete(id: number): Promise<boolean> {
+    try {
+      const response = await Http.delete(`/example/${id}`);
+      return response === true;
+    } catch (error) {
+      console.error('Erro ao deletar exemplo:', error);
+    }
+    return false;
+  }
+}
+```
+
+## Key Rules
+1. **Static Methods**: All methods should be static
+2. **Error Handling**: Always wrap in try-catch blocks
+3. **Return Types**: Return undefined on errors, log errors to console
+4. **TypeScript Generics**: Use proper generics for response types
+5. **Http Service**: Always use the Http service for requests
+6. **Method Naming**: Use standard CRUD method names (getAll, getById, create, update, delete)
+
+## Method Patterns
+
+### GET Methods
+```tsx
+static async getAll(filters?: FilterDto): Promise<EntityDto[] | undefined> {
+  try {
+    const response = await Http.get<EntityDto[]>('/entity', { params: filters });
+    return response;
+  } catch (error) {
+    console.error('Erro ao buscar entidades:', error);
+  }
+  return;
+}
+
+static async getById(id: number): Promise<EntityDto | undefined> {
+  try {
+    const response = await Http.get<EntityDto>(`/entity/${id}`);
+    return response;
+  } catch (error) {
+    console.error('Erro ao buscar entidade:', error);
+  }
+  return;
+}
+```
+
+### POST Methods
+```tsx
+static async create(entity: EntityDto): Promise<EntityDto | undefined> {
+  try {
+    const response = await Http.post<EntityDto>('/entity', entity);
+    return response;
+  } catch (error) {
+    console.error('Erro ao criar entidade:', error);
+  }
+  return;
+}
+```
+
+### PUT Methods
+```tsx
+static async update(entity: EntityDto): Promise<EntityDto | undefined> {
+  try {
+    const response = await Http.put<EntityDto>('/entity', entity);
+    return response;
+  } catch (error) {
+    console.error('Erro ao atualizar entidade:', error);
+  }
+  return;
+}
+```
+
+### DELETE Methods
+```tsx
+static async delete(id: number): Promise<boolean> {
+  try {
+    const response = await Http.delete(`/entity/${id}`);
+    return response === true;
+  } catch (error) {
+    console.error('Erro ao deletar entidade:', error);
+  }
+  return false;
+}
+```
+
+## Error Message Patterns
+- Use Portuguese error messages
+- Be specific about the operation that failed
+- Use consistent error message format: "Erro ao [action] [entity]:"
