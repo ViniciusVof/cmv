@@ -1,0 +1,145 @@
+# Cursor Rules for Forms (.form.tsx)
+
+## File Location and Naming
+- Must be located in `src/forms/`
+- Must have `.form.tsx` extension
+- Must use snake_case naming convention
+- Examples: `disciplina.form.tsx`, `course_test.form.tsx`
+
+## Key Rules
+
+### Edit Mode Support
+- **All forms MUST support edit mode** by accepting an object prop that contains the data to be edited
+- **Props interface should include**: `data?: EntityDto` where EntityDto is the specific entity type
+- **Edit mode initialization**: When `data` prop is provided, all form fields should be initialized with the data from the prop object
+- **Form state initialization**: Use `useState` with the data prop values as initial state
+- **Example pattern**:
+  ```typescript
+  interface EntityFormProps {
+    data?: EntityDto; // For edit mode
+    idCurso?: number; // Other props...
+  }
+  
+  const EntityForm = ({ data, ...props }: EntityFormProps) => {
+    const [nome, setNome] = useState(data?.nome || '');
+    const [codigo, setCodigo] = useState(data?.codigo || '');
+    // ... other fields
+  }
+  ```
+
+### Loading States and Button Management
+- **ALWAYS disable buttons while saving** to prevent duplicate submissions
+- **Show loading state on buttons** during save operations
+- **Use mutation states** from React Query hooks to track loading states
+- **Button patterns**:
+  ```typescript
+  <Button
+    onClick={handleSave}
+    disabled={createMutation.isPending || updateMutation.isPending}
+    className="text-white px-6 py-2 rounded-md bg-[#C8102E]"
+  >
+    {createMutation.isPending || updateMutation.isPending 
+      ? 'Salvando...' 
+      : data ? 'Atualizar' : 'Adicionar'
+    }
+  </Button>
+  ```
+
+### Form Behavior Patterns
+- **Create vs Update logic**: Check if `data` prop exists to determine if in edit mode
+- **API calls**: Use appropriate mutation hooks (create vs update) based on edit mode
+- **Success handling**: Show appropriate success messages and navigate appropriately
+- **Error handling**: Always show error messages using toast notifications
+- **Form validation**: Validate required fields before submission
+
+### State Management
+- **Initialize all form fields** with empty strings or appropriate defaults
+- **Use controlled components** with useState for all form inputs
+- **Handle loading states** for dependent data (dropdowns, etc.)
+- **Reset form state** after successful submission
+
+### UI/UX Guidelines
+- **Consistent styling**: Use the established color scheme
+- **Loading indicators**: Show loading states for async operations
+- **Error feedback**: Use toast notifications for user feedback
+- **Form layout**: Use grid layouts with consistent spacing
+- **Button placement**: Action buttons in header, consistent positioning
+
+## Best Practices
+
+### Form Structure
+```typescript
+const EntityForm = ({ data, ...props }: EntityFormProps) => {
+  // 1. Initialize state with data prop values
+  const [field1, setField1] = useState(data?.field1 || '');
+  const [field2, setField2] = useState(data?.field2 || '');
+  
+  // 2. Use appropriate mutations
+  const createMutation = useCreateEntity();
+  const updateMutation = useUpdateEntity();
+  
+  // 3. Handle save with edit mode logic
+  const handleSave = async () => {
+    if (!field1 || !field2) {
+      toast.error('Campos obrigatórios não preenchidos');
+      return;
+    }
+    
+    try {
+      if (data) {
+        // Edit mode
+        await updateMutation.mutateAsync({ ...data, field1, field2 });
+        toast.success('Entidade atualizada com sucesso!');
+      } else {
+        // Create mode
+        await createMutation.mutateAsync({ field1, field2 });
+        toast.success('Entidade criada com sucesso!');
+      }
+      navigate('/entities');
+    } catch (error) {
+      toast.error('Erro ao salvar entidade');
+    }
+  };
+  
+  // 4. Render form with loading states
+  return (
+    <div className="p-6 min-h-full bg-gray-50">
+      <div className="pb-8 flex justify-between items-start">
+        <h1 className="font-semibold text-[#404040] text-2xl">
+          {data ? 'Editar entidade' : 'Nova entidade'}
+        </h1>
+        <div className="flex gap-3">
+          <Button onClick={handleCancel} variant="outline">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={createMutation.isPending || updateMutation.isPending}
+            className="text-white bg-[#C8102E]"
+          >
+            {createMutation.isPending || updateMutation.isPending 
+              ? 'Salvando...' 
+              : data ? 'Atualizar' : 'Adicionar'
+            }
+          </Button>
+        </div>
+      </div>
+      {/* Form fields */}
+    </div>
+  );
+};
+```
+
+### Required Patterns
+- ✅ Always support edit mode with `data` prop
+- ✅ Initialize form fields with prop data
+- ✅ Disable buttons during save operations
+- ✅ Show loading states on buttons
+- ✅ Use appropriate create/update mutations
+- ✅ Handle errors with toast notifications
+- ✅ Validate required fields
+- ✅ Use consistent styling and layout
+
+## Key Rules
+
+## Best Practices

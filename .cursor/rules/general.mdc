@@ -1,0 +1,108 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Cursor Rules for Frontend System
+
+This file contains cursor rules for maintaining consistency with the project's naming conventions and architectural patterns.
+
+## General Rules
+
+1. **File Naming**: All files must use snake_case format
+2. **File Extensions**: Each file type has a specific extension requirement
+3. **Component Isolation**: Every single component should have its own file
+4. **Type Organization**: Only interface (class properties) should be declared within the same file of the component, all other types should either be an enum or a dto in its own file
+5. **Type Safety**: Use TypeScript interfaces and types consistently. All DTO attributes should be optional since DTOs are meant to receive external payloads
+
+## File Type Specific Rules
+
+### Routes (.route.tsx)
+- Must be located in `src/router/routes/`
+- Must have `.route.tsx` extension
+- Should use `useParams` and `useSearchParams` for parameter handling
+- Should pass processed parameters to page components
+- Keep route logic separate from page logic
+
+### APIs (.api.ts)
+- Must be located in `src/api/`
+- Must have `.api.ts` extension
+- Should use static methods with the Http service
+- Should handle errors gracefully with try-catch blocks
+- Should return undefined on errors and log errors to console
+- Should use proper TypeScript generics for response types
+
+### DTOs (.dto.ts)
+- Must be located in `src/dtos/`
+- Must have `.dto.ts` extension
+- All attributes should be optional (using `?`)
+- Should represent data transfer objects for external payloads
+- Should use descriptive interface names ending with "Dto"
+
+### Hooks (.hook.ts)
+- Must be located in `src/hooks/`
+- Must have `.hook.ts` extension
+- Should follow React hooks naming convention (use_*)
+- Should return objects with data, loading, and error states
+- Should handle async operations properly
+
+### Stores (.store.ts)
+- Must be located in `src/stores/`
+- Must have `.store.ts` extension
+- Should use Zustand for state management
+- Should define clear interfaces for state and actions
+- Should handle async operations in actions
+
+### Utils (.utils.ts)
+- Must be located in `src/utils/`
+- Must have `.utils.ts` extension
+- Should be classes with static methods and attributes
+- Should have no external dependencies
+- Should be focused on utility functions
+
+### Pages (.page.tsx)
+- Must be located in `src/pages/`
+- Should have their own folder for custom components
+- Should receive props from routes
+- Should handle loading and error states
+- Should use hooks for data fetching
+
+## Component Rules
+
+1. **Reusable Components**: Place in `src/components/`
+2. **Page-specific Components**: Place in the page folder itself
+3. **UI Components**: Place in `src/components/ui/`
+4. **Feature Components**: Place in feature-specific folders under components
+
+## Import/Export Rules
+
+1. **Relative Imports**: Use relative imports for project files
+2. **Absolute Imports**: Use `@/` alias for src directory when configured
+3. **Named Exports**: Prefer named exports over default exports
+4. **Barrel Exports**: Use index files for clean imports
+
+## Error Handling
+
+1. **API Calls**: Always wrap in try-catch blocks
+2. **Loading States**: Always provide loading states for async operations
+3. **Error States**: Always provide error states for failed operations
+4. **User Feedback**: Provide meaningful error messages
+
+## Code Organization
+
+1. **Imports**: Group imports (React, external libraries, internal)
+2. **Interfaces**: Define at the top of the file
+3. **Functions**: Export functions at the bottom
+4. **Constants**: Define at the top after imports
+
+## TypeScript Rules
+
+1. **Strict Mode**: Use strict TypeScript configuration
+2. **Optional Properties**: Use optional properties for DTOs
+3. **Generic Types**: Use generics for reusable components
+4. **Type Guards**: Use type guards for runtime type checking
+5. **Type Cast**: DO NOT ever use type cast (example as MyDto)
+6. **Error Handling**: DO NOT ever throw, except from inside a "hook"
+7. **any**: DO NOT ever use any, always search for a "DTO", is it doesn't yet exist
+8. **Type creation (DTOs)**: if the developer doesn't specify on the prompt a dto to be used, dont create random interfaces or dtos, it is the developer job to map and explain to you where each value he needs is, in this cases ASK THE DEVELOPER for him to point to you which dto should be used. The only EXCEPTION for this rule are interfaces for components, where their interfaces (parameters) should be contained and created customized for the specific component 

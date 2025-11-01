@@ -1,0 +1,254 @@
+---
+globs: **/*.page.ts
+alwaysApply: false
+---
+
+# Cursor Rules for Pages (.page.tsx)
+
+## File Location and Naming
+- Must be located in `src/pages/`
+- Should have their own folder for custom components
+- Must use snake_case naming convention
+- Examples: `user_profile/user_profile.page.tsx`, `course_management/course_management.page.tsx`
+
+## Import Requirements
+```tsx
+import { useEffect, useState } from 'react';
+import { use_[entity]_data } from '../hooks/use_[entity]_data.hook';
+import { [Component] } from '../components/[Component]';
+```
+
+## Structure Pattern
+```tsx
+// src/pages/example_page/example_page.page.tsx
+import { useEffect, useState } from 'react';
+import { use_example_data } from '../../hooks/use_example_data.hook';
+import { ExampleComponent } from '../../components/ExampleComponent';
+
+interface ExamplePageProps {
+  id?: string;
+  filter?: string;
+}
+
+export default function ExamplePage({ id, filter }: ExamplePageProps) {
+  const { data, loading, error } = use_example_data(id, filter);
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  
+  return (
+    <div>
+      <ExampleComponent data={data} />
+    </div>
+  );
+}
+```
+
+## Key Rules
+1. **Props Interface**: Define props interface at the top
+2. **Hook Usage**: Use hooks for data fetching
+3. **Loading States**: Always handle loading states
+4. **Error States**: Always handle error states
+5. **Component Composition**: Compose from smaller components
+6. **Default Export**: Use default export for page components
+
+## Common Page Patterns
+
+### List Page
+```tsx
+// src/pages/entity_list/entity_list.page.tsx
+import { useState } from 'react';
+import { use_entity_list } from '../../hooks/use_entity_list.hook';
+import { EntityListComponent } from '../../components/EntityListComponent';
+import { EntityFilters } from './EntityFilters';
+
+interface EntityListPageProps {
+  search?: string;
+  category?: string;
+}
+
+export default function EntityListPage({ search, category }: EntityListPageProps) {
+  const [filters, setFilters] = useState({ search, category });
+  const { data, loading, error } = use_entity_list(filters);
+  
+  if (loading) return <div>Carregando...</div>;
+  if (error) return <div>Erro: {error}</div>;
+  
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold pb-4">Lista de Entidades</h1>
+      <EntityFilters filters={filters} onFiltersChange={setFilters} />
+      <EntityListComponent data={data} />
+    </div>
+  );
+}
+```
+
+### Detail Page
+```tsx
+// src/pages/entity_detail/entity_detail.page.tsx
+import { use_entity_data } from '../../hooks/use_entity_data.hook';
+import { EntityDetailComponent } from '../../components/EntityDetailComponent';
+import { EntityActions } from './EntityActions';
+
+interface EntityDetailPageProps {
+  id: string;
+}
+
+export default function EntityDetailPage({ id }: EntityDetailPageProps) {
+  const { data, loading, error } = use_entity_data(id);
+  
+  if (loading) return <div>Carregando...</div>;
+  if (error) return <div>Erro: {error}</div>;
+  if (!data) return <div>Entidade não encontrada</div>;
+  
+  return (
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center pb-4">
+        <h1 className="text-2xl font-bold">Detalhes da Entidade</h1>
+        <EntityActions entity={data} />
+      </div>
+      <EntityDetailComponent data={data} />
+    </div>
+  );
+}
+```
+
+### Form Page
+```tsx
+// src/pages/entity_form/entity_form.page.tsx
+import { use_entity_form } from '../../hooks/use_entity_form.hook';
+import { use_entity_mutation } from '../../hooks/use_entity_mutation.hook';
+import { EntityFormComponent } from '../../components/EntityFormComponent';
+import { useNavigate } from 'react-router-dom';
+
+interface EntityFormPageProps {
+  id?: string;
+}
+
+export default function EntityFormPage({ id }: EntityFormPageProps) {
+  const navigate = useNavigate();
+  const { formData, errors, updateField, validate, reset } = use_entity_form();
+  const { create, update, loading, error } = use_entity_mutation();
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validate()) return;
+    
+    const result = id ? await update({ ...formData, id }) : await create(formData);
+    
+    if (result) {
+      navigate('/entities');
+    }
+  };
+  
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold pb-4">
+        {id ? 'Editar' : 'Criar'} Entidade
+      </h1>
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded pb-4">
+          {error}
+        </div>
+      )}
+      
+      <EntityFormComponent
+        data={formData}
+        errors={errors}
+        onChange={updateField}
+        onSubmit={handleSubmit}
+        loading={loading}
+      />
+    </div>
+  );
+}
+```
+
+### Dashboard Page
+```tsx
+// src/pages/dashboard/dashboard.page.tsx
+import { use_dashboard_data } from '../../hooks/use_dashboard_data.hook';
+import { DashboardCard } from '../../components/DashboardCard';
+import { DashboardChart } from '../../components/DashboardChart';
+
+export default function DashboardPage() {
+  const { data, loading, error } = use_dashboard_data();
+  
+  if (loading) return <div>Carregando dashboard...</div>;
+  if (error) return <div>Erro: {error}</div>;
+  
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold pb-6">Dashboard</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-6">
+        <DashboardCard
+          title="Total de Usuários"
+          value={data?.totalUsers}
+          change={data?.userChange}
+        />
+        <DashboardCard
+          title="Cursos Ativos"
+          value={data?.activeCourses}
+          change={data?.courseChange}
+        />
+        <DashboardCard
+          title="Receita Mensal"
+          value={data?.monthlyRevenue}
+          change={data?.revenueChange}
+        />
+        <DashboardCard
+          title="Taxa de Conversão"
+          value={data?.conversionRate}
+          change={data?.conversionChange}
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <DashboardChart
+          title="Vendas por Mês"
+          data={data?.salesData}
+        />
+        <DashboardChart
+          title="Usuários por Região"
+          data={data?.userData}
+        />
+      </div>
+    </div>
+  );
+}
+```
+
+## Page Folder Structure
+```
+src/pages/
+├── entity_list/
+│   ├── entity_list.page.tsx
+│   ├── EntityFilters.tsx
+│   └── EntityListHeader.tsx
+├── entity_detail/
+│   ├── entity_detail.page.tsx
+│   ├── EntityActions.tsx
+│   └── EntityInfo.tsx
+├── entity_form/
+│   ├── entity_form.page.tsx
+│   ├── EntityFormFields.tsx
+│   └── EntityFormValidation.tsx
+└── dashboard/
+    ├── dashboard.page.tsx
+    ├── DashboardStats.tsx
+    └── DashboardCharts.tsx
+```
+
+## Best Practices
+1. **Component Composition**: Break down pages into smaller components
+2. **Hook Usage**: Use custom hooks for data fetching and state management
+3. **Error Boundaries**: Handle errors gracefully
+4. **Loading States**: Provide meaningful loading states
+5. **Responsive Design**: Use responsive design patterns
+6. **Accessibility**: Ensure pages are accessible
+7. **SEO**: Consider SEO requirements for public pages
+8. **Performance**: Optimize for performance with lazy loading when needed

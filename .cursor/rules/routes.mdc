@@ -1,0 +1,78 @@
+---
+globs: **/*.route.ts
+alwaysApply: false
+---
+
+# Cursor Rules for Routes (.route.tsx)
+
+## File Location and Naming
+- Must be located in `src/router/routes/`
+- Must have `.route.tsx` extension
+- Must use snake_case naming convention
+- Examples: `user_profile.route.tsx`, `course_management.route.tsx`
+
+## Import Requirements
+```tsx
+import { useParams, useSearchParams } from 'react-router-dom';
+import [PageComponent] from '../../pages/[PageComponent]';
+```
+
+## Structure Pattern
+```tsx
+// src/router/routes/example.route.tsx
+import { useParams, useSearchParams } from 'react-router-dom';
+import ExamplePage from '../../pages/ExamplePage';
+
+export default function ExampleRoute() {
+  const params = useParams();
+  const [searchParams] = useSearchParams();
+  
+  // Process path and query parameters here
+  const id = params.id;
+  const filter = searchParams.get('filter');
+  
+  return <ExamplePage id={id} filter={filter} />;
+}
+```
+
+## Key Rules
+1. **Parameter Processing**: Always process parameters before passing to page
+2. **Type Safety**: Use proper TypeScript types for parameters
+3. **Separation of Concerns**: Keep route logic separate from page logic
+4. **Default Export**: Use default export for route components
+5. **Error Handling**: Handle missing or invalid parameters gracefully
+
+## Parameter Handling Examples
+```tsx
+// For path parameters
+const { id } = useParams<{ id: string }>();
+
+// For query parameters
+const [searchParams] = useSearchParams();
+const filter = searchParams.get('filter');
+const page = searchParams.get('page') || '1';
+
+// For optional parameters
+const optionalParam = searchParams.get('optional') || undefined;
+```
+
+## Validation Pattern
+```tsx
+export default function ExampleRoute() {
+  const params = useParams();
+  const [searchParams] = useSearchParams();
+  
+  // Validate required parameters
+  if (!params.id) {
+    return <div>Invalid route: missing ID</div>;
+  }
+  
+  // Process and validate parameters
+  const id = parseInt(params.id);
+  if (isNaN(id)) {
+    return <div>Invalid ID format</div>;
+  }
+  
+  return <ExamplePage id={id} />;
+}
+```

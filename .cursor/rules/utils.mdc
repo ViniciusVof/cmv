@@ -1,0 +1,296 @@
+---
+globs: **/*.utils.ts
+alwaysApply: false
+---
+
+# Cursor Rules for Utils (.utils.ts)
+
+## File Location and Naming
+- Must be located in `src/utils/`
+- Must have `.utils.ts` extension
+- Must use snake_case naming convention
+- Examples: `date_formatter.utils.ts`, `string_utils.utils.ts`
+
+## Structure Pattern
+```tsx
+// src/utils/example.utils.ts
+export class ExampleUtils {
+  private static readonly DEFAULT_LOCALE = 'pt-BR';
+  
+  public static format_example(input: string): string {
+    return input.toUpperCase();
+  }
+
+  public static validate_example(input: string): boolean {
+    return input.length > 0;
+  }
+
+  public static parse_example(input: string): string | null {
+    try {
+      return JSON.parse(input);
+    } catch {
+      return null;
+    }
+  }
+}
+```
+
+## Key Rules
+1. **Class Structure**: Should be classes with static methods and attributes
+2. **No Dependencies**: Should have no external dependencies
+3. **Static Methods**: All methods should be static
+4. **Private Attributes**: Use private static readonly for constants
+5. **Utility Focus**: Focus on utility functions only
+6. **Type Safety**: Use proper TypeScript types
+
+## Common Utility Patterns
+
+### Date Formatter
+```tsx
+// src/utils/date_formatter.utils.ts
+export class DateFormatter {
+  private static readonly LOCALE = 'pt-BR';
+  private static readonly DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  };
+  private static readonly TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+  };
+
+  public static format_date(date: Date): string {
+    return date.toLocaleDateString(this.LOCALE, this.DATE_OPTIONS);
+  }
+
+  public static format_time(date: Date): string {
+    return date.toLocaleTimeString(this.LOCALE, this.TIME_OPTIONS);
+  }
+
+  public static format_datetime(date: Date): string {
+    return date.toLocaleString(this.LOCALE, {
+      ...this.DATE_OPTIONS,
+      ...this.TIME_OPTIONS,
+    });
+  }
+
+  public static is_valid_date(date: Date): boolean {
+    return date instanceof Date && !isNaN(date.getTime());
+  }
+
+  public static parse_date(dateString: string): Date | null {
+    const date = new Date(dateString);
+    return this.is_valid_date(date) ? date : null;
+  }
+
+  public static get_relative_time(date: Date): string {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} dias atrás`;
+    if (hours > 0) return `${hours} horas atrás`;
+    if (minutes > 0) return `${minutes} minutos atrás`;
+    return 'Agora';
+  }
+}
+```
+
+### String Utils
+```tsx
+// src/utils/string_utils.utils.ts
+export class StringUtils {
+  public static capitalize_first(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
+  public static capitalize_words(str: string): string {
+    return str.split(' ').map(word => this.capitalize_first(word)).join(' ');
+  }
+
+  public static truncate(str: string, maxLength: number): string {
+    if (str.length <= maxLength) return str;
+    return str.slice(0, maxLength) + '...';
+  }
+
+  public static remove_accents(str: string): string {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  public static slugify(str: string): string {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  }
+
+  public static is_empty(str: string): boolean {
+    return !str || str.trim().length === 0;
+  }
+
+  public static generate_random_string(length: number): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+}
+```
+
+### Number Utils
+```tsx
+// src/utils/number_utils.utils.ts
+export class NumberUtils {
+  public static format_currency(value: number, currency: string = 'BRL'): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency,
+    }).format(value);
+  }
+
+  public static format_percentage(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'percent',
+      minimumFractionDigits: 2,
+    }).format(value / 100);
+  }
+
+  public static format_number(value: number): string {
+    return new Intl.NumberFormat('pt-BR').format(value);
+  }
+
+  public static clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  public static is_between(value: number, min: number, max: number): boolean {
+    return value >= min && value <= max;
+  }
+
+  public static round_to_decimal(value: number, decimals: number): number {
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  }
+}
+```
+
+### Validation Utils
+```tsx
+// src/utils/validation_utils.utils.ts
+export class ValidationUtils {
+  public static is_valid_email(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  public static is_valid_cpf(cpf: string): boolean {
+    const cleanCpf = cpf.replace(/\D/g, '');
+    if (cleanCpf.length !== 11) return false;
+    
+    // Check for known invalid CPFs
+    if (/^(\d)\1{10}$/.test(cleanCpf)) return false;
+    
+    // Validate first digit
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cleanCpf.charAt(i)) * (10 - i);
+    }
+    let remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleanCpf.charAt(9))) return false;
+    
+    // Validate second digit
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cleanCpf.charAt(i)) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleanCpf.charAt(10))) return false;
+    
+    return true;
+  }
+
+  public static is_valid_phone(phone: string): boolean {
+    const cleanPhone = phone.replace(/\D/g, '');
+    return cleanPhone.length >= 10 && cleanPhone.length <= 11;
+  }
+
+  public static is_valid_password(password: string): boolean {
+    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  }
+}
+```
+
+### Array Utils
+```tsx
+// src/utils/array_utils.utils.ts
+export class ArrayUtils {
+  public static unique<T>(array: T[]): T[] {
+    return [...new Set(array)];
+  }
+
+  public static group_by<T, K extends string | number>(
+    array: T[],
+    key: (item: T) => K
+  ): Record<K, T[]> {
+    return array.reduce((groups, item) => {
+      const groupKey = key(item);
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(item);
+      return groups;
+    }, {} as Record<K, T[]>);
+  }
+
+  public static sort_by<T>(
+    array: T[],
+    key: (item: T) => string | number,
+    direction: 'asc' | 'desc' = 'asc'
+  ): T[] {
+    return [...array].sort((a, b) => {
+      const aValue = key(a);
+      const bValue = key(b);
+      
+      if (direction === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+  }
+
+  public static chunk<T>(array: T[], size: number): T[][] {
+    const chunks: T[][] = [];
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+  }
+
+  public static flatten<T>(array: T[][]): T[] {
+    return array.flat();
+  }
+}
+```
+
+## Best Practices
+1. **Static Methods**: All methods should be static
+2. **No Dependencies**: Avoid external dependencies
+3. **Pure Functions**: Keep functions pure and predictable
+4. **Type Safety**: Use proper TypeScript types
+5. **Error Handling**: Handle edge cases gracefully
+6. **Performance**: Consider performance for frequently used utilities
+7. **Documentation**: Add JSDoc comments for complex utilities
+8. **Testing**: Utilities should be easily testable

@@ -1,0 +1,182 @@
+---
+globs: **/*.dto.ts
+alwaysApply: false
+---
+
+# Cursor Rules for DTOs (.dto.ts)
+
+## File Location and Naming
+- Must be located in `src/dtos/`
+- Must have `.dto.ts` extension
+- Must use snake_case naming convention
+- Examples: `user.dto.ts`, `course_management.dto.ts`
+
+## Structure Pattern
+```tsx
+// src/dtos/example.dto.ts
+export interface ExampleDto {
+  id?: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+```
+
+## Key Rules
+1. **Optional Properties**: All attributes should be optional (using `?`)
+2. **Interface Naming**: Use descriptive interface names ending with "Dto"
+3. **External Payloads**: DTOs are meant to receive external payloads
+4. **Type Safety**: Use proper TypeScript types
+5. **Consistency**: Follow consistent naming patterns
+
+## Common Property Types
+```tsx
+export interface ExampleDto {
+  // Basic types
+  id?: string;
+  name?: string;
+  email?: string;
+  description?: string;
+  
+  // Numeric types
+  age?: number;
+  price?: number;
+  quantity?: number;
+  
+  // Boolean types
+  is_active?: boolean;
+  is_deleted?: boolean;
+  
+  // Date types
+  created_at?: Date;
+  updated_at?: Date;
+  birth_date?: Date;
+  
+  // Array types
+  tags?: string[];
+  permissions?: string[];
+  
+  // Nested objects
+  address?: {
+    street?: string;
+    city?: string;
+    country?: string;
+  };
+  
+  // Union types
+  status?: 'active' | 'inactive' | 'pending';
+  type?: 'admin' | 'user' | 'guest';
+}
+```
+
+## Filter DTO Pattern
+```tsx
+// src/dtos/example_filter.dto.ts
+export interface ExampleFilterDto {
+  search?: string;
+  page?: number;
+  limit?: number;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
+  status?: string;
+  created_after?: Date;
+  created_before?: Date;
+}
+```
+
+## Create/Update DTO Pattern
+```tsx
+// src/dtos/create_example.dto.ts
+export interface CreateExampleDto {
+  name?: string;
+  email?: string;
+  role?: string;
+}
+
+// src/dtos/update_example.dto.ts
+export interface UpdateExampleDto {
+  id?: string;
+  name?: string;
+  email?: string;
+  role?: string;
+}
+```
+
+## Response DTO Pattern
+```tsx
+// src/dtos/example_response.dto.ts
+export interface ExampleResponseDto {
+  data?: ExampleDto[];
+  total?: number;
+  page?: number;
+  limit?: number;
+  total_pages?: number;
+}
+```
+
+## Validation DTO Pattern
+```tsx
+// src/dtos/example_validation.dto.ts
+export interface ExampleValidationDto {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirm_password?: string;
+}
+```
+
+## Naming Conventions
+- **Entity DTOs**: `EntityDto` (e.g., `UserDto`, `CourseDto`)
+- **Filter DTOs**: `EntityFilterDto` (e.g., `UserFilterDto`, `CourseFilterDto`)
+- **Create DTOs**: `CreateEntityDto` (e.g., `CreateUserDto`, `CreateCourseDto`)
+- **Update DTOs**: `UpdateEntityDto` (e.g., `UpdateUserDto`, `UpdateCourseDto`)
+- **Response DTOs**: `EntityResponseDto` (e.g., `UserResponseDto`, `CourseResponseDto`)
+
+## Common Patterns
+
+### User DTO
+```tsx
+export interface UserDto {
+  id?: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  is_active?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+}
+```
+
+### Course DTO
+```tsx
+export interface CourseDto {
+  id?: string;
+  name?: string;
+  description?: string;
+  duration?: number;
+  price?: number;
+  instructor_id?: string;
+  is_active?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+}
+```
+
+### Pagination DTO
+```tsx
+export interface PaginationDto {
+  page?: number;
+  limit?: number;
+  total?: number;
+  total_pages?: number;
+}
+```
+
+## Best Practices
+1. **Optional Properties**: Always use optional properties for flexibility
+2. **Descriptive Names**: Use clear, descriptive property names
+3. **Consistent Types**: Use consistent types across related DTOs
+4. **Documentation**: Add JSDoc comments for complex DTOs
+5. **Validation**: Consider validation requirements when designing DTOs
