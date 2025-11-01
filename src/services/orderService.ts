@@ -95,10 +95,22 @@ export const orderService = {
     const allOrders = await api.get<Order[]>('/orders').then(r => r.data);
     const nextOrderNumber = (allOrders.length + 1).toString().padStart(6, '0');
 
+    // Get customer name if customerId exists
+    let customerName: string | undefined;
+    if (data.customerId) {
+      try {
+        const customer = await customerService.getById(data.customerId);
+        customerName = customer?.name;
+      } catch (error) {
+        console.error('Error fetching customer:', error);
+      }
+    }
+
     const order: Omit<Order, 'id'> = {
       orderNumber: nextOrderNumber,
       status: 'kitchen', // Default status
       customerId: data.customerId,
+      customerName: customerName,
       deliveryAreaId: data.deliveryAreaId,
       deliveryDriverId: data.deliveryDriverId,
       paymentMethodId: data.paymentMethodId,

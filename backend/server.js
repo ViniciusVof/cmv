@@ -125,6 +125,7 @@ server.post('/orders', (req, res) => {
     quantity: Number(it.quantity) || 0,
     unitPrice: Number(it.unitPrice) || 0,
     totalPrice: (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0),
+    notes: it.notes || undefined,
   }));
   const subtotal = items.reduce((s, i) => s + i.totalPrice, 0);
   const deliveryFee = Number(body.deliveryFee || 0);
@@ -146,10 +147,18 @@ server.post('/orders', (req, res) => {
   const deliveryFeeDriverAmount = deliveryFee > 0 ? deliveryFee : 0;
   const netAmount = total - cardFee - deliveryFeeDriverAmount;
 
+  // Get customer name if customerId exists
+  let customerName;
+  if (body.customerId) {
+    const customer = db.get('customers').find((c) => String(c.id) === String(body.customerId)).value();
+    customerName = customer?.name;
+  }
+
   const order = {
     orderNumber: nextOrderNumber,
     status: 'kitchen',
     customerId: body.customerId,
+    customerName: customerName || body.customerName, // Use from body if provided, otherwise from lookup
     deliveryAreaId: body.deliveryAreaId,
     deliveryDriverId: body.deliveryDriverId,
     paymentMethodId: body.paymentMethodId,
@@ -195,11 +204,30 @@ server.post('/orders', (req, res) => {
   res.status(201).json(created);
 });
 
-// On cancel, create OUT cash transaction
+// On cancel or status update, preserve customerId and customerName, create OUT cash transaction if cancelled
 server.patch('/orders/:id', (req, res, next) => {
   const id = req.params.id;
   const current = db.get('orders').find((o) => String(o.id) === String(id)).value();
   const status = req.body?.status;
+  
+  // Preserve customerId and customerName when updating status
+  if (current && status !== undefined) {
+    // Ensure customerId and customerName are preserved when status is updated
+    if (req.body.customerId === undefined && current.customerId) {
+      req.body.customerId = current.customerId;
+    }
+    if (req.body.customerName === undefined && current.customerName) {
+      req.body.customerName = current.customerName;
+    } else if (req.body.customerId !== undefined && req.body.customerId !== current.customerId) {
+      // If customerId is being changed, update customerName
+      const customer = db.get('customers').find((c) => String(c.id) === String(req.body.customerId)).value();
+      if (customer) {
+        req.body.customerName = customer.name;
+      }
+    }
+  }
+  
+  // Create OUT cash transaction if cancelled
   if (current && status === 'cancelled' && current.cashRegisterId && current.netAmount) {
     createCashTransaction({
       cashRegisterId: current.cashRegisterId,
@@ -208,6 +236,7 @@ server.patch('/orders/:id', (req, res, next) => {
       description: `Cancelamento Pedido #${current.orderNumber || String(current.id).slice(0, 6)} - R$ ${Number(current.netAmount).toFixed(2)}`,
     });
   }
+  
   next();
 });
 

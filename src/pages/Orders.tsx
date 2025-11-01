@@ -34,6 +34,7 @@ import {
   MdVisibility,
   MdStore,
   MdShoppingBag,
+  MdHistory,
 } from "react-icons/md";
 import type { PaymentMethod } from "../types/paymentMethod";
 import { paymentMethodService } from "../services/paymentMethodService";
@@ -176,11 +177,19 @@ export function Orders() {
   const [editOrderId, setEditOrderId] = useState<string | null>(null);
   // legacy state (removed dedicated edit modal)
   const [viewOrder, setViewOrder] = useState<Order | null>(null);
+  const [customerHistoryModal, setCustomerHistoryModal] = useState<{
+    customerId: string;
+    customerName: string;
+  } | null>(null);
+  const [customerHistoryOrders, setCustomerHistoryOrders] = useState<Order[]>([]);
+  const [loadingCustomerHistory, setLoadingCustomerHistory] = useState(false);
   // Order type: counter, pickup, or delivery
   const [orderType, setOrderType] = useState<'counter' | 'pickup' | 'delivery'>('delivery');
   // Customer name/phone for auto-create
   const [customerNameInput, setCustomerNameInput] = useState<string>('');
   const [customerPhoneInput, setCustomerPhoneInput] = useState<string>('');
+  // Items selection for replication
+  const [selectedItemsForReplication, setSelectedItemsForReplication] = useState<Set<number>>(new Set());
 
   // Open fast order modal prefilled to edit an existing order
   const startEditOrder = async (order: Order) => {
@@ -243,12 +252,13 @@ export function Orders() {
       // Prefill items into cart
       const nextCart: Record<string, CartItem> = {};
       (order.items || []).forEach((it) => {
-        const key = String(it.productId);
+        const key = it.notes ? `${it.productId}|${it.notes}` : String(it.productId);
         nextCart[key] = {
           productId: String(it.productId),
           productName: it.productName,
           unitPrice: it.unitPrice,
           quantity: it.quantity,
+          notes: it.notes,
         };
       });
       setCart(nextCart);
@@ -484,6 +494,115 @@ export function Orders() {
     addToCart(product, item?.notes);
   };
 
+  // Replicate full order to cart
+  const handleReplicateFullOrder = async (order: Order) => {
+    if (!viewOrder) return;
+    
+    try {
+      // Load products if not loaded
+      if (products.length === 0) {
+        await loadNewOrderData();
+      }
+      
+      // Wait a bit for products to be set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Clear current cart
+      setCart({});
+      
+      // Get fresh products list
+      const prods = await pdvProductService.getAll();
+      const activeProds = prods.filter((p) => p.isActive);
+      
+      // Add all items to cart with their notes
+      order.items.forEach((item) => {
+        const product = activeProds.find((p) => String(p.id) === String(item.productId));
+        if (product) {
+          // Add item multiple times if quantity > 1
+          for (let i = 0; i < item.quantity; i++) {
+            addToCart(product, item.notes);
+          }
+        }
+      });
+      
+      // Set order notes if exists
+      if (order.notes) {
+        setNotes(order.notes);
+      }
+      
+      // Close modal and open new order screen
+      setViewOrder(null);
+      setShowNewOrder(true);
+      
+      notifySuccess("Pedido replicado com sucesso!");
+    } catch (error) {
+      console.error("Error replicating order:", error);
+      notifyError("Erro ao replicar pedido");
+    }
+  };
+
+  // Replicate selected items to cart
+  const handleReplicateSelectedItems = async (order: Order) => {
+    if (!viewOrder || selectedItemsForReplication.size === 0) {
+      alert("Selecione pelo menos um item para replicar");
+      return;
+    }
+    
+    try {
+      // Load products if not loaded
+      if (products.length === 0) {
+        await loadNewOrderData();
+      }
+      
+      // Wait a bit for products to be set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Get fresh products list
+      const prods = await pdvProductService.getAll();
+      const activeProds = prods.filter((p) => p.isActive);
+      
+      // Add selected items to cart with their notes
+      const selectedIndices = Array.from(selectedItemsForReplication);
+      selectedIndices.forEach((index) => {
+        const item = order.items[index];
+        if (item) {
+          const product = activeProds.find((p) => String(p.id) === String(item.productId));
+          if (product) {
+            // Add item multiple times if quantity > 1
+            for (let i = 0; i < item.quantity; i++) {
+              addToCart(product, item.notes);
+            }
+          }
+        }
+      });
+      
+      // Clear selection
+      setSelectedItemsForReplication(new Set());
+      
+      // Close modal and open new order screen
+      setViewOrder(null);
+      setShowNewOrder(true);
+      
+      notifySuccess(`${selectedIndices.length} item(ns) replicado(s) com sucesso!`);
+    } catch (error) {
+      console.error("Error replicating selected items:", error);
+      notifyError("Erro ao replicar itens selecionados");
+    }
+  };
+
+  // Toggle item selection for replication
+  const toggleItemSelection = (index: number) => {
+    setSelectedItemsForReplication((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
   const decItem = (key: string) => {
     setCart((prev) => {
       const item = prev[key];
@@ -611,6 +730,7 @@ export function Orders() {
           productName: ci.productName,
           quantity: ci.quantity,
           unitPrice: ci.unitPrice,
+          notes: ci.notes,
         })),
         notes: finalNotes || undefined,
       });
@@ -641,6 +761,45 @@ export function Orders() {
         setSelectedAreaId(undefined);
       }
     }
+    setIsAddingAddress(false);
+  };
+
+  const handleViewCustomerHistory = async (customerId: string, customerName: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setCustomerHistoryModal({ customerId, customerName });
+    setLoadingCustomerHistory(true);
+    try {
+      // Buscar apenas pedidos concluídos do cliente
+      const allOrders = await orderService.getAll();
+      const customerOrders = allOrders.filter(
+        (order) => String(order.customerId) === String(customerId) && order.status === 'completed'
+      );
+      // Ordenar por data de criação (mais recentes primeiro)
+      customerOrders.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      setCustomerHistoryOrders(customerOrders);
+    } catch (error) {
+      console.error('Error loading customer history:', error);
+      notifyError('Erro ao carregar histórico do cliente');
+    } finally {
+      setLoadingCustomerHistory(false);
+    }
+  };
+
+  const handleClearCustomer = () => {
+    setSelectedCustomerId(undefined);
+    setSelectedCustomerAddresses([]);
+    setSelectedAddressIndex(undefined);
+    setSelectedAreaId(undefined);
+    setCustomerQuery('');
+    setCustomerNameInput('');
+    setCustomerPhoneInput('');
     setIsAddingAddress(false);
   };
 
@@ -1014,7 +1173,10 @@ export function Orders() {
                           </div>
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => setViewOrder(order)}
+                              onClick={() => {
+                                setViewOrder(order);
+                                setSelectedItemsForReplication(new Set());
+                              }}
                               className="text-gray-600 hover:text-gray-800"
                               title="Ver pedido"
                             >
@@ -1724,25 +1886,108 @@ export function Orders() {
                   <div className="lg:col-span-1 flex flex-col gap-4 h-full overflow-auto pr-1">
                     {/* Cliente */}
                     <div className="bg-white border rounded-lg p-4 relative">
-                      <div className="flex items-center gap-2 mb-2 text-gray-800 font-medium">
-                        <MdPerson className="w-4 h-4" /> Cliente
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 text-gray-800 font-medium">
+                          <MdPerson className="w-4 h-4" /> Cliente
+                        </div>
+                        {selectedCustomerId && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const customer = customers.find(c => String(c.id) === String(selectedCustomerId));
+                              if (customer) {
+                                handleViewCustomerHistory(selectedCustomerId, customer.name, e);
+                              }
+                            }}
+                            className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded hover:bg-gray-100"
+                            title="Ver histórico do cliente"
+                          >
+                            <MdHistory className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                       <div className="relative">
                         <input
                           type="text"
-                          value={customerQuery}
+                          value={selectedCustomerId ? (selectedCustomerName || customerQuery) : customerQuery}
                           onChange={(e) => {
-                            const value = e.target.value;
-                            handleCustomerInputChange(value);
+                            if (!selectedCustomerId) {
+                              const value = e.target.value;
+                              handleCustomerInputChange(value);
+                            }
                           }}
+                          onKeyDown={(e) => {
+                            if (selectedCustomerId) {
+                              // Bloquear todas as teclas quando há cliente selecionado
+                              e.preventDefault();
+                              return;
+                            }
+                          }}
+                          readOnly={!!selectedCustomerId}
                           placeholder={orderType === 'delivery' ? "Nome do cliente *" : "Nome do cliente"}
-                          className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                          className={`w-full pl-10 ${selectedCustomerId || customerQuery.trim() ? 'pr-10' : 'pr-3'} py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${selectedCustomerId ? 'bg-gray-50 cursor-not-allowed' : ''}`}
                         />
                         <MdSearch className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+                        {(selectedCustomerId || customerQuery.trim()) && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleClearCustomer();
+                            }}
+                            className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                            title="Limpar cliente"
+                          >
+                            <MdClose className="w-5 h-5" />
+                          </button>
+                        )}
+                        {/* Sugestões somente quando digitando */}
+                        {customerQuery.trim() && filteredCustomers.length > 0 && (
+                          <div className="absolute z-50 top-full mt-1 w-full bg-white border rounded-lg shadow-lg max-h-56 overflow-auto">
+                            {filteredCustomers.map((c) => (
+                              <div
+                                key={c.id}
+                                className={`w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 ${
+                                  selectedCustomerId === c.id ? "bg-blue-50" : ""
+                                }`}
+                              >
+                                <button
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    handleSelectCustomer(c);
+                                  }}
+                                  className="flex-1 text-left"
+                                >
+                                  <div className="font-medium text-gray-900 text-sm">
+                                    {c.name}
+                                  </div>
+                                  {c.phone && (
+                                    <div className="text-xs text-gray-500">
+                                      {c.phone}
+                                    </div>
+                                  )}
+                                </button>
+                                <button
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleViewCustomerHistory(c.id, c.name, e);
+                                  }}
+                                  className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                  title="Ver histórico"
+                                >
+                                  <MdHistory className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       {/* Campo de telefone para entrega quando não há cliente selecionado */}
                       {orderType === 'delivery' && !selectedCustomerId && customerNameInput.trim() && (
-                        <div className="mt-2">
+                        <div className="mt-2 relative z-40">
                           <input
                             type="text"
                             value={customerPhoneInput}
@@ -1752,32 +1997,6 @@ export function Orders() {
                               !customerPhoneInput.trim() ? 'border-red-300' : 'border-gray-300'
                             }`}
                           />
-                        </div>
-                      )}
-                      {/* Sugestões somente quando digitando */}
-                      {customerQuery.trim() && filteredCustomers.length > 0 && (
-                        <div className="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow max-h-56 overflow-auto">
-                          {filteredCustomers.map((c) => (
-                            <button
-                              key={c.id}
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                handleSelectCustomer(c);
-                              }}
-                              className={`w-full text-left px-3 py-2 hover:bg-gray-50 ${
-                                selectedCustomerId === c.id ? "bg-blue-50" : ""
-                              }`}
-                            >
-                              <div className="font-medium text-gray-900 text-sm">
-                                {c.name}
-                              </div>
-                              {c.phone && (
-                                <div className="text-xs text-gray-500">
-                                  {c.phone}
-                                </div>
-                              )}
-                            </button>
-                          ))}
                         </div>
                       )}
 
@@ -2096,12 +2315,29 @@ export function Orders() {
                   {showCartDetails ? "Recolher" : "Resumo"}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-900 truncate">
-                    Cliente:{" "}
-                    <span className="font-medium">
-                      {selectedCustomerName || customerNameInput.trim() || "—"}
+                  <div className="text-sm text-gray-900 truncate flex items-center gap-2">
+                    <span>
+                      Cliente:{" "}
+                      <span className="font-medium">
+                        {selectedCustomerName || customerNameInput.trim() || "—"}
+                      </span>
+                      {selectedCustomerPhone ? ` (${selectedCustomerPhone})` : (customerPhoneInput.trim() ? ` (${customerPhoneInput.trim()})` : "")}
                     </span>
-                    {selectedCustomerPhone ? ` (${selectedCustomerPhone})` : (customerPhoneInput.trim() ? ` (${customerPhoneInput.trim()})` : "")}
+                    {selectedCustomerId && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const customer = customers.find(c => String(c.id) === String(selectedCustomerId));
+                          if (customer) {
+                            handleViewCustomerHistory(selectedCustomerId, customer.name, e);
+                          }
+                        }}
+                        className="p-1 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+                        title="Ver histórico do cliente"
+                      >
+                        <MdHistory className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                   {orderType === 'delivery' && (
                     <div className="text-xs text-gray-600">
@@ -2378,6 +2614,7 @@ export function Orders() {
                                 productName: ci.productName,
                                 quantity: ci.quantity,
                                 unitPrice: ci.unitPrice,
+                                notes: ci.notes,
                               })) as any,
                               notes: notes || undefined,
                             };
@@ -2439,22 +2676,28 @@ export function Orders() {
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div
               className="absolute inset-0 bg-black/40"
-              onClick={() => setViewOrder(null)}
+              onClick={() => {
+                setViewOrder(null);
+                setSelectedItemsForReplication(new Set());
+              }}
             />
-            <div className="relative bg-white w-full max-w-lg mx-4 rounded-lg shadow-xl border">
-              <div className="flex items-center justify-between p-4 border-b">
+            <div className="relative bg-white w-full max-w-lg mx-4 rounded-lg shadow-xl border max-h-[90vh] flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
                 <div className="text-gray-800 font-semibold text-base">
                   Pedido #
                   {viewOrder.orderNumber || String(viewOrder.id).slice(0, 8)}
                 </div>
                 <button
                   className="text-gray-500 hover:text-gray-700"
-                  onClick={() => setViewOrder(null)}
+                  onClick={() => {
+                    setViewOrder(null);
+                    setSelectedItemsForReplication(new Set());
+                  }}
                 >
                   <MdClose className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-4 flex flex-col gap-3">
+              <div className="p-4 flex-1 overflow-auto flex flex-col gap-3">
                 <div className="text-sm text-gray-800">
                   <span className="font-medium">Cliente:</span>{" "}
                   {viewOrder.customerName || "—"}
@@ -2466,14 +2709,35 @@ export function Orders() {
                   {viewOrder.paymentMethodName || "—"}
                 </div>
                 <div className="border-t pt-3">
-                  <div className="text-xs font-medium text-gray-600 mb-2">
-                    Itens
+                  <div className="text-xs font-medium text-gray-600 mb-2 flex items-center justify-between">
+                    <span>Itens</span>
+                    <button
+                      onClick={() => handleReplicateFullOrder(viewOrder)}
+                      className="text-xs text-blue-600 hover:text-blue-800 font-medium px-2 py-1 rounded hover:bg-blue-50"
+                    >
+                      Replicar pedido completo
+                    </button>
                   </div>
-                  <div className="flex flex-col gap-1 max-h-60 overflow-auto">
+                  <div className="flex flex-col gap-2 max-h-60 overflow-auto">
                     {(viewOrder.items || []).map((it, idx) => (
-                      <div key={idx} className="text-xs text-gray-700">
-                        {it.quantity}x {it.productName} —{" "}
-                        {formatCurrency(it.unitPrice * it.quantity)}
+                      <div key={idx} className="flex items-start gap-2 text-xs text-gray-700 border-b pb-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedItemsForReplication.has(idx)}
+                          onChange={() => toggleItemSelection(idx)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div>
+                            {it.quantity}x {it.productName} —{" "}
+                            {formatCurrency(it.unitPrice * it.quantity)}
+                          </div>
+                          {it.notes && (
+                            <div className="text-xs text-gray-500 mt-1 italic">
+                              Obs: {it.notes}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -2485,8 +2749,115 @@ export function Orders() {
                   </div>
                 </div>
                 {viewOrder.notes && (
-                  <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
-                    {viewOrder.notes}
+                  <div className="text-xs text-gray-700">
+                    <span className="font-medium text-gray-600">Observação do pedido:</span>
+                    <div className="text-gray-600 p-2 bg-gray-50 rounded mt-1">
+                      {viewOrder.notes}
+                    </div>
+                  </div>
+                )}
+                {selectedItemsForReplication.size > 0 && (
+                  <div className="border-t pt-3 flex justify-end">
+                    <button
+                      onClick={() => handleReplicateSelectedItems(viewOrder)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                    >
+                      Replicar {selectedItemsForReplication.size} item(ns) selecionado(s)
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Histórico do Cliente */}
+        {customerHistoryModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setCustomerHistoryModal(null)}
+            />
+            <div className="relative bg-white w-full max-w-2xl mx-4 rounded-lg shadow-xl border max-h-[90vh] flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
+                <div className="text-gray-800 font-semibold text-base">
+                  Histórico de Pedidos - {customerHistoryModal.customerName}
+                </div>
+                <button
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => setCustomerHistoryModal(null)}
+                >
+                  <MdClose className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-4 flex-1 overflow-auto">
+                {loadingCustomerHistory ? (
+                  <div className="text-center text-gray-500 py-8">
+                    Carregando...
+                  </div>
+                ) : customerHistoryOrders.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    Nenhum pedido concluído encontrado para este cliente.
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {customerHistoryOrders.map((order) => (
+                      <div
+                        key={order.id}
+                        className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <div className="font-semibold text-gray-900 text-sm">
+                              Pedido #{order.orderNumber || String(order.id).slice(0, 8)}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {order.createdAt
+                                ? new Date(order.createdAt).toLocaleDateString("pt-BR", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })
+                                : "—"}
+                            </div>
+                          </div>
+                          <div className="text-base font-bold text-gray-900">
+                            {formatCurrency(order.total)}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-600 mb-2">
+                          <div className="mb-2">
+                            <span className="font-medium">{order.items?.length || 0} item(ns):</span>
+                          </div>
+                          <div className="flex flex-col gap-1 max-h-32 overflow-auto pl-2 border-l-2 border-gray-200">
+                            {order.items?.map((item, idx) => (
+                              <div key={idx} className="text-xs text-gray-700">
+                                <span className="font-medium">{item.quantity}x {item.productName}</span>
+                                {item.notes && (
+                                  <span className="text-gray-500 italic ml-1">
+                                    (Obs: {item.notes})
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => {
+                              setCustomerHistoryModal(null);
+                              setViewOrder(order);
+                              setSelectedItemsForReplication(new Set());
+                            }}
+                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            Ver detalhes
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

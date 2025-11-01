@@ -4,7 +4,9 @@ import type { Customer, CustomerFormData, CustomerAddress } from '../types/custo
 import { customerService } from '../services/customerService';
 import { deliveryAreaService } from '../services/deliveryAreaService';
 import type { DeliveryArea } from '../types/deliveryArea';
-import { MdAdd, MdEdit, MdDelete, MdSearch, MdCheckCircle, MdClose } from 'react-icons/md';
+import { orderService } from '../services/orderService';
+import type { Order } from '../types/order';
+import { MdAdd, MdEdit, MdDelete, MdSearch, MdCheckCircle, MdClose, MdVisibility, MdHistory } from 'react-icons/md';
 
  type SortField = 'name' | 'phone';
  type SortDirection = 'asc' | 'desc';
@@ -20,29 +22,35 @@ import { MdAdd, MdEdit, MdDelete, MdSearch, MdCheckCircle, MdClose } from 'react
     phone: '',
     addresses: [{ address: '', deliveryAreaId: '' }],
   });
-   const [searchTerm, setSearchTerm] = useState('');
-   const [sortField, setSortField] = useState<SortField>('name');
-   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [viewingCustomer, setViewingCustomer] = useState<Customer | null>(null);
+  const [customerOrders, setCustomerOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
 
    useEffect(() => {
      loadData();
    }, []);
 
-   const loadData = async () => {
-     setLoading(true);
-     try {
-       const [customersData, areasData] = await Promise.all([
-         customerService.getAll(),
-         deliveryAreaService.getAll(),
-       ]);
-       setCustomers(customersData);
-       setDeliveryAreas(areasData.filter(a => a.isActive));
-     } catch (error) {
-       console.error('Error loading data:', error);
-     } finally {
-       setLoading(false);
-     }
-   };
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [customersData, areasData, ordersData] = await Promise.all([
+        customerService.getAll(),
+        deliveryAreaService.getAll(),
+        orderService.getAll(),
+      ]);
+      setCustomers(customersData);
+      setDeliveryAreas(areasData.filter(a => a.isActive));
+      setAllOrders(ordersData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
    const filteredAndSorted = useMemo(() => {
      let filtered = customers;
@@ -178,16 +186,64 @@ import { MdAdd, MdEdit, MdDelete, MdSearch, MdCheckCircle, MdClose } from 'react
      }
    };
 
-   const handleDelete = async (id: string) => {
-     if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
-     try {
-       await customerService.delete(id);
-       await loadData();
-     } catch (error) {
-       console.error('Error deleting customer:', error);
-       alert('Erro ao excluir cliente');
-     }
-   };
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
+    try {
+      await customerService.delete(id);
+      await loadData();
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      alert('Erro ao excluir cliente');
+    }
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
+
+  const formatDateTime = (isoDate: string) => {
+    return new Date(isoDate).toLocaleString('pt-BR');
+  };
+
+  const handleViewCustomer = async (customer: Customer) => {
+    setViewingCustomer(customer);
+    setLoadingOrders(true);
+    try {
+      const allOrders = await orderService.getAll();
+      const customerOrders = allOrders
+        .filter(o => o.customerId && String(o.customerId) === String(customer.id) && o.status === 'completed')
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setCustomerOrders(customerOrders);
+    } catch (error) {
+      console.error('Error loading customer orders:', error);
+      setCustomerOrders([]);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  // Encontrar o endereço com pedido mais recente
+  const getMostRecentAddress = (customer: Customer): CustomerAddress | null => {
+    if (!customer.addresses || customer.addresses.length === 0) return null;
+    
+    // Buscar pedidos do cliente que tenham deliveryAreaId
+    const customerOrders = allOrders
+      .filter(o => o.customerId && String(o.customerId) === String(customer.id) && o.deliveryAreaId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
+    if (customerOrders.length === 0) return customer.addresses[0] || null;
+    
+    // Encontrar o pedido mais recente e seu endereço correspondente
+    const mostRecentOrder = customerOrders[0];
+    const address = customer.addresses.find(
+      addr => String(addr.deliveryAreaId) === String(mostRecentOrder.deliveryAreaId)
+    );
+    
+    return address || customer.addresses[0] || null;
+  };
 
    if (loading) {
      return (
@@ -361,32 +417,31 @@ import { MdAdd, MdEdit, MdDelete, MdSearch, MdCheckCircle, MdClose } from 'react
                        </td>
                        <td className="px-6 py-4">
                          <div className="text-sm text-gray-600 max-w-xl">
-                           {c.addresses && c.addresses.length > 0 ? (
-                             <div className="space-y-1">
-                               {c.addresses.map((addr, idx) => {
-                                 const area = deliveryAreas.find(a => String(a.id) === String(addr.deliveryAreaId));
-                                 return (
-                                   <div key={idx} className="text-xs">
-                                     {addr.address && <span>{addr.address}</span>}
-                                     {area && (
-                                       <span className={addr.address ? ' ml-1' : ''}>
-                                         {addr.address && ' - '}
-                                         <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
-                                           {area.name}
-                                         </span>
-                                       </span>
-                                     )}
-                                   </div>
-                                 );
-                               })}
-                             </div>
-                           ) : (
-                             '-'
-                           )}
+                           {(() => {
+                             const mostRecentAddr = getMostRecentAddress(c);
+                             if (!mostRecentAddr) return '-';
+                             const area = deliveryAreas.find(a => String(a.id) === String(mostRecentAddr.deliveryAreaId));
+                             return (
+                               <div className="text-xs">
+                                 {mostRecentAddr.address && <span>{mostRecentAddr.address}</span>}
+                                 {area && (
+                                   <span className={mostRecentAddr.address ? ' ml-1' : ''}>
+                                     {mostRecentAddr.address && ' - '}
+                                     <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
+                                       {area.name}
+                                     </span>
+                                   </span>
+                                 )}
+                               </div>
+                             );
+                           })()}
                          </div>
                        </td>
                        <td className="px-6 py-4 whitespace-nowrap text-center">
                          <div className="flex justify-center gap-2">
+                           <button onClick={() => handleViewCustomer(c)} className="text-green-600 hover:text-green-800" title="Ver detalhes">
+                             <MdVisibility className="w-5 h-5" />
+                           </button>
                            <button onClick={() => handleEdit(c)} className="text-blue-600 hover:text-blue-800" title="Editar">
                              <MdEdit className="w-5 h-5" />
                            </button>
@@ -400,9 +455,139 @@ import { MdAdd, MdEdit, MdDelete, MdSearch, MdCheckCircle, MdClose } from 'react
                  )}
                </tbody>
              </table>
-           </div>
-         </div>
-       </div>
-     </Layout>
-   );
- }
+          </div>
+        </div>
+
+        {/* Modal de Detalhes do Cliente */}
+        {viewingCustomer && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => {
+                setViewingCustomer(null);
+                setCustomerOrders([]);
+              }}
+            />
+            <div className="relative bg-white w-full max-w-3xl mx-4 rounded-lg shadow-xl border max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b">
+                <div className="text-gray-800 font-semibold text-lg">
+                  {viewingCustomer.name}
+                </div>
+                <button
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => {
+                    setViewingCustomer(null);
+                    setCustomerOrders([]);
+                  }}
+                >
+                  <MdClose className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {/* Informações Básicas */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Informações Básicas</h3>
+                  <div className="space-y-2">
+                    <div className="text-sm">
+                      <span className="font-medium text-gray-700">Telefone: </span>
+                      <span className="text-gray-600">{viewingCustomer.phone || '—'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Endereços */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Todos os Endereços</h3>
+                  <div className="space-y-3">
+                    {viewingCustomer.addresses && viewingCustomer.addresses.length > 0 ? (
+                      viewingCustomer.addresses.map((addr, idx) => {
+                        const area = deliveryAreas.find(a => String(a.id) === String(addr.deliveryAreaId));
+                        return (
+                          <div key={idx} className="border border-gray-200 rounded-lg p-3">
+                            <div className="text-sm">
+                              {addr.address && (
+                                <div className="text-gray-900 mb-1">{addr.address}</div>
+                              )}
+                              {area && (
+                                <div className="text-xs">
+                                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                    {area.name}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-sm text-gray-500">Nenhum endereço cadastrado</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Histórico de Pedidos */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <MdHistory className="w-5 h-5" />
+                    Histórico de Pedidos
+                  </h3>
+                  {loadingOrders ? (
+                    <div className="text-center py-8 text-gray-500">Carregando...</div>
+                  ) : customerOrders.length > 0 ? (
+                    <div className="space-y-3">
+                      {customerOrders.map((order) => (
+                        <div key={order.id} className="border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                Pedido #{order.orderNumber || String(order.id).slice(0, 6)}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {formatDateTime(order.createdAt)}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-semibold text-gray-900">
+                                {formatCurrency(order.total)}
+                              </div>
+                              {order.deliveryAreaName && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {order.deliveryAreaName}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {order.items && order.items.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-gray-100">
+                              <div className="text-xs text-gray-600 space-y-1">
+                                {order.items.slice(0, 3).map((item, idx) => (
+                                  <div key={idx}>
+                                    {item.quantity}x {item.productName}
+                                  </div>
+                                ))}
+                                {order.items.length > 3 && (
+                                  <div className="text-gray-500">
+                                    + {order.items.length - 3} item(ns)
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      Nenhum pedido concluído ainda
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </Layout>
+  );
+}
