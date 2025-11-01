@@ -21,9 +21,10 @@
       "value": 200
     },
     {
-      "id": "5",
       "name": "Entregador",
-      "value": 2400
+      "value": 2400,
+      "showInDRE": false,
+      "id": "5"
     },
     {
       "id": "6",
@@ -65,8 +66,7 @@
     },
     {
       "name": "Simples Nacional",
-      "percentage": 7.5,
-      "showInDRE": true,
+      "percentage": 4,
       "id": "2"
     },
     {
@@ -765,10 +765,13 @@
         {
           "address": "Rua Pedro Bento Da Silva, 891",
           "deliveryAreaId": "1"
+        },
+        {
+          "address": "Rua Rio Iguaçu 158",
+          "deliveryAreaId": "2"
         }
       ],
-      "createdAt": "2025-10-30T01:21:59.332Z",
-      "updatedAt": "2025-10-30T01:21:59.332Z",
+      "updatedAt": "2025-11-01T04:39:24.767Z",
       "id": 1
     },
     {
@@ -824,6 +827,14 @@
       "createdAt": "2025-10-30T00:04:42.503Z",
       "updatedAt": "2025-10-30T00:04:42.503Z",
       "id": 1
+    },
+    {
+      "name": "Rio Pequeno",
+      "deliveryFee": 5,
+      "estimatedTime": 50,
+      "isActive": true,
+      "updatedAt": "2025-11-01T04:39:57.384Z",
+      "id": 2
     }
   ],
   "deliveryDrivers": [
@@ -835,6 +846,15 @@
       "createdAt": "2025-10-30T00:09:08.763Z",
       "updatedAt": "2025-10-30T00:09:08.763Z",
       "id": 1
+    },
+    {
+      "name": "Moto 02",
+      "dailyRate": 55,
+      "receivesDeliveryFee": false,
+      "isActive": true,
+      "createdAt": "2025-11-01T04:38:58.873Z",
+      "updatedAt": "2025-11-01T04:38:58.873Z",
+      "id": 2
     }
   ],
   "paymentMethods": [
@@ -1477,6 +1497,46 @@
       "quantity": 0.02,
       "date": "2025-11-01T04:19:44.998Z",
       "note": "Pedido #000009 - baixa automática"
+    },
+    {
+      "id": 72,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 3,
+      "date": "2025-11-01T04:40:13.663Z",
+      "note": "Pedido #000010 - baixa automática"
+    },
+    {
+      "id": 73,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.44999999999999996,
+      "date": "2025-11-01T04:40:13.663Z",
+      "note": "Pedido #000010 - baixa automática"
+    },
+    {
+      "id": 74,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 6,
+      "date": "2025-11-01T04:40:13.664Z",
+      "note": "Pedido #000010 - baixa automática"
+    },
+    {
+      "id": 75,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.06,
+      "date": "2025-11-01T04:40:13.665Z",
+      "note": "Pedido #000010 - baixa automática"
+    },
+    {
+      "id": 76,
+      "ingredientId": "22",
+      "type": "OUT",
+      "quantity": 1,
+      "date": "2025-11-01T04:40:13.666Z",
+      "note": "Pedido #000010 - baixa automática"
     }
   ],
   "cashTransactions": [
@@ -1607,6 +1667,30 @@
       "type": "in",
       "amount": 27.4032,
       "description": "Pedido #000009 - Crédito (Taxa: R$ 1.60)"
+    },
+    {
+      "id": 17,
+      "createdAt": "2025-11-01T04:40:13.661Z",
+      "cashRegisterId": 3,
+      "type": "in",
+      "amount": 93.0199,
+      "description": "Pedido #000010 - PIX (Taxa: R$ 0.98)"
+    },
+    {
+      "cashRegisterId": "3",
+      "type": "out",
+      "amount": 63,
+      "description": "Pagamento entregadores - Moto 01",
+      "createdAt": "2025-11-01T04:47:05.429Z",
+      "id": 18
+    },
+    {
+      "cashRegisterId": "3",
+      "type": "out",
+      "amount": 55,
+      "description": "Pagamento entregadores - Moto 02",
+      "createdAt": "2025-11-01T04:47:08.168Z",
+      "id": 19
     }
   ],
   "cashRegisters": [
@@ -1636,8 +1720,12 @@
       "openedAt": "2025-11-01T03:56:31.327Z",
       "openingBalance": 150,
       "notes": "",
-      "status": "open",
-      "id": 3
+      "status": "closed",
+      "id": 3,
+      "closedAt": "2025-11-01T04:47:16.071Z",
+      "expectedBalance": 93.66910000000007,
+      "actualBalance": 93.67,
+      "difference": 0.0008999999999304009
     }
   ],
   "orders": [
@@ -1900,6 +1988,41 @@
       "deliveryDriverId": "1",
       "changeFor": 0,
       "changeAmount": 0
+    },
+    {
+      "orderNumber": "000010",
+      "status": "completed",
+      "customerId": 1,
+      "deliveryAreaId": "2",
+      "paymentMethodId": "2",
+      "paymentMethodKind": "pix",
+      "deliveryFee": 5,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 3,
+          "unitPrice": 29,
+          "totalPrice": 87
+        },
+        {
+          "productId": 2,
+          "productName": "Coca Cola",
+          "quantity": 1,
+          "unitPrice": 7,
+          "totalPrice": 7
+        }
+      ],
+      "subtotal": 94,
+      "total": 99,
+      "cashRegisterId": 3,
+      "cardFee": 0.9801000000000001,
+      "deliveryFeeDriverAmount": 5,
+      "netAmount": 93.0199,
+      "createdAt": "2025-11-01T04:40:13.660Z",
+      "updatedAt": "2025-11-01T04:40:18.569Z",
+      "id": 10,
+      "deliveryDriverId": "2"
     }
   ],
   "categories": [

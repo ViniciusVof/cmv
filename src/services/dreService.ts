@@ -289,48 +289,77 @@ export const dreService = {
     // Not used for now, keeping for future
     // const settings = businessSettings[0];
     // Taxas de cartão já estão deduzidas do netAmount dos pedidos
-    // Somar taxas de cartão pagas nos pedidos
-    const cardFeesAmount = completedOrders.reduce((sum, order) => sum + (order.cardFee || 0), 0);
+    // Somar taxas de cartão pagas nos pedidos (APENAS para pagamentos de maquininha: credit, debit, pix)
+    const cardFeesAmount = completedOrders
+      .filter(order => {
+        const isMachinePayment = order.paymentMethodKind === 'credit' || 
+                                 order.paymentMethodKind === 'debit' || 
+                                 order.paymentMethodKind === 'pix';
+        return isMachinePayment;
+      })
+      .reduce((sum, order) => sum + (order.cardFee || 0), 0);
 
     // Taxas de entregadores (deliveryFeeDriverAmount) - apenas taxas de entrega
-    const deliveryFeesOnly = completedOrders.reduce(
-      (sum, order) => sum + (order.deliveryFeeDriverAmount || 0),
-      0
-    );
+    // Só somar se o entregador recebe taxa (receivesDeliveryFee = true)
+    const deliveryFeesOnly = completedOrders.reduce((sum, order) => {
+      if (!order.deliveryDriverId || !order.deliveryFee || order.deliveryFee <= 0) {
+        return sum;
+      }
+      
+      const driver = drivers.find(d => String(d.id) === String(order.deliveryDriverId));
+      // Só soma a taxa se o entregador recebe taxa de entrega
+      if (!driver || !driver.receivesDeliveryFee) {
+        return sum;
+      }
+      
+      return sum + (order.deliveryFee || 0);
+    }, 0);
     
-    // Agrupar taxas de cartão por maquininha + tipo de pagamento
+    // Agrupar taxas de cartão por maquininha + tipo de pagamento (APENAS pagamentos de maquininha)
     const cardFeesByMachine = new Map<string, number>();
     completedOrders.forEach(order => {
-      if (order.cardFee && order.cardFee > 0 && order.paymentMethodName) {
-        const baseName = order.paymentMethodName;
-        let methodKey = baseName;
-        
-        // Adicionar tipo de pagamento ao nome
-        if (order.paymentMethodKind) {
-          const kindLabels: Record<string, string> = {
-            'credit': 'Cartão de Crédito',
-            'debit': 'Cartão de Débito',
-            'pix': 'PIX',
-            'cash': 'Dinheiro',
-            'other': 'Outro',
-          };
-          const kindLabel = kindLabels[order.paymentMethodKind] || order.paymentMethodKind;
-          methodKey = `${baseName} - ${kindLabel}`;
-        }
-        
-        const current = cardFeesByMachine.get(methodKey) || 0;
-        cardFeesByMachine.set(methodKey, current + order.cardFee);
+      // Só processar se for pagamento de maquininha (credit, debit, pix) e tiver cardFee > 0
+      const isMachinePayment = order.paymentMethodKind === 'credit' || 
+                               order.paymentMethodKind === 'debit' || 
+                               order.paymentMethodKind === 'pix';
+      if (!isMachinePayment || !order.cardFee || order.cardFee <= 0 || !order.paymentMethodName) {
+        return;
       }
+      
+      const baseName = order.paymentMethodName;
+      let methodKey = baseName;
+      
+      // Adicionar tipo de pagamento ao nome
+      if (order.paymentMethodKind) {
+        const kindLabels: Record<string, string> = {
+          'credit': 'Cartão de Crédito',
+          'debit': 'Cartão de Débito',
+          'pix': 'PIX',
+        };
+        const kindLabel = kindLabels[order.paymentMethodKind] || order.paymentMethodKind;
+        methodKey = `${baseName} - ${kindLabel}`;
+      }
+      
+      const current = cardFeesByMachine.get(methodKey) || 0;
+      cardFeesByMachine.set(methodKey, current + order.cardFee);
     });
     
-    // Agrupar taxas de entregadores por entregador (apenas taxas de entrega)
+    // Agrupar taxas de entregadores por entregador (apenas taxas de entrega, apenas se recebe taxa)
     const deliveryFeesByDriver = new Map<string, number>();
     completedOrders.forEach(order => {
-      if (order.deliveryFeeDriverAmount && order.deliveryFeeDriverAmount > 0) {
-        const driverName = order.deliveryDriverName || 'Sem entregador';
-        const current = deliveryFeesByDriver.get(driverName) || 0;
-        deliveryFeesByDriver.set(driverName, current + order.deliveryFeeDriverAmount);
+      if (!order.deliveryDriverId || !order.deliveryFee || order.deliveryFee <= 0) {
+        return;
       }
+      
+      const driver = drivers.find(d => String(d.id) === String(order.deliveryDriverId));
+      // Só soma a taxa se o entregador recebe taxa de entrega
+      if (!driver || !driver.receivesDeliveryFee) {
+        return;
+      }
+      
+      const driverName = order.deliveryDriverName || 'Sem entregador';
+      const current = deliveryFeesByDriver.get(driverName) || 0;
+      deliveryFeesByDriver.set(driverName, current + order.deliveryFee);
     });
     
     // Calcular diárias dos entregadores (uma vez por dia trabalhado)
@@ -373,15 +402,13 @@ export const dreService = {
         const dailyRateTotal = driver.dailyRate * daysCount;
         totalDailyRates += dailyRateTotal;
         
-        // Adicionar diária aos detalhes do entregador
-        const currentFees = deliveryFeesByDriver.get(driverKey) || 0;
-        deliveryFeesByDriver.set(driverKey, currentFees + dailyRateTotal);
+        // Guardar diária separadamente (não adicionar a deliveryFeesByDriver, que é só taxas)
         dailyRatesByDriver.set(driverKey, dailyRateTotal);
       }
     });
     
-    // Total de despesas com entregadores = taxas + diárias
-    const deliveryDriverFeesAmount = deliveryFeesOnly + totalDailyRates;
+    // Total de despesas com entregadores = taxas (variável) + diárias (fixa)
+    // Nota: Não precisamos de uma variável total pois agora são separadas
 
     // Despesas detalhadas - SEPARADAS em Variáveis e Fixas
     const variableExpenses: DREItem[] = [];
@@ -457,26 +484,26 @@ export const dreService = {
       });
     }
 
-    // Adicionar despesas com entregadores (variável) - detalhado por entregador (taxas + diárias)
+    // Adicionar despesas com entregadores - TAXAS DE ENTREGA (variável) - detalhado por entregador
     // Apenas se useAutomaticPDVValues estiver ativado
-    if (dreSettings.useAutomaticPDVValues && deliveryDriverFeesAmount > 0) {
+    if (dreSettings.useAutomaticPDVValues && deliveryFeesOnly > 0) {
       const deliveryAdjustment = adjustments.find(
-        (adj) => adj.itemType === 'expense' && adj.itemName === 'Despesas com Entregadores'
+        (adj) => adj.itemType === 'expense' && adj.itemName === 'Taxas de Entrega aos Entregadores'
       );
       const adjustedDeliveryFees = deliveryAdjustment
         ? deliveryAdjustment.adjustedAmount
-        : deliveryDriverFeesAmount;
+        : deliveryFeesOnly;
       
       const details: import('../types/dre').DREItemDetail[] = [];
       let totalDetailsAmount = 0;
       deliveryFeesByDriver.forEach((amount: number, driverName: string) => {
         // Verificar se há ajuste específico para este detalhe
         const detailAdjustment = adjustments.find(
-          (adj) => adj.itemType === 'expense' && adj.itemName === `Despesas com Entregadores - ${driverName}`
+          (adj) => adj.itemType === 'expense' && adj.itemName === `Taxas de Entrega aos Entregadores - ${driverName}`
         );
         const adjustedDetailAmount = detailAdjustment ? detailAdjustment.adjustedAmount : amount;
         totalDetailsAmount += adjustedDetailAmount;
-        // amount já inclui taxas + diária
+        // amount aqui é apenas a taxa de entrega (não inclui diária)
         details.push({ name: driverName, amount: adjustedDetailAmount });
       });
       
@@ -486,7 +513,7 @@ export const dreService = {
         : adjustedDeliveryFees;
       
       variableExpenses.push({
-        categoryName: 'Despesas com Entregadores',
+        categoryName: 'Taxas de Entrega aos Entregadores',
         amount: finalDeliveryFees,
         type: 'expense',
         isVariable: true,
@@ -495,6 +522,42 @@ export const dreService = {
     }
 
     // === DESPESAS FIXAS ===
+    // Adicionar diárias dos entregadores (fixa) - detalhado por entregador
+    // Apenas se useAutomaticPDVValues estiver ativado
+    if (dreSettings.useAutomaticPDVValues && totalDailyRates > 0) {
+      const dailyRatesAdjustment = adjustments.find(
+        (adj) => adj.itemType === 'expense' && adj.itemName === 'Diárias dos Entregadores'
+      );
+      const adjustedDailyRates = dailyRatesAdjustment
+        ? dailyRatesAdjustment.adjustedAmount
+        : totalDailyRates;
+      
+      const details: import('../types/dre').DREItemDetail[] = [];
+      let totalDetailsAmount = 0;
+      dailyRatesByDriver.forEach((amount: number, driverKey: string) => {
+        // Verificar se há ajuste específico para este detalhe
+        const detailAdjustment = adjustments.find(
+          (adj) => adj.itemType === 'expense' && adj.itemName === `Diárias dos Entregadores - ${driverKey}`
+        );
+        const adjustedDetailAmount = detailAdjustment ? detailAdjustment.adjustedAmount : amount;
+        totalDetailsAmount += adjustedDetailAmount;
+        details.push({ name: driverKey, amount: adjustedDetailAmount });
+      });
+      
+      // Se houver ajustes nos detalhes, recalcular o total baseado nos detalhes ajustados
+      const finalDailyRates = details.length > 0 && totalDetailsAmount !== adjustedDailyRates
+        ? totalDetailsAmount
+        : adjustedDailyRates;
+      
+      fixedExpenses.push({
+        categoryName: 'Diárias dos Entregadores',
+        amount: finalDailyRates,
+        type: 'expense',
+        isVariable: false,
+        details: details.length > 0 ? details : undefined,
+      });
+    }
+
     // Adicionar cada custo fixo individualmente (aplicar ajustes se houver)
     // Filtrar apenas os que devem aparecer no DRE (showInDRE !== false)
     // Apenas se useConfiguredFixedValues estiver ativado
@@ -637,8 +700,9 @@ export const dreService = {
       cmvAmount +
       variableCostsAmount +
       cardFeesAmount +
-      deliveryDriverFeesAmount +
+      deliveryFeesOnly + // Apenas taxas de entrega (variável)
       fixedCostsAmount +
+      totalDailyRates + // Diárias (fixa)
       otherPayablesAmount +
       mappedExpensesAmount;
 
@@ -664,8 +728,21 @@ export const dreService = {
       const orderRevenue = order.total || 0;
       
       // Calcular despesas aproximadas para este pedido
-      const orderCardFee = order.cardFee || 0;
-      const orderDeliveryFee = order.deliveryFeeDriverAmount || 0;
+      // Só considerar taxa se for pagamento de maquininha (credit, debit, pix)
+      const isMachinePayment = order.paymentMethodKind === 'credit' || 
+                               order.paymentMethodKind === 'debit' || 
+                               order.paymentMethodKind === 'pix';
+      const orderCardFee = isMachinePayment ? (order.cardFee || 0) : 0;
+      
+      // Apenas taxa de entrega como variável (não incluir diárias que são fixas)
+      // Verificar se o entregador recebe taxa antes de considerar
+      let orderDeliveryFee = 0;
+      if (order.deliveryDriverId && order.deliveryFee && order.deliveryFee > 0) {
+        const driver = drivers.find(d => String(d.id) === String(order.deliveryDriverId));
+        if (driver && driver.receivesDeliveryFee) {
+          orderDeliveryFee = order.deliveryFee;
+        }
+      }
       
       // Custos variáveis sobre a receita (apenas se useConfiguredFixedValues estiver ativado)
       let orderVariableCosts = 0;
@@ -732,6 +809,7 @@ export const dreService = {
     
     // Considerar também CMV e taxas de cartão/entregadores como % variável se useAutomaticPDVValues estiver ativado
     // Calcular margem de contribuição (1 - % custos variáveis)
+    // NOTA: Apenas taxas de entrega são variáveis, diárias são fixas
     let avgCardFeePercentage = 0;
     let cmvPercentage = 0;
     let deliveryFeesPercentage = 0;
@@ -739,7 +817,8 @@ export const dreService = {
     if (dreSettings.useAutomaticPDVValues) {
       avgCardFeePercentage = revenueForCalculation > 0 ? (cardFeesAmount / revenueForCalculation) * 100 : 0;
       cmvPercentage = revenueForCalculation > 0 ? (cmvAmount / revenueForCalculation) * 100 : 0;
-      deliveryFeesPercentage = revenueForCalculation > 0 ? (deliveryDriverFeesAmount / revenueForCalculation) * 100 : 0;
+      // Apenas taxas de entrega são variáveis (não incluir diárias)
+      deliveryFeesPercentage = revenueForCalculation > 0 ? (deliveryFeesOnly / revenueForCalculation) * 100 : 0;
     }
     
     const totalVariablePercentage = totalVariableCostsPercentage + avgCardFeePercentage + cmvPercentage + deliveryFeesPercentage;
@@ -818,13 +897,30 @@ export const dreService = {
           }, 0);
       }
 
-      const prevCardFeesAmount = prevCompletedOrders.reduce((sum, order) => sum + (order.cardFee || 0), 0);
+      // Taxas de cartão do período anterior (APENAS para pagamentos de maquininha: credit, debit, pix)
+      const prevCardFeesAmount = prevCompletedOrders
+        .filter(order => {
+          const isMachinePayment = order.paymentMethodKind === 'credit' || 
+                                   order.paymentMethodKind === 'debit' || 
+                                   order.paymentMethodKind === 'pix';
+          return isMachinePayment;
+        })
+        .reduce((sum, order) => sum + (order.cardFee || 0), 0);
       
-      // Taxas de entregadores do período anterior
-      const prevDeliveryFeesOnly = prevCompletedOrders.reduce(
-        (sum, order) => sum + (order.deliveryFeeDriverAmount || 0),
-        0
-      );
+      // Taxas de entregadores do período anterior (apenas se o entregador recebe taxa)
+      const prevDeliveryFeesOnly = prevCompletedOrders.reduce((sum, order) => {
+        if (!order.deliveryDriverId || !order.deliveryFee || order.deliveryFee <= 0) {
+          return sum;
+        }
+        
+        const driver = drivers.find(d => String(d.id) === String(order.deliveryDriverId));
+        // Só soma a taxa se o entregador recebe taxa de entrega
+        if (!driver || !driver.receivesDeliveryFee) {
+          return sum;
+        }
+        
+        return sum + (order.deliveryFee || 0);
+      }, 0);
       
       // Calcular diárias do período anterior
       const prevDriverDays = new Map<string, Set<string>>();
@@ -863,7 +959,8 @@ export const dreService = {
         }
       });
       
-      const prevDeliveryDriverFeesAmount = prevDeliveryFeesOnly + prevTotalDailyRates;
+      // Total de despesas com entregadores do período anterior = taxas (variável) + diárias (fixa)
+      // Nota: Não precisamos de uma variável total pois agora são separadas
 
       let prevFixedCostsAmount = 0;
       if (dreSettings.useConfiguredFixedValues) {
@@ -936,8 +1033,9 @@ export const dreService = {
         prevCmvAmount +
         prevVariableCostsAmount +
         prevCardFeesAmount +
-        prevDeliveryDriverFeesAmount +
+        prevDeliveryFeesOnly + // Apenas taxas de entrega (variável)
         prevFixedCostsAmount +
+        prevTotalDailyRates + // Diárias (fixa)
         prevOtherPayablesAmount +
         prevMappedExpensesAmount;
 
@@ -976,14 +1074,27 @@ export const dreService = {
             categoryName: 'Despesas com Maquininha de Cartão',
             amount: prevCardFeesAmount,
             type: 'expense',
+            isVariable: true,
           });
         }
 
-        if (prevDeliveryDriverFeesAmount > 0) {
+        // Taxas de entrega (variável)
+        if (prevDeliveryFeesOnly > 0) {
           prevExpenseBreakdown.push({
-            categoryName: 'Despesas com Entregadores',
-            amount: prevDeliveryDriverFeesAmount,
+            categoryName: 'Taxas de Entrega aos Entregadores',
+            amount: prevDeliveryFeesOnly,
             type: 'expense',
+            isVariable: true,
+          });
+        }
+
+        // Diárias (fixa)
+        if (prevTotalDailyRates > 0) {
+          prevExpenseBreakdown.push({
+            categoryName: 'Diárias dos Entregadores',
+            amount: prevTotalDailyRates,
+            type: 'expense',
+            isVariable: false,
           });
         }
       }

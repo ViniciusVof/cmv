@@ -209,8 +209,6 @@ export function CashRegister() {
     const cardFeesPix = reportOrders.filter(o => o.paymentMethodKind === 'pix').reduce((s, o) => s + (o.cardFee || 0), 0);
     const cardFees = cardFeesCredit + cardFeesDebit + cardFeesPix;
     const deliveryFees = reportOrders.reduce((sum, o) => sum + (o.deliveryFee || 0), 0);
-    // Pagamento aos entregadores = 100% da taxa de entrega
-    const deliveryDriverFees = reportOrders.reduce((sum, o) => sum + (o.deliveryFee || 0), 0);
     
     const byPaymentMethod: Record<string, { total: number; count: number; fee: number; net: number }> = {};
     reportOrders.forEach(o => {
@@ -220,16 +218,35 @@ export function CashRegister() {
       }
       byPaymentMethod[key].total += o.total || 0;
       byPaymentMethod[key].count += 1;
-      byPaymentMethod[key].fee += o.cardFee || 0;
-      byPaymentMethod[key].net += o.netAmount || o.total || 0;
+      
+      // Só somar taxa se for pagamento de maquininha (credit, debit, pix)
+      const isMachinePayment = key === 'credit' || key === 'debit' || key === 'pix';
+      if (isMachinePayment) {
+        byPaymentMethod[key].fee += o.cardFee || 0;
+      }
+      
+      // Para dinheiro e outros, o líquido é o total (sem descontar taxa, mesmo se houver cardFee incorreto no banco)
+      // Para maquininha, usa o netAmount calculado (total - taxas)
+      if (key === 'cash' || key === 'other') {
+        byPaymentMethod[key].net += o.total || 0;
+      } else {
+        byPaymentMethod[key].net += o.netAmount || o.total || 0;
+      }
     });
 
     // Pagamentos por entregador (taxa de entrega + diária)
     const byDriver: Record<string, number> = {};
     
-    // Primeiro, somar as taxas de entrega
+    // Primeiro, somar as taxas de entrega (apenas se o entregador recebe taxa)
     reportOrders.forEach(o => {
-      const key = o.deliveryDriverName || o.deliveryDriverId || 'Sem entregador';
+      const driverId = o.deliveryDriverId;
+      if (!driverId || !o.deliveryFee || o.deliveryFee <= 0) return;
+      
+      const driver = reportDrivers.find(d => String(d.id) === String(driverId));
+      // Só soma a taxa se o entregador recebe taxa de entrega
+      if (!driver || !driver.receivesDeliveryFee) return;
+      
+      const key = o.deliveryDriverName || driverId || 'Sem entregador';
       const fee = o.deliveryFee || 0;
       if (!byDriver[key]) byDriver[key] = 0;
       byDriver[key] += fee;
@@ -276,16 +293,34 @@ export function CashRegister() {
       }
     });
 
-    // Pagamentos por maquininha (somente métodos do tipo maquininha)
+    // Calcular o total de pagamentos aos entregadores (taxa + diária)
+    const deliveryDriverFees = Object.values(byDriver).reduce((sum, value) => sum + value, 0);
+
+    // Pagamentos por maquininha (somente métodos do tipo maquininha - credit, debit, pix)
     const byMachine: Record<string, { credit: number; debit: number; pix: number; total: number }> = {};
     reportOrders.forEach(o => {
+      // Só processar pedidos com pagamento de maquininha (credit, debit, pix) e com cardFee > 0
+      const isValidMachinePayment = o.paymentMethodKind === 'credit' || 
+                                     o.paymentMethodKind === 'debit' || 
+                                     o.paymentMethodKind === 'pix';
+      if (!isValidMachinePayment || !o.cardFee || o.cardFee <= 0) return;
+      
       const name = o.paymentMethodName || '—';
       if (!name) return;
       if (!byMachine[name]) byMachine[name] = { credit: 0, debit: 0, pix: 0, total: 0 };
-      if (o.paymentMethodKind === 'credit') byMachine[name].credit += o.cardFee || 0;
-      if (o.paymentMethodKind === 'debit') byMachine[name].debit += o.cardFee || 0;
-      if (o.paymentMethodKind === 'pix') byMachine[name].pix += o.cardFee || 0;
-      byMachine[name].total += o.cardFee || 0;
+      
+      if (o.paymentMethodKind === 'credit') {
+        byMachine[name].credit += o.cardFee;
+      } else if (o.paymentMethodKind === 'debit') {
+        byMachine[name].debit += o.cardFee;
+      } else if (o.paymentMethodKind === 'pix') {
+        byMachine[name].pix += o.cardFee;
+      }
+    });
+    
+    // Calcular o total como a soma de credit + debit + pix para cada máquina
+    Object.keys(byMachine).forEach(name => {
+      byMachine[name].total = byMachine[name].credit + byMachine[name].debit + byMachine[name].pix;
     });
 
     return {
