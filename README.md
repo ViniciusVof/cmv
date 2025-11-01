@@ -170,22 +170,31 @@ O JSON Server cria automaticamente os seguintes endpoints REST:
 - ✅ Baixa automática de estoque ao criar pedidos (recursiva para sub-receitas)
 
 ### Relatórios e Análises
-- ✅ Relatório de Movimentação de Estoque: histórico completo com filtros de data
+- ✅ Relatório de Movimentação de Estoque: histórico completo com filtros de data, valores formatados com 2 casas decimais
 - ✅ Relatório de Conciliação de Estoque: histórico de todas as conciliações realizadas
-- ✅ Relatório de Caixa: detalhado com todas as transações, saldo esperado vs real
+- ✅ Relatório de Caixa: detalhado com todas as transações, saldo esperado vs real, diferenças (furos)
+  - Vendas totais e líquidas
+  - Taxas detalhadas por tipo (crédito, débito, PIX)
+  - Vendas por forma de pagamento (sem taxas para dinheiro)
+  - Taxas por maquininha (detalhado por tipo)
+  - Pagamentos a entregadores (taxas + diárias, apenas entregadores que recebem taxa)
+  - Todas as transações com links para pedidos
+  - Visualização de detalhes de pedidos
 - ✅ CMV Global: módulo completo com:
-  - Filtros de período (últimos 7 dias, este mês, último mês, período customizado)
+  - Filtros de período (últimos 7 dias, este mês, último mês, período customizado, semana atual)
   - KPIs: Custo Consumido, Vendas, CMV %
   - Tabela detalhada por insumo: quantidade, custo unitário, custo total, participação, CMV %
   - Ordenação por qualquer coluna
   - Insights: Maior contribuição, Top 5 cobertura, Regra 80/20 (Pareto)
-  - Filtros interativos nos insights (Top 5, 80/20)
+  - Filtros interativos nos insights (Top 5, 80/20) - filtra a tabela automaticamente
   - Visualização gráfica dos dados
+- ✅ Dashboard: insights consolidados com métricas principais do negócio
 
 ### Configurações
 - ✅ Configurações de Negócio: markup padrão, taxa iFood, método de cálculo de CMV
 - ✅ Taxas de pagamento configuráveis (cartão de crédito, débito, PIX)
 - ✅ Taxa de entregador configurável
+- ✅ Configurações do DRE: toggle de exibição de custos individuais, escolha entre valores automáticos do PDV ou valores configurados
 
 ### Utilitários
 - ✅ Scripts de reset do banco de dados:
@@ -196,23 +205,35 @@ O JSON Server cria automaticamente os seguintes endpoints REST:
 
 ## 🧭 Roadmap
 
+### ✅ Recém Implementado
+- ✅ Módulo Financeiro completo (Contas a Pagar e Receber)
+- ✅ DRE (Demonstrativo de Resultado do Exercício) completo com análises AH/AV
+- ✅ Configurações do DRE (toggle de custos, valores automáticos vs configurados)
+- ✅ Separação de taxas de entrega (variáveis) e diárias (fixas) no DRE
+- ✅ Correções de cálculos: taxas apenas para pagamentos de maquininha, não para dinheiro
+- ✅ PDV melhorado: tabs de tipo de pedido, criação automática de clientes, campo de troco
+- ✅ Dashboard com insights consolidados
+
 ### Melhorias Futuras
 - [ ] Integrações externas (ex.: iFood API)
 - [ ] Permissões e perfis de usuário (além de Admin)
-- [ ] Dashboard executivo com gráficos e métricas consolidadas
+- [ ] Dashboard executivo com gráficos interativos
 - [ ] Exportação de relatórios (PDF, Excel)
 - [ ] Notificações e alertas em tempo real
 - [ ] Sistema de backup e restore
 - [ ] Modo offline/PWA
 - [ ] Multi-tenancy (suporte a múltiplos negócios)
+- [ ] Histórico de alterações e auditoria
+- [ ] Relatórios personalizados e agendados
 
 ### Otimizações Técnicas
-- [ ] Migração de JSON Server para banco de dados real (PostgreSQL/SQLite)
+- [ ] Migração de JSON Server para banco de dados real (PostgreSQL/SQLite/Supabase)
 - [ ] Cache e otimização de queries
 - [ ] Testes automatizados (unitários e E2E)
 - [ ] Documentação da API (Swagger/OpenAPI)
 - [ ] CI/CD pipeline
 - [ ] Logs e monitoramento de erros
+- [ ] Melhorias de performance (lazy loading, code splitting)
 
 ### Features Adicionais
 - [ ] Compras e pedidos de compra a fornecedores
