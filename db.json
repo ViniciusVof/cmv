@@ -806,6 +806,13 @@
       ],
       "updatedAt": "2025-10-30T16:32:11.169Z",
       "id": 4
+    },
+    {
+      "name": "teste",
+      "addresses": [],
+      "createdAt": "2025-11-01T04:18:44.977Z",
+      "updatedAt": "2025-11-01T04:18:44.977Z",
+      "id": 5
     }
   ],
   "deliveryAreas": [
@@ -1310,6 +1317,166 @@
       "quantity": 0.3,
       "date": "2025-10-31T18:02:38.797Z",
       "note": "Pedido #000004 - baixa automática"
+    },
+    {
+      "id": 52,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 1,
+      "date": "2025-11-01T04:00:49.224Z",
+      "note": "Pedido #000005 - baixa automática"
+    },
+    {
+      "id": 53,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.15,
+      "date": "2025-11-01T04:00:49.225Z",
+      "note": "Pedido #000005 - baixa automática"
+    },
+    {
+      "id": 54,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 2,
+      "date": "2025-11-01T04:00:49.226Z",
+      "note": "Pedido #000005 - baixa automática"
+    },
+    {
+      "id": 55,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.02,
+      "date": "2025-11-01T04:00:49.228Z",
+      "note": "Pedido #000005 - baixa automática"
+    },
+    {
+      "id": 56,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 1,
+      "date": "2025-11-01T04:06:22.764Z",
+      "note": "Pedido #000006 - baixa automática"
+    },
+    {
+      "id": 57,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.15,
+      "date": "2025-11-01T04:06:22.765Z",
+      "note": "Pedido #000006 - baixa automática"
+    },
+    {
+      "id": 58,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 2,
+      "date": "2025-11-01T04:06:22.766Z",
+      "note": "Pedido #000006 - baixa automática"
+    },
+    {
+      "id": 59,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.02,
+      "date": "2025-11-01T04:06:22.767Z",
+      "note": "Pedido #000006 - baixa automática"
+    },
+    {
+      "id": 60,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 1,
+      "date": "2025-11-01T04:08:50.625Z",
+      "note": "Pedido #000007 - baixa automática"
+    },
+    {
+      "id": 61,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.15,
+      "date": "2025-11-01T04:08:50.627Z",
+      "note": "Pedido #000007 - baixa automática"
+    },
+    {
+      "id": 62,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 2,
+      "date": "2025-11-01T04:08:50.628Z",
+      "note": "Pedido #000007 - baixa automática"
+    },
+    {
+      "id": 63,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.02,
+      "date": "2025-11-01T04:08:50.629Z",
+      "note": "Pedido #000007 - baixa automática"
+    },
+    {
+      "id": 64,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 1,
+      "date": "2025-11-01T04:18:45.148Z",
+      "note": "Pedido #000008 - baixa automática"
+    },
+    {
+      "id": 65,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.15,
+      "date": "2025-11-01T04:18:45.148Z",
+      "note": "Pedido #000008 - baixa automática"
+    },
+    {
+      "id": 66,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 2,
+      "date": "2025-11-01T04:18:45.149Z",
+      "note": "Pedido #000008 - baixa automática"
+    },
+    {
+      "id": 67,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.02,
+      "date": "2025-11-01T04:18:45.150Z",
+      "note": "Pedido #000008 - baixa automática"
+    },
+    {
+      "id": 68,
+      "ingredientId": "2",
+      "type": "OUT",
+      "quantity": 1,
+      "date": "2025-11-01T04:19:44.994Z",
+      "note": "Pedido #000009 - baixa automática"
+    },
+    {
+      "id": 69,
+      "ingredientId": "1",
+      "type": "OUT",
+      "quantity": 0.15,
+      "date": "2025-11-01T04:19:44.996Z",
+      "note": "Pedido #000009 - baixa automática"
+    },
+    {
+      "id": 70,
+      "ingredientId": "3",
+      "type": "OUT",
+      "quantity": 2,
+      "date": "2025-11-01T04:19:44.997Z",
+      "note": "Pedido #000009 - baixa automática"
+    },
+    {
+      "id": 71,
+      "ingredientId": "12",
+      "type": "OUT",
+      "quantity": 0.02,
+      "date": "2025-11-01T04:19:44.998Z",
+      "note": "Pedido #000009 - baixa automática"
     }
   ],
   "cashTransactions": [
@@ -1352,6 +1519,94 @@
       "type": "in",
       "amount": 15841.6,
       "description": "Pedido #000004 - PIX (Taxa: R$ 158.40)"
+    },
+    {
+      "id": 6,
+      "createdAt": "2025-11-01T04:00:49.222Z",
+      "cashRegisterId": 3,
+      "type": "in",
+      "amount": 28.3069,
+      "description": "Pedido #000005 - Débito (Taxa: R$ 0.69)"
+    },
+    {
+      "id": 7,
+      "createdAt": "2025-11-01T04:01:54.695Z",
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 28.3069,
+      "description": "Cancelamento Pedido #000005 - R$ 28.31"
+    },
+    {
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 28.3069,
+      "description": "Cancelamento Pedido #000005 - R$ 28,31",
+      "createdAt": "2025-11-01T04:01:54.723Z",
+      "id": 8
+    },
+    {
+      "id": 9,
+      "createdAt": "2025-11-01T04:06:22.763Z",
+      "cashRegisterId": 3,
+      "type": "in",
+      "amount": 29,
+      "description": "Pedido #000006 - Dinheiro"
+    },
+    {
+      "id": 10,
+      "createdAt": "2025-11-01T04:08:50.622Z",
+      "cashRegisterId": 3,
+      "type": "in",
+      "amount": 29,
+      "description": "Pedido #000007 - Dinheiro"
+    },
+    {
+      "id": 11,
+      "createdAt": "2025-11-01T04:16:07.126Z",
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 29,
+      "description": "Cancelamento Pedido #000006 - R$ 29.00"
+    },
+    {
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 29,
+      "description": "Cancelamento Pedido #000006 - R$ 29,00",
+      "createdAt": "2025-11-01T04:16:07.138Z",
+      "id": 12
+    },
+    {
+      "id": 13,
+      "createdAt": "2025-11-01T04:16:09.296Z",
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 29,
+      "description": "Cancelamento Pedido #000007 - R$ 29.00"
+    },
+    {
+      "cashRegisterId": 3,
+      "type": "out",
+      "amount": 29,
+      "description": "Cancelamento Pedido #000007 - R$ 29,00",
+      "createdAt": "2025-11-01T04:16:09.312Z",
+      "id": 14
+    },
+    {
+      "id": 15,
+      "createdAt": "2025-11-01T04:18:45.147Z",
+      "cashRegisterId": 3,
+      "type": "in",
+      "amount": 27.5529,
+      "description": "Pedido #000008 - Crédito (Taxa: R$ 1.45)"
+    },
+    {
+      "id": 16,
+      "createdAt": "2025-11-01T04:19:44.993Z",
+      "cashRegisterId": 3,
+      "type": "in",
+      "amount": 27.4032,
+      "description": "Pedido #000009 - Crédito (Taxa: R$ 1.60)"
     }
   ],
   "cashRegisters": [
@@ -1511,6 +1766,140 @@
       "customerId": 1,
       "deliveryAreaId": "1",
       "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000005",
+      "status": "cancelled",
+      "paymentMethodId": "2",
+      "paymentMethodKind": "debit",
+      "deliveryFee": 0,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        }
+      ],
+      "subtotal": 29,
+      "total": 29,
+      "cashRegisterId": 3,
+      "cardFee": 0.6931,
+      "deliveryFeeDriverAmount": 0,
+      "netAmount": 28.3069,
+      "createdAt": "2025-11-01T04:00:49.220Z",
+      "updatedAt": "2025-11-01T04:01:54.691Z",
+      "id": 5
+    },
+    {
+      "orderNumber": "000006",
+      "status": "cancelled",
+      "paymentMethodId": "5",
+      "paymentMethodKind": "cash",
+      "deliveryFee": 0,
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        }
+      ],
+      "subtotal": 29,
+      "total": 29,
+      "cashRegisterId": 3,
+      "cardFee": 0,
+      "deliveryFeeDriverAmount": 0,
+      "netAmount": 29,
+      "createdAt": "2025-11-01T04:06:22.759Z",
+      "updatedAt": "2025-11-01T04:16:07.123Z",
+      "id": 6,
+      "deliveryDriverId": "1"
+    },
+    {
+      "orderNumber": "000007",
+      "status": "cancelled",
+      "paymentMethodId": "5",
+      "paymentMethodKind": "cash",
+      "deliveryFee": 0,
+      "items": [
+        {
+          "productId": 1,
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        }
+      ],
+      "subtotal": 29,
+      "total": 29,
+      "cashRegisterId": 3,
+      "cardFee": 0,
+      "deliveryFeeDriverAmount": 0,
+      "netAmount": 29,
+      "createdAt": "2025-11-01T04:08:50.621Z",
+      "updatedAt": "2025-11-01T04:16:09.293Z",
+      "id": 7
+    },
+    {
+      "orderNumber": "000008",
+      "status": "completed",
+      "customerId": "5",
+      "paymentMethodId": "5",
+      "paymentMethodKind": "cash",
+      "deliveryFee": 0,
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        }
+      ],
+      "subtotal": 29,
+      "total": 29,
+      "cashRegisterId": 3,
+      "cardFee": 1.4471,
+      "deliveryFeeDriverAmount": 0,
+      "netAmount": 27.5529,
+      "createdAt": "2025-11-01T04:18:45.146Z",
+      "updatedAt": "2025-11-01T04:32:48.603Z",
+      "id": 8,
+      "changeFor": 100,
+      "changeAmount": 71
+    },
+    {
+      "orderNumber": "000009",
+      "status": "completed",
+      "customerId": "1",
+      "deliveryAreaId": "1",
+      "paymentMethodId": "5",
+      "paymentMethodKind": "cash",
+      "deliveryFee": 3,
+      "items": [
+        {
+          "productId": "1",
+          "productName": "Origin",
+          "quantity": 1,
+          "unitPrice": 29,
+          "totalPrice": 29
+        }
+      ],
+      "subtotal": 29,
+      "total": 32,
+      "cashRegisterId": 3,
+      "cardFee": 1.5968,
+      "deliveryFeeDriverAmount": 3,
+      "netAmount": 27.4032,
+      "createdAt": "2025-11-01T04:19:44.991Z",
+      "updatedAt": "2025-11-01T04:36:19.474Z",
+      "id": 9,
+      "deliveryDriverId": "1",
+      "changeFor": 0,
+      "changeAmount": 0
     }
   ],
   "categories": [

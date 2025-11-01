@@ -32,6 +32,8 @@ import {
   MdAttachMoney,
   MdNotes,
   MdVisibility,
+  MdStore,
+  MdShoppingBag,
 } from "react-icons/md";
 import type { PaymentMethod } from "../types/paymentMethod";
 import { paymentMethodService } from "../services/paymentMethodService";
@@ -50,7 +52,7 @@ const STATUS_CONFIG: Partial<
     icon: MdRestaurant,
   },
   waiting_delivery: {
-    label: "Aguardando Entrega",
+    label: "Aguardando Entrega/Retirada",
     color: "bg-yellow-100 border-yellow-300 text-yellow-800",
     icon: MdSchedule,
   },
@@ -88,9 +90,6 @@ export function Orders() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<
     string | undefined
   >(undefined);
-  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
-  const [newCustomerName, setNewCustomerName] = useState("");
-  const [newCustomerPhone, setNewCustomerPhone] = useState("");
   const [selectedCustomerAddresses, setSelectedCustomerAddresses] = useState<
     Customer["addresses"]
   >([]);
@@ -117,6 +116,9 @@ export function Orders() {
   >({});
   const [driverDropdownOpen, setDriverDropdownOpen] = useState<
     Record<string, boolean>
+  >({});
+  const [cashChangeByOrder, setCashChangeByOrder] = useState<
+    Record<string, string>
   >({});
   const [paymentQueryByOrder, setPaymentQueryByOrder] = useState<
     Record<string, string>
@@ -174,6 +176,11 @@ export function Orders() {
   const [editOrderId, setEditOrderId] = useState<string | null>(null);
   // legacy state (removed dedicated edit modal)
   const [viewOrder, setViewOrder] = useState<Order | null>(null);
+  // Order type: counter, pickup, or delivery
+  const [orderType, setOrderType] = useState<'counter' | 'pickup' | 'delivery'>('delivery');
+  // Customer name/phone for auto-create
+  const [customerNameInput, setCustomerNameInput] = useState<string>('');
+  const [customerPhoneInput, setCustomerPhoneInput] = useState<string>('');
 
   // Open fast order modal prefilled to edit an existing order
   const startEditOrder = async (order: Order) => {
@@ -220,12 +227,18 @@ export function Orders() {
         setSelectedAddressIndex(undefined);
       }
 
-      // Prefill area (bairro)
+      // Prefill area (bairro) and order type
       if (order.deliveryAreaId) {
         setSelectedAreaId(String(order.deliveryAreaId));
+        setOrderType('delivery');
       } else {
         setSelectedAreaId(undefined);
+        // Assume counter if no delivery area (could be pickup too, but counter is safer default)
+        setOrderType('counter');
       }
+      
+      setCustomerNameInput('');
+      setCustomerPhoneInput('');
 
       // Prefill items into cart
       const nextCart: Record<string, CartItem> = {};
@@ -245,6 +258,26 @@ export function Orders() {
       setSelectedPaymentMethodId(
         order.paymentMethodId ? String(order.paymentMethodId) : ""
       );
+      
+      // Prefill payment kind if exists
+      if (order.paymentMethodKind) {
+        // Find the payment method to get its kind options
+        const pm = paymentMethods.find(
+          (p) => String(p.id) === String(order.paymentMethodId)
+        );
+        // If it's cash or the kind matches, set it
+        if (order.paymentMethodKind === "cash") {
+          setSelectedPaymentKind("cash");
+        } else if (pm) {
+          // For other kinds, try to match
+          setSelectedPaymentKind(order.paymentMethodKind as any);
+        }
+      }
+      
+      // Prefill change amount if exists
+      if (typeof order.changeFor === "number" && order.changeFor > 0) {
+        setCashChangeAmount(String(order.changeFor));
+      }
 
       setShowNewOrder(true);
     } catch (e) {
@@ -367,6 +400,9 @@ export function Orders() {
       setNotes("");
       setSelectedPaymentMethodId("");
       setCashChangeAmount("");
+      setOrderType('delivery');
+      setCustomerNameInput('');
+      setCustomerPhoneInput('');
     } catch (error) {
       console.error("Error loading fast order data:", error);
       alert("Erro ao carregar dados para novo pedido");
@@ -472,11 +508,34 @@ export function Orders() {
     [cartItems]
   );
   const deliveryFee = useMemo(() => {
+    if (orderType !== 'delivery') return 0;
     if (!selectedAreaId) return 0;
     const area = areas.find((a) => String(a.id) === String(selectedAreaId));
     return area ? area.deliveryFee : 0;
-  }, [selectedAreaId, areas]);
+  }, [orderType, selectedAreaId, areas]);
   const total = useMemo(() => subtotal + deliveryFee, [subtotal, deliveryFee]);
+
+  // Auto-create customer if name is entered but not found
+  const handleCustomerInputChange = (value: string) => {
+    setCustomerQuery(value);
+    
+    // Clear selection when typing
+    setSelectedCustomerId(undefined);
+    setSelectedCustomerAddresses([]);
+    setSelectedAddressIndex(undefined);
+    setCustomerNameInput(value.trim());
+    
+    // Try to find customer in the list
+    const found = customers.find(
+      c => c.name.toLowerCase() === value.toLowerCase().trim() ||
+      (c.phone && c.phone.includes(value))
+    );
+    
+    if (found) {
+      // If found, select it
+      handleSelectCustomer(found);
+    }
+  };
 
   // handleCreateOrder is replaced by handleCreateOrderWithPayment
   const handleCreateOrderWithPayment = async (
@@ -489,10 +548,59 @@ export function Orders() {
       alert("Adicione ao menos um item");
       return;
     }
+    
+    // Auto-create customer if needed
+    let finalCustomerId = selectedCustomerId;
+    
+    if (!finalCustomerId && customerNameInput.trim()) {
+      // For delivery, phone is required
+      if (orderType === 'delivery') {
+        if (!customerPhoneInput.trim()) {
+          alert("Para pedidos de entrega, é necessário informar o telefone do cliente");
+          return;
+        }
+      }
+      
+      try {
+        // Auto-create customer
+        const created = await customerService.create({
+          name: customerNameInput.trim(),
+          phone: customerPhoneInput.trim() || undefined,
+          addresses: orderType === 'delivery' && selectedAreaId ? [{
+            deliveryAreaId: selectedAreaId,
+            address: undefined,
+          }] : [],
+        });
+        
+        // Refresh customers list
+        const updatedCustomers = await customerService.getAll();
+        setCustomers(updatedCustomers);
+        
+        // Select the created customer
+        finalCustomerId = created.id;
+        setSelectedCustomerId(created.id);
+        setCustomerQuery(`${created.name}${created.phone ? ' - ' + created.phone : ''}`);
+        
+        const addresses = created.addresses || [];
+        setSelectedCustomerAddresses(addresses);
+        if (addresses.length > 0 && orderType === 'delivery') {
+          setSelectedAddressIndex(0);
+          setSelectedAreaId(addresses[0].deliveryAreaId);
+        }
+      } catch (error) {
+        console.error("Error auto-creating customer:", error);
+        alert("Erro ao cadastrar cliente automaticamente");
+        return;
+      }
+    } else if (orderType === 'delivery' && !finalCustomerId) {
+      alert("Selecione ou informe um cliente para entrega");
+      return;
+    }
+    
     try {
       await orderService.create({
-        customerId: selectedCustomerId,
-        deliveryAreaId: selectedAreaId,
+        customerId: finalCustomerId,
+        deliveryAreaId: orderType === 'delivery' ? selectedAreaId : undefined,
         deliveryDriverId: undefined,
         paymentMethodId,
         paymentMethodKind: (selectedPaymentKind || "other") as any,
@@ -519,39 +627,21 @@ export function Orders() {
     setCustomerQuery(
       `${customer.name}${customer.phone ? " - " + customer.phone : ""}`
     );
+    setCustomerNameInput('');
+    setCustomerPhoneInput('');
     const addresses = customer.addresses || [];
     setSelectedCustomerAddresses(addresses);
-    if (addresses.length > 0) {
-      // Seleciona o primeiro por padrão e aplica área
+    if (addresses.length > 0 && orderType === 'delivery') {
+      // Seleciona o primeiro por padrão e aplica área (apenas para entrega)
       setSelectedAddressIndex(0);
       setSelectedAreaId(addresses[0].deliveryAreaId);
     } else {
       setSelectedAddressIndex(undefined);
-      setSelectedAreaId(undefined);
+      if (orderType === 'delivery') {
+        setSelectedAreaId(undefined);
+      }
     }
-    setIsCreatingCustomer(false);
     setIsAddingAddress(false);
-  };
-
-  const saveNewCustomer = async () => {
-    if (!newCustomerName.trim()) {
-      alert("Informe o nome");
-      return;
-    }
-    try {
-      const created = await customerService.create({
-        name: newCustomerName.trim(),
-        phone: newCustomerPhone.trim() || undefined,
-        addresses: [],
-      });
-      // atualiza lista e seleciona
-      const list = await customerService.getAll();
-      setCustomers(list);
-      handleSelectCustomer(created);
-    } catch (e) {
-      console.error(e);
-      alert("Erro ao cadastrar cliente");
-    }
   };
 
   const saveNewAddress = async () => {
@@ -953,15 +1043,232 @@ export function Orders() {
 
                         {/* Minimal info */}
                         <div className="space-y-1 mb-2">
+                          {/* Badge do tipo de pedido */}
+                          <div className="flex items-center gap-2 mb-1">
+                            {order.deliveryAreaId ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-800 border border-blue-300">
+                                <MdLocalShipping className="w-3 h-3" />
+                                Entrega
+                              </span>
+                            ) : (
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                                !order.customerId ? 'bg-gray-100 text-gray-800 border-gray-300' : 'bg-purple-100 text-purple-800 border-purple-300'
+                              }`}>
+                                {!order.customerId ? (
+                                  <>
+                                    <MdStore className="w-3 h-3" />
+                                    Balcão
+                                  </>
+                                ) : (
+                                  <>
+                                    <MdShoppingBag className="w-3 h-3" />
+                                    Retirada
+                                  </>
+                                )}
+                              </span>
+                            )}
+                          </div>
                           {order.customerName && (
                             <div className="text-sm text-gray-800">
                               <span className="font-medium">Cliente:</span>{" "}
                               {order.customerName}
                             </div>
                           )}
-                          {statusKey !== "completed" && (
+                          {statusKey !== "completed" && order.deliveryAreaId && (
                             <div className="text-xs text-gray-600">
                               {getOrderAddressLabel(order)}
+                            </div>
+                          )}
+                          {/* Forma de pagamento para retirada/balcão em waiting_delivery */}
+                          {statusKey === "waiting_delivery" && !order.deliveryAreaId && (
+                            <div className="text-xs text-gray-700 mb-2">
+                              <div className="mb-1">Forma de pagamento</div>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  value={
+                                    paymentQueryByOrder[String(order.id)] ??
+                                    (() => {
+                                      const pm = paymentMethods.find(
+                                        (p) =>
+                                          String(p.id) ===
+                                          String(order.paymentMethodId)
+                                      );
+                                      if (!pm) return "";
+                                      const kind = order.paymentMethodKind;
+                                      if (kind === "credit")
+                                        return `${pm.name} - Crédito`;
+                                      if (kind === "debit")
+                                        return `${pm.name} - Débito`;
+                                      if (kind === "pix")
+                                        return `${pm.name} - Pix`;
+                                      if (kind === "cash") return "Dinheiro";
+                                      return pm.name;
+                                    })()
+                                  }
+                                  onChange={(e) =>
+                                    setPaymentQueryByOrder((prev) => ({
+                                      ...prev,
+                                      [String(order.id)]: e.target.value,
+                                    }))
+                                  }
+                                  onFocus={() =>
+                                    setPaymentDropdownOpen((prev) => ({
+                                      ...prev,
+                                      [String(order.id)]: true,
+                                    }))
+                                  }
+                                  onBlur={() =>
+                                    setTimeout(
+                                      () =>
+                                        setPaymentDropdownOpen((prev) => ({
+                                          ...prev,
+                                          [String(order.id)]: false,
+                                        })),
+                                      150
+                                    )
+                                  }
+                                  placeholder="Selecione ou pesquise..."
+                                  className="w-full px-2 py-1 border rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                {paymentDropdownOpen[String(order.id)] && (
+                                  <div className="absolute z-20 mt-1 w-full bg-white border rounded shadow max-h-48 overflow-auto">
+                                    {buildPaymentOptions
+                                      .filter((opt) => {
+                                        const q = (
+                                          paymentQueryByOrder[
+                                            String(order.id)
+                                          ] || ""
+                                        ).toLowerCase();
+                                        return opt.label
+                                          .toLowerCase()
+                                          .includes(q);
+                                      })
+                                      .map((opt) => (
+                                        <button
+                                          key={`${opt.id}-${opt.kind}`}
+                                          type="button"
+                                          className="w-full text-left px-3 py-2 hover:bg-gray-50"
+                                          onMouseDown={async () => {
+                                            const updateData: any = {
+                                              paymentMethodId: String(opt.id),
+                                              paymentMethodKind: opt.kind as any,
+                                            };
+                                            
+                                            // Se for dinheiro e houver valor de troco preenchido, incluir
+                                            if (opt.kind === "cash") {
+                                              const changeValue = cashChangeByOrder[String(order.id)] || "";
+                                              if (changeValue.trim()) {
+                                                const changeFor = Number(changeValue);
+                                                updateData.changeFor = changeFor;
+                                                updateData.changeAmount = Math.max(
+                                                  0,
+                                                  changeFor - order.total
+                                                );
+                                              } else {
+                                                // Se não houver valor, limpar
+                                                updateData.changeFor = undefined;
+                                                updateData.changeAmount = undefined;
+                                              }
+                                            } else {
+                                              // Se não for dinheiro, limpar troco
+                                              updateData.changeFor = undefined;
+                                              updateData.changeAmount = undefined;
+                                            }
+                                            
+                                            await orderService.update(order.id, updateData);
+                                            setPaymentQueryByOrder((prev) => ({
+                                              ...prev,
+                                              [String(order.id)]: opt.label,
+                                            }));
+                                            setPaymentDropdownOpen((prev) => ({
+                                              ...prev,
+                                              [String(order.id)]: false,
+                                            }));
+                                            
+                                            // Se não for dinheiro, limpar o campo de troco
+                                            if (opt.kind !== "cash") {
+                                              setCashChangeByOrder((prev) => {
+                                                const next = { ...prev };
+                                                delete next[String(order.id)];
+                                                return next;
+                                              });
+                                            }
+                                            
+                                            await loadData();
+                                          }}
+                                        >
+                                          {opt.label}
+                                        </button>
+                                      ))}
+                                    {buildPaymentOptions.filter((opt) => {
+                                      const q = (
+                                        paymentQueryByOrder[String(order.id)] ||
+                                        ""
+                                      ).toLowerCase();
+                                      return opt.label
+                                        .toLowerCase()
+                                        .includes(q);
+                                    }).length === 0 && (
+                                      <div className="px-3 py-2 text-xs text-gray-500">
+                                        Nenhuma forma cadastrada
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              {/* Campo de troco para dinheiro */}
+                              {(() => {
+                                const pm = paymentMethods.find(
+                                  (p) => String(p.id) === String(order.paymentMethodId)
+                                );
+                                const paymentQuery = paymentQueryByOrder[String(order.id)] || "";
+                                const isCash = order.paymentMethodKind === "cash" || paymentQuery.toLowerCase().includes("dinheiro");
+                                const requiresChange = pm?.requiresChange || isCash;
+                                
+                                if (!requiresChange) return null;
+                                
+                                return (
+                                  <div className="mt-2">
+                                    <div className="mb-1 text-xs text-gray-600">
+                                      Troco para quanto? (opcional)
+                                    </div>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      value={cashChangeByOrder[String(order.id)] ?? (order.changeFor ? String(order.changeFor) : "")}
+                                      onChange={(e) => {
+                                        setCashChangeByOrder((prev) => ({
+                                          ...prev,
+                                          [String(order.id)]: e.target.value,
+                                        }));
+                                      }}
+                                      onBlur={async () => {
+                                        const changeValue = cashChangeByOrder[String(order.id)] || "";
+                                        if (changeValue.trim() || order.changeFor) {
+                                          const updateData: any = {};
+                                          if (changeValue.trim()) {
+                                            const changeFor = Number(changeValue);
+                                            updateData.changeFor = changeFor;
+                                            updateData.changeAmount = Math.max(
+                                              0,
+                                              changeFor - order.total
+                                            );
+                                          } else {
+                                            updateData.changeFor = undefined;
+                                            updateData.changeAmount = undefined;
+                                          }
+                                          await orderService.update(order.id, updateData);
+                                          await loadData();
+                                        }
+                                      }}
+                                      placeholder="Ex.: 100,00"
+                                      className="w-full px-2 py-1 border rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                  </div>
+                                );
+                              })()}
                             </div>
                           )}
                           {statusKey === "in_delivery" && (
@@ -1168,26 +1475,72 @@ export function Orders() {
                                   )}
                                 </div>
                               </div>
+                              {/* Campo de troco para dinheiro */}
+                              {(() => {
+                                const pm = paymentMethods.find(
+                                  (p) => String(p.id) === String(order.paymentMethodId)
+                                );
+                                const paymentQuery = paymentQueryByOrder[String(order.id)] || "";
+                                const isCash = order.paymentMethodKind === "cash" || paymentQuery.toLowerCase().includes("dinheiro");
+                                const requiresChange = pm?.requiresChange || isCash;
+                                
+                                if (!requiresChange) return null;
+                                
+                                return (
+                                  <div className="mt-2">
+                                    <div className="mb-1 text-xs text-gray-600">
+                                      Troco para quanto? (opcional)
+                                    </div>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      value={cashChangeByOrder[String(order.id)] ?? (order.changeFor ? String(order.changeFor) : "")}
+                                      onChange={(e) => {
+                                        setCashChangeByOrder((prev) => ({
+                                          ...prev,
+                                          [String(order.id)]: e.target.value,
+                                        }));
+                                      }}
+                                      onBlur={async () => {
+                                        const changeValue = cashChangeByOrder[String(order.id)] || "";
+                                        if (changeValue.trim() || order.changeFor) {
+                                          const updateData: any = {};
+                                          if (changeValue.trim()) {
+                                            const changeFor = Number(changeValue);
+                                            updateData.changeFor = changeFor;
+                                            updateData.changeAmount = Math.max(
+                                              0,
+                                              changeFor - order.total
+                                            );
+                                          } else {
+                                            updateData.changeFor = undefined;
+                                            updateData.changeAmount = undefined;
+                                          }
+                                          await orderService.update(order.id, updateData);
+                                          await loadData();
+                                        }
+                                      }}
+                                      placeholder="Ex.: 100,00"
+                                      className="w-full px-2 py-1 border rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                  </div>
+                                );
+                              })()}
                             </div>
                           )}
-                          {statusKey !== "kitchen" &&
-                            statusKey !== "completed" && (
+                          {statusKey !== "kitchen" && statusKey !== "completed" && (
                               <div className="text-xs text-gray-600 flex items-center gap-2 flex-wrap">
                                 {(() => {
                                   // Mostrar "Receber R$ X"; não exibir forma de pagamento nem "Enviar ..."
-                                  const pm = paymentMethods.find(
-                                    (pm) =>
-                                      String(pm.id) ===
-                                      String(order.paymentMethodId)
-                                  );
                                   const changeFor =
-                                    typeof order.changeFor === "number"
+                                    typeof order.changeFor === "number" && order.changeFor > 0
                                       ? order.changeFor
-                                      : 0;
-                                  const toReceive =
-                                    pm?.requiresChange && changeFor > 0
-                                      ? changeFor
-                                      : order.total;
+                                      : undefined;
+                                  const isCash = order.paymentMethodKind === "cash";
+                                  // Para dinheiro, sempre usar o valor do troco preenchido (changeFor) se existir
+                                  // Se não houver changeFor preenchido, usar o total do pedido
+                                  const toReceive = isCash && changeFor ? changeFor : order.total;
                                   return (
                                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-800 border border-green-300">
                                       Receber {formatCurrency(toReceive)}
@@ -1203,12 +1556,19 @@ export function Orders() {
                           {statusKey !== "kitchen" && (
                             <button
                               onClick={() => {
-                                const prevStatus: OrderStatus[] = [
-                                  "kitchen",
-                                  "waiting_delivery",
-                                  "in_delivery",
-                                  "completed",
-                                ];
+                                const isDelivery = !!order.deliveryAreaId;
+                                const prevStatus: OrderStatus[] = isDelivery
+                                  ? [
+                                      "kitchen",
+                                      "waiting_delivery",
+                                      "in_delivery",
+                                      "completed",
+                                    ]
+                                  : [
+                                      "kitchen",
+                                      "waiting_delivery",
+                                      "completed",
+                                    ];
                                 const currentIndex =
                                   prevStatus.indexOf(statusKey);
                                 if (currentIndex > 0) {
@@ -1227,19 +1587,27 @@ export function Orders() {
                           {statusKey !== "completed" && (
                             <button
                               onClick={() => {
-                                const nextStatus: OrderStatus[] = [
-                                  "kitchen",
-                                  "waiting_delivery",
-                                  "in_delivery",
-                                  "completed",
-                                ];
+                                const isDelivery = !!order.deliveryAreaId;
+                                const nextStatus: OrderStatus[] = isDelivery
+                                  ? [
+                                      "kitchen",
+                                      "waiting_delivery",
+                                      "in_delivery",
+                                      "completed",
+                                    ]
+                                  : [
+                                      "kitchen",
+                                      "waiting_delivery",
+                                      "completed",
+                                    ];
                                 const currentIndex =
                                   nextStatus.indexOf(statusKey);
                                 if (currentIndex < nextStatus.length - 1) {
                                   const target = nextStatus[currentIndex + 1];
-                                  // Block going to completed without delivery driver
+                                  // Block going to completed without delivery driver (only for delivery orders)
                                   if (
                                     target === "completed" &&
+                                    isDelivery &&
                                     !order.deliveryDriverId
                                   ) {
                                     alert(
@@ -1287,6 +1655,66 @@ export function Orders() {
                 </button>
               </div>
 
+              {/* Tabs para tipo de pedido */}
+              <div className="border-b bg-gray-50 px-4">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderType('counter');
+                      setSelectedAreaId(undefined);
+                      setSelectedAddressIndex(undefined);
+                      setSelectedCustomerAddresses([]);
+                      setCustomerNameInput('');
+                      setCustomerPhoneInput('');
+                    }}
+                    className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors flex items-center gap-1 ${
+                      orderType === 'counter'
+                        ? 'bg-white border-t border-l border-r border-gray-300 text-blue-600'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <MdStore className="w-4 h-4" />
+                    Balcão
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderType('pickup');
+                      setSelectedAreaId(undefined);
+                      setSelectedAddressIndex(undefined);
+                      setSelectedCustomerAddresses([]);
+                      setCustomerNameInput('');
+                      setCustomerPhoneInput('');
+                    }}
+                    className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors flex items-center gap-1 ${
+                      orderType === 'pickup'
+                        ? 'bg-white border-t border-l border-r border-gray-300 text-blue-600'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <MdShoppingBag className="w-4 h-4" />
+                    Retirada
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderType('delivery');
+                      setCustomerNameInput('');
+                      setCustomerPhoneInput('');
+                    }}
+                    className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors flex items-center gap-1 ${
+                      orderType === 'delivery'
+                        ? 'bg-white border-t border-l border-r border-gray-300 text-blue-600'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <MdLocalShipping className="w-4 h-4" />
+                    Entrega
+                  </button>
+                </div>
+              </div>
+
               <div className="flex-1 overflow-hidden p-4 relative">
                 {showCartDetails && (
                   <div className="absolute inset-0 bg-black/60 z-40"></div>
@@ -1304,16 +1732,28 @@ export function Orders() {
                           type="text"
                           value={customerQuery}
                           onChange={(e) => {
-                            setCustomerQuery(e.target.value);
-                            setSelectedCustomerId(undefined);
-                            setSelectedCustomerAddresses([]);
-                            setSelectedAddressIndex(undefined);
+                            const value = e.target.value;
+                            handleCustomerInputChange(value);
                           }}
-                          placeholder="Buscar por nome ou telefone"
+                          placeholder={orderType === 'delivery' ? "Nome do cliente *" : "Nome do cliente"}
                           className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                         />
                         <MdSearch className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
                       </div>
+                      {/* Campo de telefone para entrega quando não há cliente selecionado */}
+                      {orderType === 'delivery' && !selectedCustomerId && customerNameInput.trim() && (
+                        <div className="mt-2">
+                          <input
+                            type="text"
+                            value={customerPhoneInput}
+                            onChange={(e) => setCustomerPhoneInput(e.target.value)}
+                            placeholder="Telefone * (obrigatório para entrega)"
+                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+                              !customerPhoneInput.trim() ? 'border-red-300' : 'border-gray-300'
+                            }`}
+                          />
+                        </div>
+                      )}
                       {/* Sugestões somente quando digitando */}
                       {customerQuery.trim() && filteredCustomers.length > 0 && (
                         <div className="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow max-h-56 overflow-auto">
@@ -1341,67 +1781,18 @@ export function Orders() {
                         </div>
                       )}
 
-                      {/* Cadastrar cliente inline quando não encontrado */}
+                      {/* Mensagem informativa para auto-cadastro */}
                       {customerQuery.trim() &&
                         filteredCustomers.length === 0 &&
                         !selectedCustomerId && (
-                          <div className="mt-3 border rounded-lg p-3 bg-gray-50">
-                            {!isCreatingCustomer ? (
-                              <div className="text-sm text-gray-700">
-                                Nenhum cliente encontrado.{" "}
-                                <button
-                                  className="text-blue-600 font-medium"
-                                  onClick={() => {
-                                    setIsCreatingCustomer(true);
-                                    setNewCustomerName(customerQuery);
-                                  }}
-                                >
-                                  Cadastrar agora
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col gap-2">
-                                <div className="grid grid-cols-1 gap-2">
-                                  <input
-                                    type="text"
-                                    value={newCustomerName}
-                                    onChange={(e) =>
-                                      setNewCustomerName(e.target.value)
-                                    }
-                                    placeholder="Nome do cliente"
-                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={newCustomerPhone}
-                                    onChange={(e) =>
-                                      setNewCustomerPhone(e.target.value)
-                                    }
-                                    placeholder="Telefone (opcional)"
-                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                  />
-                                </div>
-                                <div className="flex gap-2 justify-end">
-                                  <button
-                                    className="px-3 py-2 bg-gray-200 rounded-lg text-gray-700"
-                                    onClick={() => setIsCreatingCustomer(false)}
-                                  >
-                                    Cancelar
-                                  </button>
-                                  <button
-                                    className="px-3 py-2 bg-blue-600 rounded-lg text-white"
-                                    onClick={saveNewCustomer}
-                                  >
-                                    Salvar cliente
-                                  </button>
-                                </div>
-                              </div>
-                            )}
+                          <div className="mt-2 text-xs text-gray-500">
+                            Cliente será cadastrado automaticamente ao criar o pedido
+                            {orderType === 'delivery' && ' (telefone obrigatório)'}
                           </div>
                         )}
 
-                      {/* Endereços do cliente selecionado */}
-                      {selectedCustomerId && (
+                      {/* Endereços do cliente selecionado - apenas para entrega */}
+                      {selectedCustomerId && orderType === 'delivery' && (
                         <div className="mt-3">
                           <div className="text-xs text-gray-500 mb-2">
                             Endereço de entrega
@@ -1562,22 +1953,22 @@ export function Orders() {
 
                       {/* Grade de produtos */}
                       <div className="h-[calc(100vh-300px)] overflow-auto">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 p-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 p-1 items-stretch">
                           {visibleProducts.map((p) => (
                             <div
                               key={p.id}
-                              className="border rounded-lg p-3 bg-white hover:shadow transition"
+                              className="border rounded-lg p-3 bg-white hover:shadow transition flex flex-col h-full"
                             >
-                              <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-start justify-between gap-2 flex-1 min-h-0">
                                 <button
                                   onClick={() => addToCart(p)}
-                                  className="text-left flex-1"
+                                  className="text-left flex-1 min-w-0"
                                   title="Adicionar ao pedido"
                                 >
-                                  <div className="text-sm font-medium text-gray-800 truncate">
+                                  <div className="text-sm font-medium text-gray-800 break-words whitespace-normal">
                                     {p.code} - {p.name}
                                   </div>
-                                  <div className="text-xs text-gray-500">
+                                  <div className="text-xs text-gray-500 mt-1">
                                     {formatCurrency(p.sellingPrice)}
                                   </div>
                                 </button>
@@ -1586,7 +1977,7 @@ export function Orders() {
                                     setNoteModalProduct(p);
                                     setNoteText("");
                                   }}
-                                  className="text-gray-500 hover:text-gray-700 p-1"
+                                  className="text-gray-500 hover:text-gray-700 p-1 flex-shrink-0 self-start"
                                   title="Adicionar com observação"
                                 >
                                   <MdNotes className="w-4 h-4" />
@@ -1658,16 +2049,18 @@ export function Orders() {
                       ))}
                     </div>
                   )}
-                  <div className="border-t mt-3 pt-3 flex flex-col gap-1">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Subtotal</span>
-                      <span>{formatCurrency(subtotal)}</span>
+                    <div className="border-t mt-3 pt-3 flex flex-col gap-1">
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Subtotal</span>
+                        <span>{formatCurrency(subtotal)}</span>
+                      </div>
+                      {orderType === 'delivery' && deliveryFee > 0 && (
+                        <div className="flex justify-between text-sm text-gray-600">
+                          <span>Entrega</span>
+                          <span>{formatCurrency(deliveryFee)}</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Entrega</span>
-                      <span>{formatCurrency(deliveryFee)}</span>
-                    </div>
-                  </div>
                   <div className="mt-3 flex gap-2 justify-end">
                     <button
                       onClick={() => setShowCartDetails((v) => !v)}
@@ -1676,7 +2069,16 @@ export function Orders() {
                       Cancelar
                     </button>
                     <button
-                      onClick={() => setShowPaymentModal(true)}
+                      onClick={() => {
+                        setShowCartDetails(false);
+                        // Limpar estados do modal de pagamento antes de abrir
+                        setSelectedPaymentMethodId("");
+                        setSelectedPaymentKind("");
+                        setCashChangeAmount("");
+                        setPaymentSearch("");
+                        setPaymentOptionsOpen(false);
+                        setShowPaymentModal(true);
+                      }}
                       className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                     >
                       Enviar Pedido
@@ -1697,21 +2099,28 @@ export function Orders() {
                   <div className="text-sm text-gray-900 truncate">
                     Cliente:{" "}
                     <span className="font-medium">
-                      {selectedCustomerName || "—"}
+                      {selectedCustomerName || customerNameInput.trim() || "—"}
                     </span>
-                    {selectedCustomerPhone ? ` (${selectedCustomerPhone})` : ""}
+                    {selectedCustomerPhone ? ` (${selectedCustomerPhone})` : (customerPhoneInput.trim() ? ` (${customerPhoneInput.trim()})` : "")}
                   </div>
-                  <div className="text-xs text-gray-600">
-                    <span className="truncate inline-block max-w-full align-bottom">
-                      Endereço: {selectedAddress?.address || "—"}
-                      {selectedArea ? ` - ${selectedArea.name}` : ""}
-                    </span>
-                    {selectedArea && (
-                      <span className="ml-2 whitespace-nowrap">
-                        (Taxa {formatCurrency(selectedArea.deliveryFee)})
+                  {orderType === 'delivery' && (
+                    <div className="text-xs text-gray-600">
+                      <span className="truncate inline-block max-w-full align-bottom">
+                        Endereço: {selectedAddress?.address || "—"}
+                        {selectedArea ? ` - ${selectedArea.name}` : ""}
                       </span>
-                    )}
-                  </div>
+                      {selectedArea && (
+                        <span className="ml-2 whitespace-nowrap">
+                          (Taxa {formatCurrency(selectedArea.deliveryFee)})
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {orderType !== 'delivery' && (
+                    <div className="text-xs text-gray-500">
+                      {orderType === 'counter' ? 'Balcão' : 'Retirada'}
+                    </div>
+                  )}
                 </div>
                 <div className="text-base font-bold text-gray-900 whitespace-nowrap">
                   {formatCurrency(total)}
@@ -1723,7 +2132,10 @@ export function Orders() {
                 <div className="absolute inset-0 z-50 flex items-center justify-center">
                   <div
                     className="absolute inset-0 bg-black/40"
-                    onClick={() => setNoteModalProduct(null)}
+                    onClick={() => {
+                      setNoteModalProduct(null);
+                      setNoteText("");
+                    }}
                   />
                   <div className="relative bg-white w-full max-w-md mx-4 rounded-lg shadow-xl border">
                     <div className="flex items-center justify-between p-4 border-b">
@@ -1732,7 +2144,10 @@ export function Orders() {
                       </div>
                       <button
                         className="text-gray-500 hover:text-gray-700"
-                        onClick={() => setNoteModalProduct(null)}
+                        onClick={() => {
+                          setNoteModalProduct(null);
+                          setNoteText("");
+                        }}
                       >
                         <MdClose className="w-5 h-5" />
                       </button>
@@ -1752,7 +2167,10 @@ export function Orders() {
                     <div className="flex items-center justify-end gap-2 p-4 border-t bg-gray-50">
                       <button
                         className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                        onClick={() => setNoteModalProduct(null)}
+                        onClick={() => {
+                          setNoteModalProduct(null);
+                          setNoteText("");
+                        }}
                       >
                         Cancelar
                       </button>
@@ -1778,7 +2196,15 @@ export function Orders() {
                 <div className="absolute inset-0 z-50 flex items-center justify-center">
                   <div
                     className="absolute inset-0 bg-black/40"
-                    onClick={() => setShowPaymentModal(false)}
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      // Limpar estados ao fechar
+                      setSelectedPaymentMethodId("");
+                      setSelectedPaymentKind("");
+                      setCashChangeAmount("");
+                      setPaymentSearch("");
+                      setPaymentOptionsOpen(false);
+                    }}
                   />
                   <div className="relative bg-white w-full max-w-md mx-4 rounded-lg shadow-xl border">
                     <div className="flex items-center justify-between p-4 border-b">
@@ -1787,7 +2213,15 @@ export function Orders() {
                       </div>
                       <button
                         className="text-gray-500 hover:text-gray-700"
-                        onClick={() => setShowPaymentModal(false)}
+                        onClick={() => {
+                          setShowPaymentModal(false);
+                          // Limpar estados ao fechar
+                          setSelectedPaymentMethodId("");
+                          setSelectedPaymentKind("");
+                          setCashChangeAmount("");
+                          setPaymentSearch("");
+                          setPaymentOptionsOpen(false);
+                        }}
                       >
                         <MdClose className="w-5 h-5" />
                       </button>
@@ -1898,7 +2332,15 @@ export function Orders() {
                     <div className="flex items-center justify-end gap-2 p-4 border-t bg-gray-50">
                       <button
                         className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                        onClick={() => setShowPaymentModal(false)}
+                        onClick={() => {
+                          setShowPaymentModal(false);
+                          // Limpar estados ao fechar
+                          setSelectedPaymentMethodId("");
+                          setSelectedPaymentKind("");
+                          setCashChangeAmount("");
+                          setPaymentSearch("");
+                          setPaymentOptionsOpen(false);
+                        }}
                       >
                         Voltar
                       </button>
@@ -1906,27 +2348,31 @@ export function Orders() {
                         className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
                         disabled={!selectedPaymentMethodId}
                         onClick={async () => {
+                          // Salvar valores antes de limpar
+                          const paymentMethodId = selectedPaymentMethodId;
+                          const paymentKind = selectedPaymentKind;
+                          const changeAmount = cashChangeAmount;
+                          
+                          // Limpar estados do modal antes de fechar
                           setShowPaymentModal(false);
+                          setSelectedPaymentMethodId("");
+                          setSelectedPaymentKind("");
+                          setCashChangeAmount("");
+                          setPaymentSearch("");
+                          setPaymentOptionsOpen(false);
+                          
                           if (editOrderId) {
                             // Atualiza pedido existente
-                            await orderService.update(editOrderId, {
+                            const pm = paymentMethods.find(
+                              (p) => p.id === paymentMethodId
+                            );
+                            const requires = pm?.requiresChange || paymentKind === "cash";
+                            const updateData: any = {
                               customerId: selectedCustomerId,
                               deliveryAreaId: selectedAreaId,
-                              paymentMethodId: selectedPaymentMethodId,
-                              paymentMethodKind: (selectedPaymentKind ||
+                              paymentMethodId: paymentMethodId,
+                              paymentMethodKind: (paymentKind ||
                                 "other") as any,
-                              ...(paymentMethods.find(
-                                (p) => p.id === selectedPaymentMethodId
-                              )?.requiresChange && cashChangeAmount.trim()
-                                ? {
-                                    changeFor: Number(cashChangeAmount),
-                                    changeAmount: Math.max(
-                                      0,
-                                      (parseFloat(cashChangeAmount || "0") ||
-                                        0) - total
-                                    ),
-                                  }
-                                : {}),
                               items: cartItems.map((ci) => ({
                                 productId: ci.productId,
                                 productName: ci.productName,
@@ -1934,28 +2380,44 @@ export function Orders() {
                                 unitPrice: ci.unitPrice,
                               })) as any,
                               notes: notes || undefined,
-                            });
+                            };
+                            
+                            // Se requer troco e há valor preenchido, atualizar
+                            if (requires && changeAmount.trim()) {
+                              updateData.changeFor = Number(changeAmount);
+                              updateData.changeAmount = Math.max(
+                                0,
+                                (parseFloat(changeAmount || "0") || 0) - total
+                              );
+                            } else if (requires) {
+                              // Se requer troco mas não há valor, limpar
+                              updateData.changeFor = undefined;
+                              updateData.changeAmount = undefined;
+                            }
+                            
+                            await orderService.update(editOrderId, updateData);
                             setShowNewOrder(false);
                             setEditOrderId(null);
                             await loadData();
                           } else {
                             // Create new order with change info when applicable
-                            const requires = paymentMethods.find(
-                              (p) => p.id === selectedPaymentMethodId
-                            )?.requiresChange;
+                            const pm = paymentMethods.find(
+                              (p) => p.id === paymentMethodId
+                            );
+                            const requires = pm?.requiresChange || paymentKind === "cash";
                             const changeFor =
-                              requires && cashChangeAmount.trim()
-                                ? Number(cashChangeAmount)
+                              requires && changeAmount.trim()
+                                ? Number(changeAmount)
                                 : undefined;
-                            const changeAmount =
+                            const calculatedChangeAmount =
                               requires && changeFor
                                 ? Math.max(0, changeFor - total)
                                 : undefined;
                             await handleCreateOrderWithPayment(
-                              selectedPaymentMethodId,
+                              paymentMethodId,
                               notes || "",
                               changeFor,
-                              changeAmount
+                              calculatedChangeAmount
                             );
                           }
                         }}
