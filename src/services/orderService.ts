@@ -48,10 +48,17 @@ export const orderService = {
 
   create: async (data: OrderFormData): Promise<Order> => {
     // Calculate totals
-    const itemsWithTotals = data.items.map(item => ({
-      ...item,
-      totalPrice: item.quantity * item.unitPrice,
-    }));
+    const itemsWithTotals = data.items.map(item => {
+      const itemWithTotal = {
+        ...item,
+        totalPrice: item.quantity * item.unitPrice,
+      };
+      // Ensure notes are preserved
+      if (item.notes !== undefined) {
+        itemWithTotal.notes = item.notes;
+      }
+      return itemWithTotal;
+    });
 
     const subtotal = itemsWithTotals.reduce((sum, item) => sum + item.totalPrice, 0);
     
@@ -157,10 +164,17 @@ export const orderService = {
 
     let items = current.items;
     if (data.items) {
-      items = data.items.map(item => ({
-        ...item,
-        totalPrice: item.quantity * item.unitPrice,
-      }));
+      items = data.items.map(item => {
+        const itemWithTotal = {
+          ...item,
+          totalPrice: item.quantity * item.unitPrice,
+        };
+        // Ensure notes are preserved
+        if (item.notes !== undefined) {
+          itemWithTotal.notes = item.notes;
+        }
+        return itemWithTotal;
+      });
     }
     const subtotal = items.reduce((s, i) => s + i.totalPrice, 0);
     let deliveryFee = current.deliveryFee || 0;

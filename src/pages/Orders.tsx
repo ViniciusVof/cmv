@@ -717,7 +717,7 @@ export function Orders() {
     }
     
     try {
-      await orderService.create({
+      const orderData = {
         customerId: finalCustomerId,
         deliveryAreaId: orderType === 'delivery' ? selectedAreaId : undefined,
         deliveryDriverId: undefined,
@@ -725,15 +725,22 @@ export function Orders() {
         paymentMethodKind: (selectedPaymentKind || "other") as any,
         changeFor,
         changeAmount,
-        items: cartItems.map((ci) => ({
-          productId: ci.productId,
-          productName: ci.productName,
-          quantity: ci.quantity,
-          unitPrice: ci.unitPrice,
-          notes: ci.notes,
-        })),
+        items: cartItems.map((ci) => {
+          const item: any = {
+            productId: ci.productId,
+            productName: ci.productName,
+            quantity: ci.quantity,
+            unitPrice: ci.unitPrice,
+          };
+          // Include notes if present (even if empty string)
+          if (ci.notes !== undefined && ci.notes !== null) {
+            item.notes = String(ci.notes);
+          }
+          return item;
+        }),
         notes: finalNotes || undefined,
-      });
+      };
+      await orderService.create(orderData);
       setShowNewOrder(false);
       await loadData();
     } catch (error) {
@@ -1174,6 +1181,7 @@ export function Orders() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => {
+                                console.log('[View Order] Order items with notes:', order.items?.map(it => ({ name: it.productName, notes: it.notes })));
                                 setViewOrder(order);
                                 setSelectedItemsForReplication(new Set());
                               }}
@@ -2732,9 +2740,13 @@ export function Orders() {
                             {it.quantity}x {it.productName} —{" "}
                             {formatCurrency(it.unitPrice * it.quantity)}
                           </div>
-                          {it.notes && (
+                          {it.notes ? (
                             <div className="text-xs text-gray-500 mt-1 italic">
                               Obs: {it.notes}
+                            </div>
+                          ) : (
+                            <div className="text-xs text-gray-400 mt-1" style={{ display: 'none' }}>
+                              DEBUG: Item sem nota - {JSON.stringify({ name: it.productName, hasNotes: 'notes' in it, notesValue: it.notes })}
                             </div>
                           )}
                         </div>

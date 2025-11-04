@@ -109,6 +109,12 @@ server.post('/cashRegisters/:id/close', (req, res) => {
   res.json(updated);
 });
 
+// GET /orders - ensure notes are included in response
+server.get('/orders', (req, res, next) => {
+  // Let JSON Server handle the GET, it should return everything including notes
+  next();
+});
+
 // Override POST /orders to add business logic
 server.post('/orders', (req, res) => {
   const body = req.body || {};
@@ -119,14 +125,24 @@ server.post('/orders', (req, res) => {
   const open = getOpenCashRegister();
 
   // Calculate totals
-  const items = (body.items || []).map((it) => ({
-    productId: it.productId,
-    productName: it.productName,
-    quantity: Number(it.quantity) || 0,
-    unitPrice: Number(it.unitPrice) || 0,
-    totalPrice: (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0),
-    notes: it.notes || undefined,
-  }));
+  const items = (body.items || []).map((it) => {
+    const mapped = {
+      productId: it.productId,
+      productName: it.productName,
+      quantity: Number(it.quantity) || 0,
+      unitPrice: Number(it.unitPrice) || 0,
+      totalPrice: (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0),
+    };
+    // Preserve notes if present (even empty strings)
+    if (it.notes !== undefined && it.notes !== null) {
+      mapped.notes = String(it.notes);
+    }
+    // Debug log to verify notes are being received
+    if (it.notes !== undefined) {
+      console.log(`[POST /orders] Item ${it.productName}: received notes = ${JSON.stringify(it.notes)}, saved = ${JSON.stringify(mapped.notes)}`);
+    }
+    return mapped;
+  });
   const subtotal = items.reduce((s, i) => s + i.totalPrice, 0);
   const deliveryFee = Number(body.deliveryFee || 0);
   const total = subtotal + deliveryFee;
@@ -225,6 +241,28 @@ server.patch('/orders/:id', (req, res, next) => {
         req.body.customerName = customer.name;
       }
     }
+  }
+  
+  // Preserve items notes when updating order
+  if (current && req.body.items && Array.isArray(req.body.items)) {
+    req.body.items = req.body.items.map((item, idx) => {
+      // Try to preserve notes from current order if not provided
+      const currentItem = current.items?.[idx];
+      const mapped = {
+        productId: item.productId,
+        productName: item.productName,
+        quantity: Number(item.quantity) || 0,
+        unitPrice: Number(item.unitPrice) || 0,
+        totalPrice: (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
+      };
+      // Preserve notes if present in new item, otherwise try to keep from current
+      if (item.notes !== undefined && item.notes !== null) {
+        mapped.notes = String(item.notes);
+      } else if (currentItem?.notes !== undefined && currentItem?.notes !== null) {
+        mapped.notes = String(currentItem.notes);
+      }
+      return mapped;
+    });
   }
   
   // Create OUT cash transaction if cancelled
