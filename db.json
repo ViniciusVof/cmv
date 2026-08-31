@@ -759,58 +759,6 @@
   ],
   "customers": [
     {
-      "name": "Vinicius Oliveira de Freitas",
-      "phone": "45998530063",
-      "addresses": [
-        {
-          "address": "Rua Pedro Bento Da Silva, 891",
-          "deliveryAreaId": "1"
-        },
-        {
-          "address": "Rua Rio Iguaçu 158",
-          "deliveryAreaId": "2"
-        }
-      ],
-      "updatedAt": "2025-11-01T04:39:24.767Z",
-      "id": 1
-    },
-    {
-      "name": "Eliana Aparecida da Silveira Oliveira",
-      "phone": "47992284390",
-      "addresses": [
-        {
-          "address": "Rua do Gasômetro, 425",
-          "deliveryAreaId": "1"
-        }
-      ],
-      "createdAt": "2025-10-30T04:31:17.312Z",
-      "updatedAt": "2025-10-30T04:31:17.312Z",
-      "id": 2
-    },
-    {
-      "name": "Thaila",
-      "addresses": [
-        {
-          "address": "Rua Mineirão 878",
-          "deliveryAreaId": "1"
-        }
-      ],
-      "updatedAt": "2025-10-30T16:27:15.940Z",
-      "id": 3
-    },
-    {
-      "name": "Thaila Taiane",
-      "phone": "45998461890",
-      "addresses": [
-        {
-          "address": "Rua Mineirão 878",
-          "deliveryAreaId": "1"
-        }
-      ],
-      "updatedAt": "2025-10-30T16:32:11.169Z",
-      "id": 4
-    },
-    {
       "name": "teste",
       "addresses": [],
       "createdAt": "2025-11-01T04:18:44.977Z",
